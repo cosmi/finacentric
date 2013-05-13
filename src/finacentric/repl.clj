@@ -1,8 +1,7 @@
 (ns finacentric.repl
   (:use finacentric.handler
         ring.server.standalone
-        [ring.middleware file-info file])
-  (:require org.httpkit.server))
+        [ring.middleware file-info file]))
 
 (defonce server (atom nil))
 
@@ -33,12 +32,3 @@
 (defn stop-server []
   (.stop @server)
   (reset! server nil))
-
-
-
-(defn -main [& args]
-  (org.httpkit.server/run-server #(apply
-                                   (-> war-handler
-                                       ) %&) {:port 3000})
-  (init)
-  (println "Server started at port 3000."))

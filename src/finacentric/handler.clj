@@ -10,27 +10,27 @@
             [finacentric.models.schema :as schema]
             [taoensso.timbre :as timbre]
             [com.postspectacular.rotor :as rotor]
-            [org.httpkit.server :as http-kit])))
+            [org.httpkit.server :as http-kit]))
 
 (defroutes app-routes
   (route/resources "/")
-  (route/not-found "Not Fround"))
+  (route/not-found "Not Found"))
 
 (defn init
   "runs when the application starts and checks if the database
    schema exists, calls schema/create-tables if not."
   []
   (timbre/set-config!
-    [:appenders :rotor]
-    {:min-level :info
-     :enabled? true
-     :async? false ; should be always false for rotor
-     :max-message-per-msecs nil
-     :fn rotor/append})
+   [:appenders :rotor]
+   {:min-level :info
+    :enabled? true
+    :async? false ; should be always false for rotor
+    :max-message-per-msecs nil
+    :fn rotor/append})
   
   (timbre/set-config!
-    [:shared-appender-config :rotor]
-    {:path "finacentric.log" :max-size (* 512 1024) :backlog 10})
+   [:shared-appender-config :rotor]
+   {:path "finacentric.log" :max-size (* 512 1024) :backlog 10})
   
   (if-not (schema/actualized?)
     (schema/actualize))
@@ -64,10 +64,11 @@
 (defn port [args]
   (if-let [port (first (remove #{"-dev"} args))]
     (Integer/parseInt port)
-    8080))
+    3000))
 
 (defn -main [& args]
   (http-kit/run-server
-    (if (dev? args) (reload/wrap-reload war-handler) war-handler)
-    {:port (port args)})
-  (timbre/info "server started on port"))
+   #(apply #'war-handler %&)
+   ;(if (dev? args) (reload/wrap-reload war-handler) war-handler)
+   {:port (port args)})
+  (timbre/info "server started on port" port))
