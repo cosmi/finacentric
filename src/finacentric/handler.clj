@@ -14,7 +14,7 @@
 
 (defroutes app-routes
   (route/resources "/")
-  (route/not-found "Not Found"))
+  (route/not-found "Not Fround"))
 
 (defn init
   "runs when the application starts and checks if the database
@@ -51,8 +51,6 @@
                      :log-level  :normal
                      :precompiles ["./assets/myfile.js.dieter"]})
 
-(defn dupsko [app]
-  (fn [req] (let [resp (app req)] (prn resp) resp)))
 
 ;;append your application routes to the all-routes vector
 (def all-routes [auth-routes home-routes app-routes])

@@ -8,3 +8,8 @@ pom.xml
 /.lein-*
 /.env
 *.log
+/target-resources
+/repl
+\#*#
+.#*
+*~
