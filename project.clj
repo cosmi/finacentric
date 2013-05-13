@@ -16,6 +16,7 @@
    [korma "0.3.0-RC5"]
    [lobos "1.0.0-beta1"]
    [dieter "0.4.0"]
+   [http-kit "2.1.1"]
    [log4j
     "1.2.15"
     :exclusions

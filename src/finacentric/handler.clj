@@ -9,7 +9,8 @@
             [compojure.route :as route]
             [finacentric.models.schema :as schema]
             [taoensso.timbre :as timbre]
-            [com.postspectacular.rotor :as rotor]))
+            [com.postspectacular.rotor :as rotor]
+            [org.httpkit.server :as http-kit])))
 
 (defroutes app-routes
   (route/resources "/")
@@ -59,3 +60,16 @@
           (middleware/app-handler all-routes)
           (asset-pipeline config-options)))
 (def war-handler app)
+
+(defn dev? [args] (some #{"-dev"} args))
+
+(defn port [args]
+  (if-let [port (first (remove #{"-dev"} args))]
+    (Integer/parseInt port)
+    8080))
+
+(defn -main [& args]
+  (http-kit/run-server
+    (if (dev? args) (reload/wrap-reload war-handler) war-handler)
+    {:port (port args)})
+  (timbre/info "server started on port"))
