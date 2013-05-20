@@ -1,0 +1,55 @@
+
+{% extends "finacentric/views/templates/admin/base.html" %}
+
+
+
+{% block content %}
+
+<table class="table">
+  <caption>Domeny</caption>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Nazwa</th>
+      <th>Domena</th>
+    </tr>
+  </thead>
+  <tbody>
+{% for d in domains %}
+    <tr{% if d.is_active %}{% else %} class="error"{% endif %}>
+      <td>{{d.id}}</td>
+      <td>{{d.name}}</td>
+      <td>{{d.domain}}</td>
+      <td>{%if d.is_active %}<span class="label label-success">Aktywna</span>
+        {% else %} <span class="label label-important">Nieaktywna</span>{% endif %}</td>
+    </tr>
+{% endfor %}
+  </tbody>
+</table>
+
+
+<form method="post">
+  <fieldset>
+    <legend>Dodawanie domeny</legend>
+    <label>Nazwa</label>
+    <input type="text" placeholder="Type something…" name="name" value="{{name}}">    
+    {% if name-error %}
+
+    <div class="error">{{name-error}}</div>
+
+    {% endif %}
+
+    <label>Domena</label>
+    <input type="text" placeholder="Type something…" name="domain" value="{{domain}}">
+    {% if domain-error %}
+
+    <div class="error">{{domain-error}}</div>
+
+    {% endif %}
+    
+  </fieldset>
+  <button type="submit" class="btn">Submit</button>
+</form>
+
+
+{% endblock %}

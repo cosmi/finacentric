@@ -3,36 +3,94 @@
    :exclude [alter drop bigint boolean char double float time])
   (:use (lobos [migration :only [defmigration]] core schema config)))
 
-(defmigration add-users-table
-  (up [] (create
-          (table :users
-                 (integer :id :primary-key :auto-inc)
-                 (varchar :first_name 30)
-                 (varchar :last_name 30)
-                 (varchar :email 40)
-                 (boolean :admin)
-                 (time    :last_login)
-                 (boolean :is_active)
-                 (varchar :pass 100))))
-  (down [] (drop (table :users))))
-
-
-(defmigration add-domain
-  (up []
+(defmigration init-tables
+  (up [] 
       (create
-       (table :domains
+       (table :companies
               (integer :id :primary-key :auto-inc)
-              (varchar :domain 30 :unique)
-              (varchar :name 40 :unique)
-              (boolean :is_active)))
-      (alter :add
-             (table :users 
-                    (integer :domain_id [:refer :domains :id] :not-null)))
+              (varchar :name 50)
+              (varchar :domain 30)))
+      
       (create
-       (index :users :users-email-domain [:email :domain_id] :unique)))
+       (table :users
+              (integer :id :primary-key :auto-inc)
+              (varchar :first_name 30)
+              (varchar :last_name 30)
+              (varchar :email 40)
+              (boolean :admin)
+              (time    :last_login)
+              (boolean :is_active (default true))
+              (varchar :pass 100)
+              (varchar :salt 100)
+              (integer :company_id [:refer :companies :id])))
+      
+      (create
+       (table :suppliers
+              (integer :seller_id [:refer :companies :id])
+              (integer :buyer_id [:refer :companies :id])
+              (primary-key [:seller_id :buyer_id])))
+      
+      (create
+       (table :company_datas
+              (integer :id :primary-key :auto-inc)
+              (integer :company_id [:refer :companies :id])
+              (varchar :company_name 30)
+              (varchar :nip 10)
+              (varchar :regon 40)
+              (varchar :address 100)
+              (varchar :bank_data 100)))
+      
+      (alter :add
+             (table :companies 
+                    (integer :data_id [:refer :company_datas :id])))
+      
+      (create
+       (table :invoices
+              (integer :id :primary-key :auto-inc)
+              (integer :seller_id [:refer :companies :id])
+              (integer :buyer_id [:refer :companies :id])
+              (integer :seller_data_id [:refer :company_datas :id])
+              (integer :buyer_data_id [:refer :company_datas :id])
+              (varchar :number 30)
+              (unique [:seller_id :number])
+              (date :issue_date)
+              (date :sell_date)
+              (date :payment_date)
+              (varchar :payment_mode 30)
+              (decimal :paid_already 17 4)
+              (decimal :net_total 17 4)
+              (decimal :gross_total 17 4)
+              
+              (varchar :extra 500)
+
+              (decimal :allowed_discount_rate 7 4)
+              (decimal :discounted_payment_date 7 4)
+              (decimal :discount_rate 7 4)
+              (decimal :discounted_net_total 17 4)
+              (decimal :discounted_gross_total 17 4)
+
+              (boolean :accepted)
+              (boolean :discount_accepted)))
+
+      (create
+       (table :invoice_lines
+              (integer :invoice_id [:refer :invoices :id])
+              (integer :position)
+              (primary-key [:invoice_id :position])
+              (varchar :name 60)
+              (decimal :amount 17 4)
+              (varchar :unit 10)
+              (decimal :net_unit_price 17 4)
+              (decimal :net_price 17 4)
+              (decimal :gross_unit_price 17 4)
+              (decimal :gross_price 17 4)
+              (decimal :vat 5 2)
+              (varchar :extra 500))))
   (down []
-        (drop (index :users :users-email-domain))
-        (alter :drop
-               (table :users
-                      (column :domain_id)))
-        (drop (table :domains))))
+        (drop (table :users) :cascade)
+        (drop (table :invoices) :cascade)
+        (drop (table :invoice_lines) :cascade)
+        (drop (table :companies) :cascade)
+        (drop (table :company_datas) :cascade)
+        (drop (table :suppliers) :cascade)))
+
