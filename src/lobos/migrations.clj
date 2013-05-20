@@ -27,12 +27,12 @@
               (boolean :is_active)))
       (alter :add
              (table :users 
-                    (integer :domain-id [:refer :domains :id] :not-null)))
+                    (integer :domain_id [:refer :domains :id] :not-null)))
       (create
-       (index :users :users-email-domain [:email :domain-id] :unique)))
+       (index :users :users-email-domain [:email :domain_id] :unique)))
   (down []
         (drop (index :users :users-email-domain))
         (alter :drop
                (table :users
-                      (column :domain-id)))
+                      (column :domain_id)))
         (drop (table :domains))))

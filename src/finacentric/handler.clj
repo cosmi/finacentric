@@ -1,6 +1,7 @@
 (ns finacentric.handler
   (:use finacentric.routes.auth
         finacentric.routes.home
+        finacentric.routes.admin
         [dieter.core :only [asset-pipeline]]
         [ring.middleware.file-info :only [wrap-file-info]]
         compojure.core)
@@ -9,6 +10,7 @@
             [compojure.route :as route]
             [finacentric.models.schema :as schema]
             [taoensso.timbre :as timbre]
+            [ring.middleware.reload :as reload]
             [com.postspectacular.rotor :as rotor]
             [org.httpkit.server :as http-kit]))
 
@@ -53,7 +55,7 @@
 
 
 ;;append your application routes to the all-routes vector
-(def all-routes [auth-routes home-routes app-routes])
+(def all-routes [auth-routes home-routes admin-routes app-routes ])
 (def app (->
           (middleware/app-handler all-routes)
           (asset-pipeline config-options)))
@@ -69,7 +71,8 @@
 (defn -main [& args]
   (init)
   (http-kit/run-server
-   #(apply #'war-handler %&)
-   ;(if (dev? args) (reload/wrap-reload war-handler) war-handler)
+   ;(if (dev? args)
+     (reload/wrap-reload #(apply #'war-handler %&))
+    ; war-handler)
    {:port (port args)})
   (timbre/info "server started on port" port))

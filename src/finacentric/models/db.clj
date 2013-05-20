@@ -5,11 +5,17 @@
 
 (defdb db schema/db-spec)
 
-(defentity users)
+(declare users domains)
+
+
+(defentity users
+  (belongs-to domains))
 
 (defn create-user [user]
   (insert users
           (values user)))
+
+
 
 (defn update-user [id first-name last-name email]
   (update users
@@ -22,3 +28,12 @@
   (first (select users
                  (where {:id id})
                  (limit 1))))
+
+
+(defentity domains
+  (entity-fields :id :name :domain :is_active)
+  (has-many users))
+
+(defn create-domain [domain]
+  (insert domains
+    (values domain)))
