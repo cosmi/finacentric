@@ -67,6 +67,7 @@
     3000))
 
 (defn -main [& args]
+  (init)
   (http-kit/run-server
    #(apply #'war-handler %&)
    ;(if (dev? args) (reload/wrap-reload war-handler) war-handler)
