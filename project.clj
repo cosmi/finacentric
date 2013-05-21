@@ -33,7 +33,9 @@
              :dev
              {:ring {:nrepl {:start? true :port 6060}
                      :open-browser? false}
-              :dependencies [[ring-mock "0.1.3"] [ring/ring-devel "1.1.8"]]}}
+              :dependencies [[ring-mock "0.1.3"]
+                             [ring/ring-devel "1.1.8"]
+                             [clojure-complete "0.2.2"]]}}
   :url "http://example.com/FIXME"
   :plugins [[lein-ring "0.8.5"]]
   :description "FIXME: write description"
