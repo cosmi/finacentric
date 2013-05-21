@@ -21,7 +21,7 @@
       <td>{{c.id}}</td>
       <td>{{c.name}}</td>
       <td>{{c.domain}}</td>
-      <td><a href="?id={{c.id}}">edycja</a> <a class="ajaxify" href='#' data-url="companies/delete?id={{c.id}}">usuwanie</a></td>
+      <td><a href="?id={{c.id}}">edycja</a> <a class="ajaxify" href='#' data-modal-header="Jesteś pewny?" data-modal-body="Czy na pewno chcesz usunąć element?" data-modal-confirm="Tak" data-modal-cancel="Nie" data-url="companies/delete?id={{c.id}}">usuwanie</a></td>
     </tr>
 {% endfor %}
   </tbody>
