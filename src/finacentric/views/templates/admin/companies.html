@@ -33,18 +33,18 @@
     <legend>{% if values.id %} Edycja domeny {% else %}Dodawanie domeny {% endif %}</legend>
     {% if values.id %}<input type="hidden" value="{{values.id}}" name="id">{% endif %}
     <label>Nazwa</label>
-    <input type="text" placeholder="Type something…" name="name" value="{{values.name}}">    
-    {% if errors.name %}
+    <input type="text" placeholder="Type something…" name="name" value="{{v.name}}">    
+    {% if e.name %}
 
-    <div class="error">{{errors.name}}</div>
+    <div class="error">{{e.name}}</div>
 
     {% endif %}
 
     <label>Domena</label>
-    <input type="text" placeholder="Type something…" name="domain" value="{{values.domain}}">
-    {% if errors.domain %}
+    <input type="text" placeholder="Type something…" name="domain" value="{{v.domain}}">
+    {% if e.domain %}
 
-    <div class="error">{{errors.domain}}</div>
+    <div class="error">{{e.domain}}</div>
 
     {% endif %}
     

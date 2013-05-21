@@ -15,8 +15,8 @@
        (table :users
               (integer :id :primary-key :auto-inc)
               (varchar :first_name 30)
-              (varchar :last_name 30)
-              (varchar :email 40)
+              (varchar :last_name 40)
+              (varchar :email 50)
               (boolean :admin)
               (time    :last_login)
               (boolean :is_active (default true))

@@ -16,6 +16,7 @@
                  [lobos "1.0.0-beta1"]
                  [dieter "0.4.0"]
                  [http-kit "2.1.1"]
+                 [hiccup "1.0.3"]
                  [log4j
                   "1.2.15"
                   :exclusions

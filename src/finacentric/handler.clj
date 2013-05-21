@@ -12,7 +12,8 @@
             [taoensso.timbre :as timbre]
             [ring.middleware.reload :as reload]
             [com.postspectacular.rotor :as rotor]
-            [org.httpkit.server :as http-kit]))
+            [org.httpkit.server :as http-kit]
+            finacentric.validation))
 
 (defroutes app-routes
   (route/resources "/")
@@ -70,6 +71,7 @@
 (def all-routes [auth-routes home-routes admin-routes app-routes ])
 (def app (->
           (middleware/app-handler all-routes)
+          (finacentric.validation/wrap-validation)
           (asset-pipeline config-options)
           asset-fixpath))
 (def war-handler app)
