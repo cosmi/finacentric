@@ -5,6 +5,14 @@
 
 (defdb db schema/db-spec)
 
+(defn page [query page-no per-page]
+  (-> query
+      (offset (* page-no per-page))
+      (limit per-page)))
+
+(defmacro select-one [ent & body]
+  `(first (select ~ent (limit 1) ~@body)))
+
 (declare companies users company_datas invoices invoices-send invoices-recv invoice_lines)
 
 (defentity users
@@ -76,10 +84,11 @@
   )
 
 
-(defentity domains
-  (entity-fields :id :name :domain :is_active)
-  (has-many users))
+(defn create-company [data]
+  (insert companies
+    (values data)))
 
-(defn create-domain [domain]
-  (insert domains
-    (values domain)))
+(defn update-company [id data]
+  (update companies
+    (where {:id id})
+    (set-fields data)))

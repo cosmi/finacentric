@@ -9,7 +9,7 @@
        (table :companies
               (integer :id :primary-key :auto-inc)
               (varchar :name 50)
-              (varchar :domain 30)))
+              (varchar :domain 30 :unique)))
       
       (create
        (table :users

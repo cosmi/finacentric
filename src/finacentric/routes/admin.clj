@@ -1,5 +1,6 @@
 (ns finacentric.routes.admin
   (:use compojure.core)
+  (:use finacentric.util)
   (:require [finacentric.views.layout :as layout]
             [noir.session :as session]
             [noir.response :as resp]
@@ -10,44 +11,59 @@
 
 
 
-(defn valid-domain? [name domain]
+
+
+(defn valid-company [{:keys [name domain]}]
   (vali/rule (vali/min-length? name 5)
              [:name "Nazwa musi mieć conajmniej pięć literek"])
   (vali/rule (vali/max-length? name 40)
              [:name "Nazwa może mieć maksymalnie 40 literek"])
-  (vali/rule (vali/min-length? domain 4)
-             [:domain "Domena musi mieć 4 literki"])
-  (vali/rule (vali/max-length? domain 30)
-             [:domain "Domena musi mieć co najwyżej 30 literek"])
-  (not (vali/errors? :name :domain)))
+  (when (not-empty domain)
+    (vali/rule (vali/min-length? domain 4)
+               [:domain "Domena musi mieć 4 literki"])
+    (vali/rule (vali/max-length? domain 30)
+               [:domain "Domena musi mieć co najwyżej 30 literek"])
+    (vali/rule (re-matches #"[a-z0-9]+" domain)
+               [:domain "Domena może się składać wyłącznie z małych liter oraz cyfr"]))
+  (when (not (vali/errors? :name :domain))
+    {:name name :domain (not-empty domain)}))
 
 
 
-(defn domains [& [name domain]]
+(defn companies [page-no & [{:keys [name domain] :as params}]]
   (layout/render
-    "admin/domains.html" {:domains (korma/select db/domains)
-                          :domain-error (vali/on-error :domain first)
-                          :name-error (vali/on-error :name first)
-                          :name name
-                          :domain domain}))
+    "admin/companies.html" {:companies (korma/select db/companies (db/page page-no 50) (korma/order :id))
+                            :errors {:domain  (vali/on-error :domain first)
+                                     :name (vali/on-error :name first)}
+                            :values params}))
 
 (defroutes admin-routes
   (context "/admin" {:as request}
-    (GET "/domains" []
-      (domains)
-      )
+    (GET "/companies" []
+      (with-pagination page-no
+        (with-integer id
+          (companies page-no (when id (db/select-one db/companies (korma/where {:id id}))))
+        )))
 
-    (POST "/domains" [name domain]
-       (if (valid-domain? name domain)
-         (try
-           (do
-             (db/create-domain {:name name :domain domain})
-             (resp/redirect (request :uri)))
-           (catch Exception ex
-             (vali/rule false [:name (.getMessage ex)])
-             (domains)))
-         (domains name domain)
-         ))
+    (POST "/companies/delete" {params :params}
+      (with-integer id
+        (korma/delete db/companies (korma/where {:id id}))
+        ))
 
-    )
-  )
+    (POST "/companies" {params :params}
+      (with-pagination page-no
+        (with-integer id
+          (let [params (select-keys params [:name :domain])]
+            (if-let [company (valid-company params)]
+              (try
+                (do
+                  (if id
+                    (db/update-company id company)
+                    (db/create-company company))
+                  (resp/redirect (request :uri)))
+                (catch Exception ex
+                  (vali/rule false [:name (.getMessage ex)])
+                  (companies page-no params)))
+              (companies page-no params)
+              )))))))
+  
