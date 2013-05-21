@@ -10,10 +10,19 @@
 (defentity users
   (belongs-to companies))
 
+(defentity buyers
+  (table :suppliers :buyers)
+  (belongs-to companies {:fk :buyer_id}))
+
+(defentity sellers
+  (table :suppliers :sellers)
+  (belongs-to companies {:fk :seller_id}))
+
 (defentity companies
   (has-many users)
   (belongs-to company_datas {:fk :data_id}) ;; Single current company data
-  (many-to-many companies :suppliers {:lfk :seller_id :rfk :buyer_id})
+  (has-many buyers {:fk :seller_id})
+  (has-many sellers {:fk :buyer_id})
   (has-many invoices-send {:fk :seller_id})
   (has-many invoices-recv {:fk :buyer_id}))
 
