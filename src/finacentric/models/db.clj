@@ -5,34 +5,44 @@
 
 (defdb db schema/db-spec)
 
-(declare companies users suppliers company_datas invoices invoice_lines)
+(declare companies users company_datas invoices invoices-send invoices-recv invoice_lines)
 
 (defentity users
   (belongs-to companies))
 
 (defentity companies
   (has-many users)
-  (has-many company_datas)
   (belongs-to company_datas {:fk :data_id}) ;; Single current company data
   (many-to-many companies :suppliers {:lfk :seller_id :rfk :buyer_id})
-  (has-many invoices {:fk :seller_id})
-  (has-many invoices {:fk :buyer_id}))
+  (has-many invoices-send {:fk :seller_id})
+  (has-many invoices-recv {:fk :buyer_id}))
 
-(defentity suppliers
-  (belongs-to companies {:fk :seller_id})
-  (belongs-to companies {:fk :buyer_id}))
+(defentity company_datas)
 
-(defentity company_datas
-  (belongs-to companies)
-  (has-many invoices {:fk :seller_data_id})
-  (has-many invoices {:fk :buyer_data_id}))
+(defentity seller_company
+  (table :companies :seller_company))
+
+(defentity buyer_company
+  (table :companies :buyer_company))
+
+(defentity seller_data
+  (table :company_datas :seller_data))
+
+(defentity buyer_data
+  (table :company_datas :buyer_data))
 
 (defentity invoices
-  (belongs-to companies {:fk :seller_id})
-  (belongs-to companies {:fk :buyer_id})
-  (belongs-to company_datas {:fk :seller_data_id})
-  (belongs-to company_datas {:fk :buyer_data_id})
+  (belongs-to seller_company {:fk :seller_id})
+  (belongs-to buyer_company {:fk :buyer_id})
+  (belongs-to seller_data {:fk :seller_data_id})
+  (belongs-to buyer_data {:fk :buyer_data_id})
   (has-many invoice_lines))
+
+(defentity invoices-send
+  (table :invoices :invoices-send))
+
+(defentity invoices-recv
+  (table :invoices :invoices-recv))
 
 (defentity invoice_lines
   (belongs-to invoices))
@@ -41,8 +51,6 @@
   ;; (insert users
   ;;         (values user))
   )
-
-
 
 (defn update-user [id first-name last-name email]
   ;;   (update users
