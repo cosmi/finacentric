@@ -54,11 +54,24 @@
                      :precompiles ["./assets/myfile.js.dieter"]})
 
 
+(defn asset-fixpath-newuri [uri]
+  (when (re-matches #"^/assets/.*" uri)
+    (cond (re-matches #".*\.js" uri) (str uri ".coffee")
+          (re-matches #".*\.css" uri) (clojure.string/replace uri ".css" ".less"))))
+
+(def asset-fixpath
+  (fn [app]
+    (fn [req]
+      (if-let [new-uri (asset-fixpath-newuri (req :uri))]
+        (app (assoc req :uri new-uri))
+        (app req)))))
+
 ;;append your application routes to the all-routes vector
 (def all-routes [auth-routes home-routes admin-routes app-routes ])
 (def app (->
           (middleware/app-handler all-routes)
-          (asset-pipeline config-options)))
+          (asset-pipeline config-options)
+          asset-fixpath))
 (def war-handler app)
 
 (defn dev? [args] (some #{"-dev"} args))
