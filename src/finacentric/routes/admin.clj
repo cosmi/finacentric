@@ -53,9 +53,9 @@
 ;;                                  :name (vali/on-error :name first)}
 ;;                         :values params}))
 
-(defn layout [content]
- (layout/render
-  "admin/base.html" {:content content}))
+(defn layout [& content]
+  (layout/render
+   "admin/base.html" {:content (apply str content)}))
 
 (defn object-table [fields methods objects ]
   (hiccup/html [:table.table
@@ -71,9 +71,9 @@
                             (interpose " "
                                        (for [[k, v] methods]
                                          (if (-> k name last (= \!))
-                                           [:a {:data-url (str (name k) "?id="(get o :id))
+                                           [:a {:data-url (str (get o :id)"/"(name k))
                                                 :class "ajaxify" :href "#"} v]
-                                           [:a {:href (str (name k) "?id="(get o :id))} v])
+                                           [:a {:href (str (get o :id)"/"(name k))} v])
                                          ))]
                            ])]]))
 
@@ -84,16 +84,17 @@
 ;  <fieldset>
  ;   <legend>Dodawanie domeny </legend>
 
-(defn company-form [input]
-  (form-wrapper 
+(defn company-form [input errors]
+  (form-wrapper
    (with-input input
-     (text-input :name "Nazwa" 40)
-     (text-input :domain "Domena" 30)
-     )))
+     (with-errors errors
+       (text-input :name "Nazwa" 40)
+       (text-input :domain "Domena" 30)
+       ))))
 
 
 
-(defmacro object-routes [entity table-fields methods]
+(defmacro object-routes [entity table-fields methods validator entity-form]
   (let [table-fields (eval table-fields)
         methods (eval methods)]
     `(routes
@@ -102,20 +103,41 @@
            (layout
             (object-table ~table-fields ~methods
                           (korma/select ~entity (db/page page-no# 50)))
+            (hiccup/html [:a {:href "new"} "Nowy element"])
                                         ;page-no# (when id (db/select-one ~entity (korma/where {:id id}))))
             )))
-       ~@(when (get methods :delete!)
-          [`(POST "/delete" []
-             (with-integer ~'id
-               (korma/delete ~entity (korma/where {:id ~'id}))))])
+       (context ["/:id", :id #"[0-9]+"]  {{~'id :id} :params :as request#}
+         (with-integer ~'id
+           (prn :!!id ~'id (-> noir.request/*request* ))
+           (routes
+         ~@(when (get methods :delete!)
+             [`(POST "/delete" []
+                   (korma/delete ~entity (korma/where {:id ~'id})))])
 
-       ~@(when (get methods :edit)
-          [`(GET "/edit" []
-             (with-integer ~'id
-               (layout
-                (company-form
-                 (db/select-one ~entity (korma/where {:id ~'id}))))))])
-       )))
+         ~@(when (get methods :edit)
+             [`(GET "/edit" []
+                 (prn :IDD ~'id)
+                 (layout
+                  (~entity-form
+                   (db/select-one ~entity (korma/where {:id ~'id})) nil)))
+              `(POST "/edit" {params# :params :as request#}
+                 (if-let [obj# (validates? ~validator params#)]
+                   (and (korma/update ~entity (korma/where {:id ~'id}) (korma/set-fields obj#))
+                        (resp/redirect "list"))
+                   (layout
+                    (~entity-form params# (get-errors)))
+                   ))]))))
+
+       (GET "/new" []
+         (layout
+          (~entity-form nil nil)))
+       (POST "/new" {params# :params :as request#}
+         (if-let [obj# (validates? ~validator params#)]
+           (and (korma/insert ~entity (korma/values [obj#]))
+                (resp/redirect "list"))
+           (layout
+            (~entity-form params# (get-errors)))
+           )))))
 
 
 
@@ -134,7 +156,8 @@
     (context "/cps" []
       (object-routes db/companies
                      (array-map :id "#" :name "Nazwa" :domain "Domena")
-                     (array-map :delete! "Usuń" :edit "Edytuj")))
+                     (array-map :delete! "Usuń" :edit "Edytuj")
+                     valid-company company-form))
 
     (POST "/companies" {params :params}
       (with-pagination page-no

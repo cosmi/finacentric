@@ -25,10 +25,12 @@
      ))
 
 (defmacro with-integer [id & body]
-  `(let [~id (-> noir.request/*request* :params ~(-> id name keyword))
-         ~id (when ~id (Integer/parseInt ~id))]
-     ~@body
-     ))
+  (if (contains? &env id) ;; if there is a local variable id, then use it, otherwise get one from *request*
+    `(let [~id (when ~id (Integer/parseInt ~id))]
+       ~@body)
+    `(let [~id (-> noir.request/*request* :params ~(-> id name keyword))
+           ~id (when ~id (Integer/parseInt ~id))]
+       ~@body)))
 
 
 
