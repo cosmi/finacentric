@@ -33,6 +33,7 @@
   `(binding [*input* ~input]
      (list
       ~@body)))
+
 (defmacro with-errors [errors & body]
   `(binding [*errors* ~errors]
      (list

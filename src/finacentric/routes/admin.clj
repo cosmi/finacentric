@@ -50,43 +50,43 @@
 (defmacro object-routes [entity table-fields methods validator entity-form]
   `(routes
     (GET "/list" []
-       (with-pagination page-no#
-         (layout
-          (object-table ~table-fields ~methods
-                        (korma/select ~entity (db/page page-no# 50)))
-          (hiccup/html [:a {:href "new"} "Nowy element"])
+         (with-pagination page-no#
+           (layout
+            (object-table ~table-fields ~methods
+                          (korma/select ~entity (db/page page-no# 50)))
+            (hiccup/html [:a {:href "new"} "Nowy element"])
                                         ;page-no# (when id (db/select-one ~entity (korma/where {:id id}))))
-          )))
-     (context ["/:id", :id #"[0-9]+"]  {{~'id :id} :params :as request#}
-       (with-integer ~'id
-         (routes
-           ~@(when (not-empty (filter #(when (sequential? %) (-> % first (= :delete!) )) methods))
-               [`(POST "/delete" []
-                   (korma/delete ~entity (korma/where {:id ~'id})))])
+            )))
+    (context ["/:id", :id #"[0-9]+"]  {{~'id :id} :params :as request#}
+             (with-integer ~'id
+               (routes
+                ~@(when (not-empty (filter #(when (sequential? %) (-> % first (= :delete!) )) methods))
+                    [`(POST "/delete" []
+                            (korma/delete ~entity (korma/where {:id ~'id})))])
 
-           ~@(when (not-empty (filter #(when (sequential? %) (-> % first (= :edit) )) methods))
-               [`(GET "/edit" []
-                   (prn :IDD ~'id)
-                   (layout
-                    (~entity-form
-                     (db/select-one ~entity (korma/where {:id ~'id})) nil)))
-                `(POST "/edit" {params# :params :as request#}
-                   (if-let [obj# (validates? ~validator params#)]
-                     (and (korma/update ~entity (korma/where {:id ~'id}) (korma/set-fields obj#))
-                          (resp/redirect "list"))
-                     (layout
-                      (~entity-form params# (get-errors)))
-                     ))]))))
+                ~@(when (not-empty (filter #(when (sequential? %) (-> % first (= :edit) )) methods))
+                    [`(GET "/edit" []
+                           (prn :IDD ~'id)
+                           (layout
+                            (~entity-form
+                             (db/select-one ~entity (korma/where {:id ~'id})) nil)))
+                     `(POST "/edit" {params# :params :as request#}
+                            (if-let [obj# (validates? ~validator params#)]
+                              (and (korma/update ~entity (korma/where {:id ~'id}) (korma/set-fields obj#))
+                                   (resp/redirect "list"))
+                              (layout
+                               (~entity-form params# (get-errors)))
+                              ))]))))
 
-     (GET "/new" []
-       (layout
-        (~entity-form nil nil)))
-     (POST "/new" {params# :params :as request#}
-       (if-let [obj# (validates? ~validator params#)]
-         (and (korma/insert ~entity (korma/values [obj#]))
-              (resp/redirect "list"))
+    (GET "/new" []
          (layout
-          (~entity-form params# (get-errors)))))))
+          (~entity-form nil nil)))
+    (POST "/new" {params# :params :as request#}
+          (if-let [obj# (validates? ~validator params#)]
+            (and (korma/insert ~entity (korma/values [obj#]))
+                 (resp/redirect "list"))
+            (layout
+             (~entity-form params# (get-errors)))))))
 
 
 
@@ -102,9 +102,7 @@
    (with-input input
      (with-errors errors
        (text-input :name "Nazwa" 40)
-       (text-input :domain "Domena" 30)
-       ))))
-
+       (text-input :domain "Domena" 30)))))
 
 (defvalidator valid-user
   (rule :first_name (<= 2 (count _) 30) "Imię powinno mieć 2 do 30 znaków")
@@ -124,26 +122,25 @@
 
 (defroutes admin-routes
   (context "/admin" {:as request}
-    (context "/companies" []
-      (object-routes db/companies
-                     (array-map :id "#" :name "Nazwa" :domain "Domena")
-                     (array-map :delete! "Usuń" :edit "Edytuj")
-                     valid-company company-form))
-    (context "/users" []
-      (object-routes db/users
-                     [[:id "#"] [:first_name "Imię"] [:last_name "Nazwisko"] [:email "Email"]]
-                     [[:delete! "Usuń"] [:edit "Edytuj"] #(if-not (% :admin)
-                                                            [:admin-set! "Uczyń adminem"]
-                                                            [:admin-unset! "Nie admin"])]
-                     valid-user user-form)
+           (context "/companies" []
+                    (object-routes db/companies
+                                   (array-map :id "#" :name "Nazwa" :domain "Domena")
+                                   (array-map :delete! "Usuń" :edit "Edytuj")
+                                   valid-company company-form))
+           (context "/users" []
+                    (object-routes db/users
+                                   [[:id "#"] [:first_name "Imię"] [:last_name "Nazwisko"] [:email "Email"]]
+                                   [[:delete! "Usuń"] [:edit "Edytuj"] #(if-not (% :admin)
+                                                                          [:admin-set! "Uczyń adminem"]
+                                                                          [:admin-unset! "Nie admin"])]
+                                   valid-user user-form)
 
-     (context ["/:id", :id #"[0-9]+"] [id]
-       (with-integer id
-         (routes
-           (POST "/admin-set" []
-             (korma/update db/users (korma/where {:id id})
-                           (korma/set-fields {:admin true})))
-           (POST "/admin-unset" []
-             (korma/update db/users (korma/where {:id id})
-                           (korma/set-fields {:admin false})))))))))
-  
+                    (context ["/:id", :id #"[0-9]+"] [id]
+                             (with-integer id
+                               (routes
+                                (POST "/admin-set" []
+                                      (korma/update db/users (korma/where {:id id})
+                                                    (korma/set-fields {:admin true})))
+                                (POST "/admin-unset" []
+                                      (korma/update db/users (korma/where {:id id})
+                                                    (korma/set-fields {:admin false})))))))))
