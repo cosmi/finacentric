@@ -1,7 +1,9 @@
 (ns finacentric.util
+  (:use [compojure.core])
   (:require [noir.io :as io]
             [markdown.core :as md]
-            [noir.request]))
+            [noir.request]
+            ))
 
 (defn format-time
   "formats the time using SimpleDateFormat, the default format is
@@ -24,6 +26,12 @@
      ~@body
      ))
 
+(defmacro with-page-size [default page-size & body]
+  `(let [~page-size (-> noir.request/*request* :params ~(-> page-size name keyword))
+         ~page-size (or (when ~page-size (Integer/parseInt ~page-size)) ~default)]
+     ~@body
+     ))
+
 (defmacro with-integer [id & body]
   (if (contains? &env id) ;; if there is a local variable id, then use it, otherwise get one from *request*
     `(let [~id (when ~id (Integer/parseInt ~id))]
@@ -34,3 +42,12 @@
 
 
 
+
+(defmacro id-context [id & body]
+  `(context ["/:id", :id #"[0-9]+"]  {{~id :id} :params}
+     (with-integer ~id
+       (routes ~@body))))
+
+(defn current-url []
+  (noir.request/*request* :uri)
+  )

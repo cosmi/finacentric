@@ -1,6 +1,6 @@
 (ns finacentric.models.db
-  (:use korma.core
-        [korma.db :only (defdb)])
+  (:use [korma.core :as korma]
+        [korma.db :only (defdb transaction)])
   (:require [finacentric.models.schema :as schema]))
 
 (defdb db schema/db-spec)
@@ -17,6 +17,14 @@
 
 (defentity users
   (belongs-to companies))
+
+(defentity users
+  (belongs-to companies))
+
+(defentity admins
+  (table (subselect users
+            (where {:admin true}))
+         :admins))
 
 (defentity buyers
   (table :suppliers :buyers)
@@ -84,9 +92,20 @@
   )
 
 
-(defn create-company [data]
-  (insert companies
-    (values data)))
+(defn users-pin-to-company [user-id company-id]
+  (korma/update users (korma/where {:id user-id})
+                (korma/set-fields {:company_id company-id}))
+  )
+(defn users-set-admin-state [user-id state]
+  (korma/update users (korma/where {:id user-id})
+                (korma/set-fields {:admin state})))
+
+(defn create-company-for-user [user-id data]
+  (transaction
+    (let [company-id (-> (insert companies (values data)) :id)]
+      (update users (korma/where {:id user-id})
+              (set-fields {:company_id company-id})))))
+
 
 (defn update-company [id data]
   (update companies

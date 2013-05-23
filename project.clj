@@ -2,6 +2,7 @@
   finacentric
   "0.1.0-SNAPSHOT"
   :dependencies [[org.clojure/clojure "1.5.1"]
+                 [org.clojure/data.json "0.2.2"]
                  [lib-noir "0.5.2"]
                  [compojure "1.1.5"]
                  [ring-server "0.2.8"]

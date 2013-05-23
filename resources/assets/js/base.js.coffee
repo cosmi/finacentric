@@ -21,7 +21,7 @@ confirmationModal = ($el, fun) ->
   $modal.on 'click', '.btn-primary', fun
   $modal.modal 'show'
 
-handleResponse = ($el, response, status, xhr) ->
+handleResponse = ($el, response, status, xhr, requestUrl) ->
   console.log $el, response, status, xhr
   type = xhr.getResponseHeader "Content-Type"
   if type? and type.indexOf("json") != -1
@@ -31,7 +31,9 @@ handleResponse = ($el, response, status, xhr) ->
           console.log entry.content
         when "reload"
           window.location.reload false
-  reload = if $el.hasClass('no-reload') then false else true;
+        when "redirect"
+          window.location.href = entry.url
+  reload = if $el.hasClass('no-reload') then false else response.length==0;
   if reload then window.location.reload false
 
 $(document).ready ->
@@ -43,8 +45,8 @@ $(document).ready ->
     $element = $(this);
     process = () ->
       $.post(url, data, (data, status, xhr) ->
-        handleResponse($element, data, status, xhr)).fail (xhr, status, error) ->
-        handleResponse($element, xhr.responseText, status, xhr);
+        handleResponse($element, data, status, xhr, url)).fail (xhr, status, error) ->
+        handleResponse($element, xhr.responseText, status, xhr, url);
     if $element.data('modal-header')?
       confirmationModal($element, process);
     else
