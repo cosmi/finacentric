@@ -12,33 +12,6 @@
             [hiccup.core :as hiccup]
             [korma.core :as korma]))
 
-;; (defvalidator valid-user
-;;    (rule :first_name (< 2 (count _) 5) "Za krutki penis, Kielce!")
-;;    (when (not-empty (*input* :domain))
-;;      (
-;;    )
-
-
-;; (defn valid-user [{:keys [first_name last_name email] :as params}]
-;;   (vali/rule (<= 2 (count first_name) 30)
-;;              [:first_name "Imię powinno mieć 2 do 30 znaków"])
-;;   (vali/rule (<= 2 (count last_name) 40)
-;;              [:last_name "Nazwisko powinno mieć 2 do 30 znaków"])
-;;   (vali/rule (vali/is-email? email)
-;;              [:email "Zły format adresu email"])
-;;   (vali/rule (<= (count email) 50)
-;;              [:last_name "Email nie powinien mieć więcej niż 50 znaków"])
-;;   (when (not (vali/errors? :first_name :last_name :email))
-;;     (select-keys params [:first_name :last_name :email])))
-
-
-
-;; (defn companies [page-no & [params]]
-;;   (layout/render
-;;     "admin/companies.html" {:companies (korma/select db/companies (db/page page-no 50) (korma/order :id))
-;;                             :e (get-errors)
-;;                             :v params}))
-
 (defn layout [& content]
   (layout/render
    "admin/base.html" {:content (apply str content)}))
@@ -76,7 +49,7 @@
 
 (defmacro object-routes [entity table-fields methods validator entity-form]
   `(routes
-     (GET "/list" []
+    (GET "/list" []
        (with-pagination page-no#
          (layout
           (object-table ~table-fields ~methods
@@ -86,13 +59,12 @@
           )))
      (context ["/:id", :id #"[0-9]+"]  {{~'id :id} :params :as request#}
        (with-integer ~'id
-         (prn :!!id ~'id (-> noir.request/*request* ))
          (routes
-           ~@(when (not-empty (filter #(when (seq? %) (-> % first (= :delete!) )) methods))
+           ~@(when (not-empty (filter #(when (sequential? %) (-> % first (= :delete!) )) methods))
                [`(POST "/delete" []
                    (korma/delete ~entity (korma/where {:id ~'id})))])
 
-           ~@(when (not-empty (filter #(when (seq? %) (-> % first (= :edit) )) methods))
+           ~@(when (not-empty (filter #(when (sequential? %) (-> % first (= :edit) )) methods))
                [`(GET "/edit" []
                    (prn :IDD ~'id)
                    (layout
@@ -114,9 +86,7 @@
          (and (korma/insert ~entity (korma/values [obj#]))
               (resp/redirect "list"))
          (layout
-          (~entity-form params# (get-errors)))
-         ))))
-
+          (~entity-form params# (get-errors)))))))
 
 
 
@@ -148,25 +118,12 @@
      (with-errors errors
        (text-input :first_name "Imię" 30)
        (text-input :last_name "Nazwisko" 40)
-       (text-input :email "Adres email" 50)
-       ))))
-
-
+       (text-input :email "Adres email" 50)))))
 
 
 
 (defroutes admin-routes
   (context "/admin" {:as request}
-    ;; (GET "/companies" []
-    ;;   (with-pagination page-no
-    ;;     (with-integer id
-    ;;       (companies page-no (when id (db/select-one db/companies (korma/where {:id id}))))
-    ;;     )))
-
-    ;; (POST "/companies/delete" {params :params}
-    ;;   (with-integer id
-    ;;     (korma/delete db/companies (korma/where {:id id}))
-    ;;     ))
     (context "/companies" []
       (object-routes db/companies
                      (array-map :id "#" :name "Nazwa" :domain "Domena")
@@ -185,27 +142,8 @@
          (routes
            (POST "/admin-set" []
              (korma/update db/users (korma/where {:id id})
-                           (korma/set-fields {:admin true}))
-             )
+                           (korma/set-fields {:admin true})))
            (POST "/admin-unset" []
              (korma/update db/users (korma/where {:id id})
-                           (korma/set-fields {:admin false}))
-             )
-           ))))))
-
-    ;; (POST "/companies" {params :params}
-    ;;   (with-pagination page-no
-    ;;     (with-integer id
-    ;;       (if-let [company (validates? valid-company params)]
-    ;;         (try
-    ;;           (do
-    ;;             (if id
-    ;;               (db/update-company id company)
-    ;;               (db/create-company company))
-    ;;             (resp/redirect (request :uri)))
-    ;;           (catch Exception ex
-    ;;             (set-error! :name (.getMessage ex))
-    ;;             (companies page-no params)))
-    ;;         (companies page-no params)
-    ;;         ))))))
+                           (korma/set-fields {:admin false})))))))))
   
