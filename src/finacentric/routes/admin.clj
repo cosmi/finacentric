@@ -47,13 +47,13 @@
                 [:button {:type "submit" :class "btn"} "OK"]]))
 
 
-(defmacro object-routes [entity table-fields methods validator entity-form]
+(defmacro object-routes* [entity table-fields methods validator entity-form
+                          select select-one  delete update]
   `(routes
     (GET "/list" []
          (with-pagination page-no#
            (layout
-            (object-table ~table-fields ~methods
-                          (korma/select ~entity (db/page page-no# 50)))
+            (object-table ~table-fields ~methods (~select page-no#))
             (hiccup/html [:a {:href "new"} "Nowy element"])
                                         ;page-no# (when id (db/select-one ~entity (korma/where {:id id}))))
             )))
@@ -62,22 +62,20 @@
                (routes
                 ~@(when (not-empty (filter #(when (sequential? %) (-> % first (= :delete!) )) methods))
                     [`(POST "/delete" []
-                            (korma/delete ~entity (korma/where {:id ~'id})))])
+                            (~delete ~'id))])
 
                 ~@(when (not-empty (filter #(when (sequential? %) (-> % first (= :edit) )) methods))
                     [`(GET "/edit" []
-                           (prn :IDD ~'id)
                            (layout
                             (~entity-form
-                             (db/select-one ~entity (korma/where {:id ~'id})) nil)))
+                             (~select-one ~'id) nil)))
                      `(POST "/edit" {params# :params :as request#}
                             (if-let [obj# (validates? ~validator params#)]
-                              (and (korma/update ~entity (korma/where {:id ~'id}) (korma/set-fields obj#))
-                                   (resp/redirect "list"))
+                              (and (~update ~'id obj#)
+                                   (resp/redirect "../list"))
                               (layout
                                (~entity-form params# (get-errors)))
                               ))]))))
-
     (GET "/new" []
          (layout
           (~entity-form nil nil)))
@@ -88,7 +86,12 @@
             (layout
              (~entity-form params# (get-errors)))))))
 
-
+(defmacro object-routes [entity & args]
+  `(object-routes* ~entity ~@args
+                   #(korma/select ~entity (db/page % 50))
+                   #(db/select-one ~entity (korma/where {:id %}))
+                   #(korma/delete ~entity (korma/where {:id %}))
+                   #(korma/update ~entity (korma/where {:id %1}) (korma/set-fields %2))))
 
 
 (defvalidator valid-company
