@@ -6,6 +6,7 @@
         finacentric.forms)
   (:require [finacentric.views.layout :as layout]
             [finacentric.ajax :as ajax]
+            [finacentric.routes.auth :as auth]
             [noir.session :as session]
             [noir.response :as resp]
             [noir.validation :as vali]
@@ -70,9 +71,51 @@
        ))))
 
 
+;;; REGISTER FROM REG-CODE
+(defvalidator register-from-reg-code-validator
+  (rule :email (vali/is-email? _) "Niepoprawny format adresu email")
+  (rule :email (<= (count _) 50) "Email nie powinien mieć więcej niż 50 znaków")
+  (option :first_name (<= 2 (count _) 30) "Imię powinno mieć 2 do 30 znaków")
+  (option :last_name (<= 2 (count _) 40) "Nazwisko powinno mieć 2 do 40 znaków")
+  (rule :password (<= 5 (count _) 50) "Hasło powinno mieć 5 do 50 znaków")
+  (rule :password (re-matches #"[a-zA-Z0-9-_!@#$%^&*]*" _) "Hasło zawiera niedozwolone znaki")
+  (rule :repeat-password (= (get-field :password) _) "Hasła się nie zgadzają")
+  (rule :reg-code (< 0 (count _)) "Pole obowiązkowe"))
+
+(defn register-from-reg-code-form [input errors]
+  (form-wrapper
+   (with-input input
+     (with-errors errors
+       (text-input :reg-code "Kod rejestracyjny *" 50)
+       (text-input :email "Adres email *" 50)
+       (pass-input* :password "Hasło *" 50)
+       (pass-input* :repeat-password "Powtórz hasło *" 50)
+       (text-input :first_name "Imię" 30)
+       (text-input :last_name "Nazwisko" 40)))))
+
+(defn FORM-register-to-company []
+  (FORM "/register"
+        #(layout (register-from-reg-code-form %1 %2))
+        register-from-reg-code-validator
+        #(let [id (errors-validate
+                      "Niepoprawny kod rejestracyjny"
+                    (db/create-user-from-reg-code!
+                     (% :reg-code)
+                     (dissoc % :reg-code :repeat-password)))]
+           (resp/redirect (str "supplier")))))
+
+
+
+
+
 
 (defroutes supplier-routes
   (context "/supplier" {:as request}
+    (GET "/" []
+      ;; tu będzie pętla przekierowań jak gość nie ma ustawionego company_id
+      (resp/redirect (str "/supplier/" (auth/get-current-users-company-id)))) 
+    
+    
     (id-context supplier-id
       (id-context buyer-id
         (GET "/hello" []

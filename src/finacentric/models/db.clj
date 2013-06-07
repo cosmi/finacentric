@@ -2,6 +2,7 @@
   (:use [korma.core :as korma]
         [korma.db :only (defdb transaction)])
   (:require [finacentric.models.schema :as schema]
+            [finacentric.mail :as mail]
             [noir.util.crypt :as crypt]))
 
 (defdb db schema/db-spec)
@@ -78,11 +79,11 @@
   (belongs-to buyer_data {:fk :buyer_data_id})
   (has-many invoice_lines))
 
-(defentity invoices-send
-  (table :invoices :invoices-send))
+;; (defentity invoices-send
+;;   (table :invoices :invoices-send))
 
-(defentity invoices-recv
-  (table :invoices :invoices-recv))
+;; (defentity invoices-recv
+;;   (table :invoices :invoices-recv))
 
 (defentity invoice_lines
   (belongs-to invoices))
@@ -121,6 +122,14 @@
       first
       (get :admin)))
 
+
+(defn get-users-company-id [user-id]
+  (-> (select users
+        (where {:id user-id})
+        (fields :company_id)
+        (limit 1))
+      first
+      (get :company_id)))
 
 (defn user-to-company-access? [user-id company-id]
   (-> (select users
@@ -173,6 +182,24 @@
                                            :seller_data_id (data-ids seller-id)
                                            :buyer_data_id (data-ids buyer-id)
                                            }))))))
+
+
+
+
+
+(defn create-supplier-for-company! [company-id data invite-emails]
+  (let [reg-token (crypt/gen-salt)
+        id (transaction
+             (let [data (insert company_datas (values data))
+                   supplier (insert companies (values {:name (data :name)
+                                                       :reg_token reg-token
+                                                       :data_id (data :id)}))]
+               (create-supplier! company-id (supplier :id))
+               (supplier :id)))]
+    (doseq [email invite-emails]
+      (mail/send-reg-token! email reg-token))
+    id
+    ))
     
 
 

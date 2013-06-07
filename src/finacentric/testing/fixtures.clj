@@ -27,7 +27,19 @@
               (keyword? x)
               name)))))
 
-;; actions:
+
+
+(defn login [login-url user-id pass]
+  (let [result (http/post login-url {:form-params {:id user-id :pass pass}})]
+    (assert (= (:status result) 302))
+    (:cookies result)))
+
+(defmacro with-logged-user [[user-id pass] & body]
+  `(binding [*cookies* (login "http://localhost:3000/login" ~user-id ~pass)]
+     ~@body))
+
+
+;; admin-actions:
 
 (defn create-admin! [email passwd]
   (let [user-id (->
@@ -51,18 +63,14 @@
     (form-post (url :admin :users user-id :set-passwd) {:password passwd :repeat-password passwd})
     user-id))
 
+;; non-admin-actions:
 
+(defn create-supplier! [buyer-id data]
+  (let [res (form-post (url :company buyer-id :add-supplier)
+             data)]
+    (-> res (get-in [:headers "location"])) ;; TODO?
+    ))
 
-
-(defn login [login-url user-id pass]
-  (let [result (http/post login-url {:form-params {:id user-id :pass pass}})]
-    (assert (= (:status result) 302))
-    (:cookies result)))
-
-
-(defmacro with-logged-user [[user-id pass] & body]
-  `(binding [*cookies* (login "http://localhost:3000/login" ~user-id ~pass)]
-     ~@body))
 
 
 
@@ -86,8 +94,17 @@
   (lobos.core/reset)
   (create-admin! "admin" "a1234")
   (with-logged-user ["admin" "a1234"]
-    (doseq [a companies] (apply create-company! a))
+    (create-company! "D-Tel" "dtel")
     (create-user-for-company! 1 {:email "a@dtel.pl" :first_name "Adam" :last_name "Kowalski"} "abcde"))
+
+
+  (with-logged-user ["a@dtel.pl" "abcde"]
+    (create-supplier! 1 {:name "Druty Sp. z o.o."})
+    (create-supplier! 1 {:name "Kable Sp. z o.o."})
+    )
+
+
+  
     ;(doseq [[k,v] suppliers v v] (add-supplier! k v))
   
   

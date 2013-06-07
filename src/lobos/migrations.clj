@@ -9,7 +9,9 @@
        (table :companies
               (integer :id :primary-key :auto-inc)
               (varchar :name 50)
-              (varchar :domain 30 :unique)))
+              (varchar :domain 30 :unique)
+              (varchar :reg_token 50 :unique)
+              ))
       
       (create
        (table :users
@@ -35,7 +37,7 @@
        (table :company_datas
               (integer :id :primary-key :auto-inc)
               (integer :company_id [:refer :companies :id])
-              (varchar :company_name 30)
+              (varchar :name 30)
               (varchar :nip 10)
               (varchar :regon 14)
 

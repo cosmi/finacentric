@@ -81,3 +81,6 @@
 
 (defn logged-to-company? [company-id]
   (db/user-to-company-access? (session/get :user-id) company-id))
+
+(defn get-current-users-company-id []
+  (db/get-users-company-id (session/get :user-id)))

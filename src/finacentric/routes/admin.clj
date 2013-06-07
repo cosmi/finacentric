@@ -193,12 +193,13 @@
             [:p "Strona " page-no " na " pages]))))
 
 
-(defmacro FORM* [url form validator action & [redirect-to-url]]
+(defmacro FORM* [url form validator action & extra]
   `(FORM ~url
          #(layout
            (~form %1 %2))
          ~validator
-         ~action))
+         ~action
+         ~@extra))
     
 (defroutes admin-routes
   (context "/admin" {:as request}

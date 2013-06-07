@@ -37,16 +37,13 @@
 (defmacro convert
   ([field test]
   `(let [~'_ (get-input-field ~field)]
-     (binding [*context* (conj @#'*context* ~field)]
-       (let [res# ~test]
-         (set-value! ~field res#)))))
+     (let [res#
+           (binding [*context* (conj @#'*context* ~field)]
+             ~test)]
+       (set-value! ~field res#))))
   ([field test error-msg]
      `(try
-        (let [~'_ (get-input-field ~field)]
-          (binding [*context* (conj @#'*context* ~field)]
-            (let [res# ~test]
-              (set-value! ~field res#))))
-
+        (convert ~field ~test)
         (catch Exception e (set-error! ~field ~error-msg)))))
 
 
@@ -86,3 +83,19 @@
   (fn [request]
     (binding [*errors* (atom {})]
       (handler request))))
+
+(defmacro errors-validate [error-msg & body]
+  `(try
+    ~@body
+    (catch Exception e (throw (ex-info "" {::validation true ::field (conj *context* field) ::error-msg error-msg})))))
+
+(defmacro try-validate [& body]
+  (try
+    ~@body
+    (catch ExceptionInfo e
+      (let [data (ex-data e)]
+        (if (data ::validation)
+          (set-error! (data ::field) (data ::error-msg))
+          (throw e))))))
+
+
