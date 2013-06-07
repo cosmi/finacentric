@@ -49,5 +49,11 @@
        (routes ~@body))))
 
 (defn current-url []
-  (noir.request/*request* :uri)
-  )
+  (noir.request/*request* :uri))
+
+
+(defn current-url-append [s]
+  (let [url (current-url)]
+    (cond-> url
+      (.endsWith url "/") (subs 0 (dec (count url)))
+      :always (str "/" s))))

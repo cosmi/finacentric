@@ -1,6 +1,7 @@
 (ns finacentric.handler
   (:use finacentric.routes.auth
         finacentric.routes.home
+        [finacentric.routes.supplier :only [supplier-routes]]
         finacentric.routes.admin
         [dieter.core :only [asset-pipeline]]
         [ring.middleware.file-info :only [wrap-file-info]]
@@ -68,7 +69,7 @@
         (app req)))))
 
 ;;append your application routes to the all-routes vector
-(def all-routes [auth-routes home-routes admin-routes app-routes ])
+(def all-routes [auth-routes home-routes supplier-routes admin-routes app-routes ])
 (def app (->
           (middleware/app-handler all-routes)
           (finacentric.validation/wrap-validation)

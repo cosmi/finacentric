@@ -29,6 +29,9 @@
       [:div.error error]
       ))))
 
+(def date-input text-input)
+(def decimal-input text-input)
+
 (defmacro with-input [input & body]
   `(binding [*input* ~input]
      (list

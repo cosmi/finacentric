@@ -1,0 +1,35 @@
+
+{% extends "finacentric/views/templates/base.html" %}
+
+
+
+{% block content %}
+<div class="alert alert-info">
+<h4>Hello</h4>
+Is it me you're looking for?
+ 
+</div>
+
+
+<table class="table table-bordered">
+<!-- <thead> -->
+<!--                 <tr> -->
+<!--                   <th>#</th> -->
+<!--                   <th>First Name</th> -->
+<!--                   <th>Last Name</th> -->
+<!--                   <th>Username</th> -->
+<!--                 </tr> -->
+<!--               </thead> -->
+<tbody>
+{% for i in invoices %}
+    <tr>
+      <td>{{i.number}}</td>
+      <td>{{i.issue_date}}</td>
+      <td>{{i.payment_date}}</td>
+    </tr>
+{% endfor %}
+    
+</table>
+
+
+{% endblock %}

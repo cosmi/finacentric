@@ -22,12 +22,14 @@
               (boolean :is_active (default true))
               (varchar :pass 100)
               (varchar :salt 100)
-              (integer :company_id [:refer :companies :id])))
+              (integer :company_id [:refer :companies :id])
+              ))
       
       (create
-       (table :suppliers
+       (table :sellers_buyers
               (integer :seller_id [:refer :companies :id])
               (integer :buyer_id [:refer :companies :id])
+              (check "not_same" (!= :seller_id  :buyer_id))
               (primary-key [:seller_id :buyer_id])))
       
       (create
@@ -49,10 +51,11 @@
               (integer :id :primary-key :auto-inc)
               (integer :seller_id [:refer :companies :id])
               (integer :buyer_id [:refer :companies :id])
+              (foreign-key [:buyer_id :seller_id] :sellers_buyers)
               (integer :seller_data_id [:refer :company_datas :id])
               (integer :buyer_data_id [:refer :company_datas :id])
               (varchar :number 30)
-              (unique [:seller_id :number])
+              (unique [:number :buyer_id])
               (date :issue_date)
               (date :sell_date)
               (date :payment_date)
@@ -71,6 +74,7 @@
 
               (boolean :accepted)
               (boolean :discount_accepted)))
+
 
       (create
        (table :invoice_lines
@@ -92,5 +96,4 @@
         (drop (table :invoice_lines) :cascade)
         (drop (table :companies) :cascade)
         (drop (table :company_datas) :cascade)
-        (drop (table :suppliers) :cascade)))
-
+        (drop (table :sellers_buyers) :cascade)))

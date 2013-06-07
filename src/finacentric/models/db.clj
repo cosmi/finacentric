@@ -10,6 +10,7 @@
       (offset (* page-no per-page))
       (limit per-page)))
 
+
 (defmacro select-one [ent & body]
   `(first (select ~ent (limit 1) ~@body)))
 
@@ -27,12 +28,14 @@
          :admins))
 
 (defentity buyers
-  (table :suppliers :buyers)
+  (table :sellers_buyers :buyers)
   (belongs-to companies {:fk :buyer_id}))
 
 (defentity sellers
-  (table :suppliers :sellers)
+  (table :sellers_buyers :sellers)
   (belongs-to companies {:fk :seller_id}))
+
+
 
 (defentity companies
   (has-many users)
@@ -41,6 +44,17 @@
   (has-many sellers {:fk :buyer_id})
   (has-many invoices-send {:fk :seller_id})
   (has-many invoices-recv {:fk :buyer_id}))
+
+;; (defentity suppliers
+;;   (table (subselect sellers
+;;                     (fields "companies.*" :buyer_id)
+;;                     (join :right companies
+;;                           (= :companies.id :seller_id))) :suppliers))
+
+
+
+
+
 
 (defentity company_datas)
 
@@ -86,10 +100,13 @@
   )
 
 (defn get-user [id]
-  ;;   (first (select users
-  ;;                  (where {:id id})
-  ;;                  (limit 1)))
-  )
+    (first (select users
+                   (where {:id id})
+                   (limit 1))))
+(defn find-user [login]
+    (first (select users
+                   (where {:email login})
+                   (limit 1))))
 
 
 (defn users-pin-to-company [user-id company-id]
@@ -108,6 +125,62 @@
 
 
 (defn update-company [id data]
-  (update companies
-    (where {:id id})
-    (set-fields data)))
+    (update companies
+      (where {:id id})
+      (set-fields data)))
+
+
+
+(defn create-supplier! [buyer-id seller-id]
+  (insert sellers (values {:buyer_id buyer-id :seller_id seller-id}))
+  )
+
+(defn delete-supplier! [buyer-id seller-id]
+  (delete sellers (where {:buyer_id buyer-id :seller_id seller-id})))
+
+(defn simple-create-invoice [obj seller-id buyer-id]
+  (transaction
+    (let [data-ids (group-by :id
+                             (select companies
+                               (where (or (= :id seller-id) (= :id buyer-id)))
+                               (fields [:id :data_id])))
+          data-ids #(-> data-ids (get %) (get :data_id))]
+      
+      (insert invoices (values (merge obj {:seller_id seller-id :buyer_id buyer-id
+                                           :seller_data_id (data-ids seller-id)
+                                           :buyer_data_id (data-ids buyer-id)
+                                           }))))))
+    
+
+
+;; NOWE ZAJEBISTE ZAPYTANIA
+
+
+(defn page-filter [page-no per-page]
+  #(page % page-no per-page))
+
+
+
+
+(defn get-invoices [from to & filters]
+  (->
+   (reduce #(%2 %1)
+           (-> (select* invoices)
+               (where {:seller_id from :buyer_id to}))
+           filters)
+   exec))
+
+(defn fetch-potential-suppliers [buyer-id & filters]
+  (->
+   (reduce #(%2 %1)
+           (-> (select* companies)
+               (join :left
+                     sellers
+                     (and
+                      (= :sellers.seller_id :companies.id)
+                      (= :sellers.buyer_id buyer-id)))
+               (where (not= buyer-id :companies.id))
+               (fields "companies.*" :sellers.buyer_id)
+               )
+             filters)
+     exec))

@@ -18,6 +18,7 @@
                  [dieter "0.4.0"]
                  [http-kit "2.1.1"]
                  [hiccup "1.0.3"]
+                 [clj-http "0.6.5"]
                  [log4j
                   "1.2.15"
                   :exclusions

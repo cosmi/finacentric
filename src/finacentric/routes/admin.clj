@@ -1,5 +1,6 @@
 (ns finacentric.routes.admin
   (:use compojure.core)
+  (:use clojure.pprint)
   (:use finacentric.util
         finacentric.validation
         finacentric.forms)
@@ -54,9 +55,25 @@
                 [:button {:type "submit" :class "btn"} "OK"]]))
 
 
+;; (defn edit-route [form validator selector save-fn]
+;;   (routes
+;;     (GET "/edit" []
+;;       (layout
+;;        (form
+;;         (selector))))
+;;     (POST "/edit" {params# :params :as request#}
+;;       (if-let [obj#  (validates? ~validator params#)]
+;;         (and (~update ~'id obj#)
+;;              (resp/redirect "../list"))
+;;         (layout
+;;          (~entity-form params# (get-errors)))
+;;         ))))
+
 (defmacro object-routes* [entity wrapper table-fields methods validator entity-form
                           {:keys [select select-one delete update insert]}]
   `(routes
+     (GET "/" {}
+       (resp/redirect (current-url-append "list")))
      (GET "/list" []
        (with-pagination ~'page-no
          (with-page-size 30 ~'page-size
@@ -78,7 +95,7 @@
                (~entity-form
                 (~select-one ~'id) nil)))
            `(POST "/edit" {params# :params :as request#}
-              (if-let [obj# (validates? ~validator params#)]
+              (if-let [obj#  (validates? ~validator params#)]
                 (and (~update ~'id obj#)
                      (resp/redirect "../list"))
                 (layout
@@ -89,6 +106,7 @@
            (layout
             (~entity-form nil nil)))
          `(POST "/new" {params# :params :as request#}
+            (pprint request#)
            (if-let [obj# (validates? ~validator params#)]
              (and (~insert obj#)
                   (resp/redirect "list"))
@@ -105,10 +123,10 @@
                             methods)))
 
 (defmacro object-routes-read-only [entity methods & args]
-  `(object-routes ~entity ~(merge {:delete nil :update nil :insert nil})  ~@args))
+  `(object-routes ~entity ~(merge {:delete nil :update nil :insert nil} methods)  ~@args))
 
 (defmacro object-routes-strict [entity methods & args]
-  `(object-routes ~entity ~(merge {:select nil :select-one nil :delete nil :update nil :insert nil})  ~@args))
+  `(object-routes ~entity ~(merge {:select nil :select-one nil :delete nil :update nil :insert nil} methods)  ~@args))
 
 (defmacro object-routes-default [entity & args]
   `(object-routes ~entity {}  ~@args))
@@ -165,9 +183,24 @@
              (object-routes-default db/companies
                                     (wrapper "Lista firm")
                                     company-headers
-                                    [[:delete! "Usuń"] [:edit "Edytuj"] ["users/list" "użytkownicy"]]
+                                    [[:delete! "Usuń"] [:edit "Edytuj"] ["users/list" "użytkownicy"]
+                                     ["suppliers/list" "Dostawcy"]]
                                     valid-company company-form)
              (id-context company-id
+               (context "/suppliers" []
+                 (object-routes-read-only db/companies 
+                                 {:select #(db/fetch-potential-suppliers company-id (db/page-filter %1 %2))}
+                                 (wrapper "Lista dostawców")
+                                 company-headers
+                                 [#(if (% :buyer_id)
+                                     ["unpin!" "Odepnij"]
+                                     ["pin!" "Przypnij"])]
+                                 valid-company company-form)
+                 (id-context seller-id
+                   (POST "/pin" []
+                     (db/create-supplier! company-id seller-id))
+                   (POST "/unpin" []
+                     (db/delete-supplier! company-id seller-id))))
                (context "/users" []
                  (context "/pin" [] (id-context user-id (POST "/company-pin" [] (db/users-pin-to-company user-id company-id)))
                    (object-routes-read-only db/users

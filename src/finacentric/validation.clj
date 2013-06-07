@@ -6,10 +6,10 @@
 
 
 
-(def ^:dynamic *errors*)
-(def ^:dynamic *input*)
-(def ^:dynamic *output*)
-(def ^:dynamic *context* [])
+(def ^{:dynamic true :private true} *errors*)
+(def ^{:dynamic true :private true} *input*)
+(def ^{:dynamic true :private true} *output*)
+(def ^{:dynamic true :private true} *context* [])
 
 
 (defn set-error! [field text]
@@ -19,19 +19,33 @@
   (swap! *input* assoc-in (conj *context* field) value)
   (swap! *output* assoc-in (conj *context* field) value))
 
+
+(defn get-input-field [field]
+  (get @*input* field))
+  
+
 (defmacro rule [field test error-msg]
-  `(let [~'_ (get @*input* ~field)]
-     (if (binding [*context* (conj *context* ~field)]
+  `(let [~'_ (get-input-field ~field)]
+     (if (binding [*context* (conj @#'*context* ~field)]
            ~test)
        (set-value! ~field ~'_)
        (set-error! ~field ~error-msg))))
 
 
-(defmacro convert [field test]
-  `(let [~'_ (get @*input* ~field)]
-     (binding [*context* (conj *context* ~field)]
+(defmacro convert
+  ([field test]
+  `(let [~'_ (get-input-field ~field)]
+     (binding [*context* (conj @#'*context* ~field)]
        (let [res# ~test]
          (set-value! ~field res#)))))
+  ([field test error-msg]
+     `(try
+        (let [~'_ (get-input-field ~field)]
+          (binding [*context* (conj @#'*context* ~field)]
+            (let [res# ~test]
+              (set-value! ~field res#))))
+
+        (catch Exception e (set-error! ~field ~error-msg)))))
 
 
 
@@ -40,7 +54,7 @@
      (binding [*input* (atom input#)
                *output* (atom {})]
        ~@rules
-       @*output*
+       @@#'*output*
        )))
 
 
