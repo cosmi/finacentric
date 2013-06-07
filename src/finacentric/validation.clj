@@ -1,6 +1,6 @@
 (ns finacentric.validation
   (:use compojure.core)
-  (:use finacentric.util)
+  ;(:use finacentric.util)
   (:require [noir.validation :as vali]))
 
 
@@ -32,6 +32,8 @@
        (set-error! ~field ~error-msg))))
 
 
+
+
 (defmacro convert
   ([field test]
   `(let [~'_ (get-input-field ~field)]
@@ -46,6 +48,12 @@
               (set-value! ~field res#))))
 
         (catch Exception e (set-error! ~field ~error-msg)))))
+
+
+(defmacro option [field test error-msg]
+ `(do
+    (convert ~field (not-empty ~'_))
+    (rule ~field (or (nil? ~'_) ~test) ~error-msg)))
 
 
 

@@ -16,7 +16,7 @@
               (integer :id :primary-key :auto-inc)
               (varchar :first_name 30)
               (varchar :last_name 40)
-              (varchar :email 50)
+              (varchar :email 50 :not-null :unique)
               (boolean :admin)
               (time    :last_login)
               (boolean :is_active (default true))
@@ -37,8 +37,12 @@
               (integer :company_id [:refer :companies :id])
               (varchar :company_name 30)
               (varchar :nip 10)
-              (varchar :regon 40)
-              (varchar :address 100)
+              (varchar :regon 14)
+
+              (varchar :address_street 80)
+              (varchar :address_street_no 20)
+              (varchar :address_zipcode 6)
+              (varchar :address_city 60)
               (varchar :bank_data 100)))
       
       (alter :add

@@ -55,8 +55,6 @@
   (session/clear!)
   (resp/redirect "/"))
 
-(defn logged-as-admin? []
-  (db/is-admin? (session/get :user-id)))
 
 (defroutes auth-routes
   (GET "/register" []
@@ -74,3 +72,12 @@
 
   (GET "/logout" []
        (logout)))
+
+
+
+(defn logged-as-admin? []
+  (db/is-admin? (session/get :user-id)))
+
+
+(defn logged-to-company? [company-id]
+  (db/user-to-company-access? (session/get :user-id) company-id))

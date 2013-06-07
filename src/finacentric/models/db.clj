@@ -87,10 +87,8 @@
 (defentity invoice_lines
   (belongs-to invoices))
 
-(defn create-user [user]
-  ;; (insert users
-  ;;         (values user))
-  )
+(defn create-user [user-data]
+  (insert users (values user-data)))
 
 (defn set-user-pass [user-id pass]
   (let [encrypted (crypt/encrypt pass)]
@@ -116,13 +114,22 @@
                    (limit 1))))
 
 (defn is-admin? [user-id]
-  (println :USER user-id)
   (-> (select users
         (fields :id :admin)
         (where {:id user-id})
         (limit 1))
       first
       (get :admin)))
+
+
+(defn user-to-company-access? [user-id company-id]
+  (-> (select users
+        (fields :id :company_id)
+        (where {:id user-id})
+        (limit 1))
+      first
+      (get :company_id)
+      (= company-id)))
 
 
 (defn users-pin-to-company [user-id company-id]

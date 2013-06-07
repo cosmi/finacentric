@@ -1,5 +1,6 @@
 (ns finacentric.util
-  (:use [compojure.core])
+  (:use [compojure.core]
+        [finacentric.validation])
   (:require [noir.io :as io]
             [markdown.core :as md]
             [noir.request]
@@ -57,3 +58,24 @@
     (cond-> url
       (.endsWith url "/") (subs 0 (dec (count url)))
       :always (str "/" s))))
+
+
+(defmacro routes-when [test & body]
+  `(if ~test
+     (routes ~@body)
+     (constantly nil)))
+
+
+
+(defmacro FORM [url render validator action & [redirect-to-url]]
+  `(let-routes [render# ~render
+                validator# ~validator
+                action# ~action]
+     (GET ~url []
+       (render# nil nil))
+     (POST ~url {params# :params :as request#}
+       (if-let [obj# (validates? validator# params#)]
+         (and (action# obj#)
+              (resp/redirect ~(or redirect-to-url ".")))
+         (render# params# (get-errors)))
+       )))

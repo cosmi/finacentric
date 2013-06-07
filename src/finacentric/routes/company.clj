@@ -6,10 +6,11 @@
         finacentric.forms)
   (:require [finacentric.views.layout :as layout]
             [finacentric.ajax :as ajax]
+            [finacentric.routes.auth :as auth]
+            [finacentric.validation-utils :as vali-util]
             [noir.session :as session]
             [noir.response :as resp]
             [noir.validation :as vali]
-            [finacentric.validation-utils :as vali-util]
             [noir.util.crypt :as crypt]
             [finacentric.models.db :as db]
             [hiccup.core :as hiccup]
@@ -69,24 +70,45 @@
        (decimal-input :gross_total "Wartość brutto" 30)
        ))))
 
+(defn create-supplier-form [input errors]
+  (form-wrapper
+   (with-input input
+     (with-errors errors
+       (text-input :company_name "Nazwa firmy *" 60)
+       (text-input :email1 "Adres email *" 60)
+       (text-input :email2 "Adres email 2" 60)
+       (text-input :addres_street "Ulica" 80)
+       (text-input :addres_street_no "Numer budynku/lokalu" 20)
+       (text-input :addres_zipcode "Kod pocztowy" 20)
+       (text-input :addres_city "Miasto" 60)
+       (text-input :nip "NIP" 10)
+       (text-input :regon "REGON" 14)))))
+
+(defvalidator validate-create-supplier-form
+  (rule :company_name (<= 5 (count _) 60) "Nazwa musi mieć między 5 a 60 znaków.")
+  (rule :email1 (vali/is-email? _) "Niepoprawny format adresu email")
+  (rule :email1 (<= (count _) 50) "Email nie powinien mieć więcej niż 50 znaków")
+  (option :email2 (vali/is-email? _) "Niepoprawny format adresu email")
+  (option :email2 (<= (count _) 50) "Email nie powinien mieć więcej niż 50 znaków")
+  (option :addres_street (<= (count _) 80) "Ulica nie powinna mieć więcej niż 80 znaków")
+  (option :addres_street_no (<= (count _) 20) "Numer nie powinien mieć więcej niż 20 znaków")
+  (option :nip (vali-util/is-nip? _) "Niepoprawny format NIP (proszę zapisać same cyfry, bez pauz)")
+  (option :regon (vali-util/is-regon? _) "Niepoprawny format REGON")
+  )
 
 
-(defroutes supplier-routes
-  (context "/supplier" {:as request}
-    (id-context supplier-id
-      (id-context buyer-id
-        (GET "/hello" []
-          (dashboard supplier-id buyer-id))
-        (GET "/simple-invoice-form" []
-          (layout
-           (simple-invoice-form {} {})))
-        (POST "/simple-invoice-form" {params :params :as request}
-          (if-let [obj (validates? valid-simple-invoice params)]
-                (and (db/simple-create-invoice obj supplier-id buyer-id)
-                     (resp/redirect "hello"))
-                (layout
-                 (simple-invoice-form params (get-errors)))))
 
-        ))))
 
+
+
+
+(defroutes company-routes
+  (context "/company" {:as request}
+    (id-context company-id
+      (routes-when (auth/logged-to-company? company-id)
+        
+        
+
+                   
+      ))))
 

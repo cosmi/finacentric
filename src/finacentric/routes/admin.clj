@@ -160,12 +160,6 @@
        (text-input :last_name "Nazwisko" 40)
        (text-input :email "Adres email" 50)))))
 
-(defvalidator valid-user
-  (rule :first_name (<= 2 (count _) 30) "Imię powinno mieć 2 do 30 znaków")
-  (rule :last_name (<= 2 (count _) 40) "Nazwisko powinno mieć 2 do 40 znaków")
-  (rule :email (vali/is-email? _) "Niepoprawny format adresu email")
-  (rule :email (<= (count _) 50) "Email nie powinien mieć więcej niż 50 znaków"))
-
 (defn password-form [input errors]
   (form-wrapper
    (with-input input
@@ -199,20 +193,12 @@
             [:p "Strona " page-no " na " pages]))))
 
 
-(defmacro FORM [url form validator action & [redirect-to-url]]
-  `(let-routes [form# ~form
-                validator# ~validator
-                action# ~action]
-     (GET ~url []
-       (layout
-        (form# nil nil)))
-     (POST ~url {params# :params :as request#}
-       (if-let [obj# (validates? validator# params#)]
-         (and (action# obj#)
-              (resp/redirect ~(or redirect-to-url ".")))
-         (layout
-          (form# params# (get-errors)))
-         ))))
+(defmacro FORM* [url form validator action & [redirect-to-url]]
+  `(FORM ~url
+         #(layout
+           (~form %1 %2))
+         ~validator
+         ~action))
     
 (defroutes admin-routes
   (context "/admin" {:as request}
@@ -242,17 +228,18 @@
                 (POST "/unpin" []
                   (db/delete-supplier! company-id seller-id))))
             (context "/users" []
-              (context "/pin" [] (id-context user-id (POST "/company-pin" [] (db/users-pin-to-company user-id company-id)))
-                       (object-routes-read-only db/users
-                                                {:select #(korma/select db/users (korma/where
-                                                                                  (or (not= :company_id company-id)
-                                                                                      (= :company_id nil)
-                                                                                      )) (db/page % %2))
-                                                 :insert #(korma/insert db/users (korma/values [(assoc % :company_id company-id)]))}
-                                                (wrapper "Wybierz użytkowników do przypięcia")
-                                                user-headers
-                                                [[:company-pin! "Przypnij"]]
-                                                valid-user user-form))
+              (context "/pin" []
+                (id-context user-id (POST "/company-pin" [] (db/users-pin-to-company user-id company-id)))
+                (object-routes-read-only db/users
+                                         {:select #(korma/select db/users (korma/where
+                                                                           (or (not= :company_id company-id)
+                                                                               (= :company_id nil)
+                                                                               )) (db/page % %2))
+                                          :insert #(korma/insert db/users (korma/values [(assoc % :company_id company-id)]))}
+                                         (wrapper "Wybierz użytkowników do przypięcia")
+                                         user-headers
+                                         [[:company-pin! "Przypnij"]]
+                                         valid-user user-form))
               
               
               (object-routes db/users 
@@ -268,7 +255,7 @@
                   (db/users-pin-to-company user-id nil))))))
         (context "/users" []
           (id-context user-id
-            (FORM "/set-passwd"
+            (FORM* "/set-passwd"
                   password-form
                   valid-password
                   #(db/set-user-pass user-id (get % :password))
