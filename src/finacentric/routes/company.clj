@@ -1,4 +1,4 @@
-(ns finacentric.routes.supplier
+(ns finacentric.routes.company
   (:use compojure.core)
   (:use clojure.pprint)
   (:use finacentric.util
