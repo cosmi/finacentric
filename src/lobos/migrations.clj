@@ -20,8 +20,7 @@
               (boolean :admin)
               (time    :last_login)
               (boolean :is_active (default true))
-              (varchar :pass 100)
-              (varchar :salt 100)
+              (varchar :pass 60)
               (integer :company_id [:refer :companies :id])
               ))
       

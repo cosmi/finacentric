@@ -5,6 +5,7 @@
         finacentric.validation
         finacentric.forms)
   (:require [finacentric.views.layout :as layout]
+            [finacentric.routes.auth :as auth]
             [finacentric.ajax :as ajax]
             [noir.session :as session]
             [noir.response :as resp]
@@ -159,6 +160,27 @@
        (text-input :last_name "Nazwisko" 40)
        (text-input :email "Adres email" 50)))))
 
+(defvalidator valid-user
+  (rule :first_name (<= 2 (count _) 30) "Imię powinno mieć 2 do 30 znaków")
+  (rule :last_name (<= 2 (count _) 40) "Nazwisko powinno mieć 2 do 40 znaków")
+  (rule :email (vali/is-email? _) "Niepoprawny format adresu email")
+  (rule :email (<= (count _) 50) "Email nie powinien mieć więcej niż 50 znaków"))
+
+(defn password-form [input errors]
+  (form-wrapper
+   (with-input input
+     (with-errors errors
+       (pass-input* :password "Hasło" 50)
+       (pass-input* :repeat-password "Powtórz hasło" 50)))))
+
+
+(defvalidator valid-password
+  (rule :password (<= 5 (count _) 50) "Hasło powinno mieć 5 do 50 znaków")
+  (rule :password (re-matches #"[a-zA-Z0-9-_!@#$%^&*]*" _) "Hasło zawiera niedozwolone znaki")
+  (rule :repeat-password (= (get-field :password) _) "Hasła się nie zgadzają")
+  )
+
+
 (def company-headers [[:id "#"] [:name "Nazwa"] [:domain "Domena"]])
 (def user-headers [[:id "#"] [:first_name "Imię"] [:last_name "Nazwisko"] [:email "Email"] [:company_id "Firma"]])
 
@@ -177,94 +199,120 @@
             [:p "Strona " page-no " na " pages]))))
 
 
+(defmacro FORM [url form validator action & [redirect-to-url]]
+  `(let-routes [form# ~form
+                validator# ~validator
+                action# ~action]
+     (GET ~url []
+       (layout
+        (form# nil nil)))
+     (POST ~url {params# :params :as request#}
+       (if-let [obj# (validates? validator# params#)]
+         (and (action# obj#)
+              (resp/redirect ~(or redirect-to-url ".")))
+         (layout
+          (form# params# (get-errors)))
+         ))))
+    
 (defroutes admin-routes
   (context "/admin" {:as request}
-           (context "/companies" []
-             (object-routes-default db/companies
-                                    (wrapper "Lista firm")
-                                    company-headers
-                                    [[:delete! "Usuń"] [:edit "Edytuj"] ["users/list" "użytkownicy"]
-                                     ["suppliers/list" "Dostawcy"]]
-                                    valid-company company-form)
-             (id-context company-id
-               (context "/suppliers" []
-                 (object-routes-read-only db/companies 
-                                 {:select #(db/fetch-potential-suppliers company-id (db/page-filter %1 %2))}
-                                 (wrapper "Lista dostawców")
+    (if-not (auth/logged-as-admin?)
+      (constantly nil)
+      (routes
+        (context "/companies" []
+          (object-routes-default db/companies
+                                 (wrapper "Lista firm")
                                  company-headers
-                                 [#(if (% :buyer_id)
-                                     ["unpin!" "Odepnij"]
-                                     ["pin!" "Przypnij"])]
+                                 [[:delete! "Usuń"] [:edit "Edytuj"] ["users/list" "użytkownicy"]
+                                  ["suppliers/list" "Dostawcy"]]
                                  valid-company company-form)
-                 (id-context seller-id
-                   (POST "/pin" []
-                     (db/create-supplier! company-id seller-id))
-                   (POST "/unpin" []
-                     (db/delete-supplier! company-id seller-id))))
-               (context "/users" []
-                 (context "/pin" [] (id-context user-id (POST "/company-pin" [] (db/users-pin-to-company user-id company-id)))
-                   (object-routes-read-only db/users
-                                  {:select #(korma/select db/users (korma/where
-                                                                    (or (not= :company_id company-id)
-                                                                        (= :company_id nil)
-                                                                       )) (db/page % %2))
-                                   :insert #(korma/insert db/users (korma/values [(assoc % :company_id company-id)]))}
-                                   (wrapper "Wybierz użytkowników do przypięcia")
-                                  user-headers
-                                  [[:company-pin! "Przypnij"]]
-                                  valid-user user-form))
-                 
-                 
-                 (object-routes db/users 
-                                 {:select #(korma/select db/users (korma/where {:company_id company-id}) (db/page % %2))
-                                  :insert #(korma/insert db/users (korma/values [(assoc % :company_id company-id)])
-                                                         )}
-                                 (wrapper "Lista użytkowników firmy")
-                                 user-headers
-                                 [[:edit "Edytuj"] [:company-unpin! "Odepnij"]]
-                                 valid-user user-form)
-                 (id-context user-id
-                   (POST "/company-unpin" []
-                     (db/users-pin-to-company user-id nil))))))
-           (context "/users" []
-             (id-context user-id
-               (POST "/admin/:val" [val]
-                 (db/users-set-admin-state user-id (case val "set" true "unset" false)))
-               (POST "/company-unpin" [] ;/admin/users/:user-id/company-unpin
-                 (db/users-pin-to-company user-id nil)
-                 
-                 )
-               (context "/companies" [] 
-                 (id-context company-id (ajax/JSON "/company-pin" [] ;/admin/users/:user-id/companies/:company-id/company-pin
-                                          (prn :!!!!)
-                                          (db/users-pin-to-company user-id company-id)
-                                          (ajax/redirect (str (current-url) "/../../../../list"))
-                                          ))
-                 (object-routes db/companies
-                                {:update nil
-                                 :insert #(db/create-company-for-user user-id %)}
-                                (wrapper "Wybierz firmę do przypięcia")
-                                company-headers
-                                [[:company-pin! "Przypnij"]]
-                                valid-user user-form))
-               )
+          (id-context company-id
+            (context "/suppliers" []
+              (object-routes-read-only db/companies 
+                                       {:select #(db/fetch-potential-suppliers company-id (db/page-filter %1 %2))}
+                                       (wrapper "Lista dostawców")
+                                       company-headers
+                                       [#(if (% :buyer_id)
+                                           ["unpin!" "Odepnij"]
+                                           ["pin!" "Przypnij"])]
+                                       valid-company company-form)
+              (id-context seller-id
+                (POST "/pin" []
+                  (db/create-supplier! company-id seller-id))
+                (POST "/unpin" []
+                  (db/delete-supplier! company-id seller-id))))
+            (context "/users" []
+              (context "/pin" [] (id-context user-id (POST "/company-pin" [] (db/users-pin-to-company user-id company-id)))
+                       (object-routes-read-only db/users
+                                                {:select #(korma/select db/users (korma/where
+                                                                                  (or (not= :company_id company-id)
+                                                                                      (= :company_id nil)
+                                                                                      )) (db/page % %2))
+                                                 :insert #(korma/insert db/users (korma/values [(assoc % :company_id company-id)]))}
+                                                (wrapper "Wybierz użytkowników do przypięcia")
+                                                user-headers
+                                                [[:company-pin! "Przypnij"]]
+                                                valid-user user-form))
+              
+              
+              (object-routes db/users 
+                             {:select #(korma/select db/users (korma/where {:company_id company-id}) (db/page % %2))
+                              :insert #(korma/insert db/users (korma/values [(assoc % :company_id company-id)])
+                                                     )}
+                             (wrapper "Lista użytkowników firmy")
+                             user-headers
+                             [[:edit "Edytuj"] [:company-unpin! "Odepnij"]]
+                             valid-user user-form)
+              (id-context user-id
+                (POST "/company-unpin" []
+                  (db/users-pin-to-company user-id nil))))))
+        (context "/users" []
+          (id-context user-id
+            (FORM "/set-passwd"
+                  password-form
+                  valid-password
+                  #(db/set-user-pass user-id (get % :password))
+                  "/..")
+            (POST "/set-passwd" [passwd repeat-passwd]
+              (db/users-set-admin-state user-id (case val "set" true "unset" false)))
+            (POST "/admin/:val" [val]
+              (db/users-set-admin-state user-id (case val "set" true "unset" false)))
+            (POST "/company-unpin" [] ;/admin/users/:user-id/company-unpin
+              (db/users-pin-to-company user-id nil)
+              
+              )
+            (context "/companies" [] 
+              (id-context company-id (ajax/JSON "/company-pin" [] ;/admin/users/:user-id/companies/:company-id/company-pin
+                                       (prn :!!!!)
+                                       (db/users-pin-to-company user-id company-id)
+                                       (ajax/redirect (str (current-url) "/../../../../list"))
+                                       ))
+              (object-routes db/companies
+                             {:update nil
+                              :insert #(db/create-company-for-user user-id %)}
+                             (wrapper "Wybierz firmę do przypięcia")
+                             company-headers
+                             [[:company-pin! "Przypnij"]]
+                             valid-user user-form))
+            )
 
-             
-             (object-routes-default db/users
-                                    (wrapper "Lista użytkowników")
-                            user-headers
-                            [[:delete! "Usuń"] [:edit "Edytuj"]
-                             #(if (% :company_id)
-                               ["company-unpin!" "Odepnij"]
-                               ["companies/list" "Przypnij"])
-                             #(if-not (% :admin)
-                                ["admin/set!" "Uczyń adminem"]
-                                ["admin/unset!" "Nie admin"])]
-                            valid-user user-form))
-           
-           (context "/admins" []
-             (object-routes-default db/admins
-                                    (wrapper "Lista administratorów")
-                                    user-headers
-                                    [[:delete! "Usuń"] [:edit "Edytuj"]]
-                                    valid-user user-form))))
+          
+          (object-routes-default db/users
+                                 (wrapper "Lista użytkowników")
+                                 user-headers
+                                 [[:delete! "Usuń"] [:edit "Edytuj"]
+                                  [:set-passwd "Zmień hasło"]
+                                  #(if (% :company_id)
+                                     ["company-unpin!" "Odepnij"]
+                                     ["companies/list" "Przypnij"])
+                                  #(if-not (% :admin)
+                                     ["admin/set!" "Uczyń adminem"]
+                                     ["admin/unset!" "Nie admin"])]
+                                 valid-user user-form))
+        
+        (context "/admins" []
+          (object-routes-default db/admins
+                                 (wrapper "Lista administratorów")
+                                 user-headers
+                                 [[:delete! "Usuń"] [:edit "Edytuj"]]
+                                 valid-user user-form))))))

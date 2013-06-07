@@ -29,6 +29,26 @@
       [:div.error error]
       ))))
 
+(defn pass-input [field label max-len]
+  (hiccup/html
+   (list
+    [:label label]
+    [:input {:type "password" :name (get-field-name field) :value (get-value field) :maxlength max-len}]
+    (when-let [error (get-error field)]
+      [:div.error error]
+      ))))
+
+(defn pass-input*
+  "Without input"
+  [field label max-len]
+  (hiccup/html
+   (list
+    [:label label]
+    [:input {:type "password" :name (get-field-name field) :maxlength max-len}]
+    (when-let [error (get-error field)]
+      [:div.error error]
+      ))))
+
 (def date-input text-input)
 (def decimal-input text-input)
 

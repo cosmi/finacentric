@@ -48,12 +48,15 @@
 (defn handle-login [id pass]
   (let [user (db/find-user id)]
     (if (and user (crypt/compare pass (:pass user)))
-      (session/put! :user-id id))
+      (session/put! :user-id (user :id)))
     (resp/redirect "/")))
 
 (defn logout []
   (session/clear!)
   (resp/redirect "/"))
+
+(defn logged-as-admin? []
+  (db/is-admin? (session/get :user-id)))
 
 (defroutes auth-routes
   (GET "/register" []

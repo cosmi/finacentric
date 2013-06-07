@@ -1,7 +1,8 @@
 (ns finacentric.models.db
   (:use [korma.core :as korma]
         [korma.db :only (defdb transaction)])
-  (:require [finacentric.models.schema :as schema]))
+  (:require [finacentric.models.schema :as schema]
+            [noir.util.crypt :as crypt]))
 
 (defdb db schema/db-spec)
 
@@ -91,6 +92,12 @@
   ;;         (values user))
   )
 
+(defn set-user-pass [user-id pass]
+  (let [encrypted (crypt/encrypt pass)]
+    (update users
+      (where (= :id user-id))
+      (set-fields {:pass encrypted}))))
+
 (defn update-user [id first-name last-name email]
   ;;   (update users
   ;;           (set-fields {:first_name first-name
@@ -107,6 +114,15 @@
     (first (select users
                    (where {:email login})
                    (limit 1))))
+
+(defn is-admin? [user-id]
+  (println :USER user-id)
+  (-> (select users
+        (fields :id :admin)
+        (where {:id user-id})
+        (limit 1))
+      first
+      (get :admin)))
 
 
 (defn users-pin-to-company [user-id company-id]
