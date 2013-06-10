@@ -87,12 +87,12 @@
 (defmacro errors-validate [error-msg & body]
   `(try
     ~@body
-    (catch Exception e (throw (ex-info "" {::validation true ::field (conj *context* field) ::error-msg error-msg})))))
+    (catch Exception e# (throw (ex-info "" {::validation true ::field (conj @#'*context* field) ::error-msg error-msg})))))
 
 (defmacro try-validate [& body]
   (try
     ~@body
-    (catch ExceptionInfo e
+    (catch clojure.lang.ExceptionInfo e
       (let [data (ex-data e)]
         (if (data ::validation)
           (set-error! (data ::field) (data ::error-msg))
