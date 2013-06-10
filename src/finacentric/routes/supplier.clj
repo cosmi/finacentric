@@ -98,6 +98,7 @@
         #(layout (register-from-reg-code-form %1 %2))
         register-from-reg-code-validator
         #(let [id (errors-validate
+                      :reg-code
                       "Niepoprawny kod rejestracyjny"
                     (db/create-user-from-reg-code!
                      (% :reg-code)
@@ -112,10 +113,8 @@
 (defroutes supplier-routes
   (context "/supplier" {:as request}
     (GET "/" []
-      ;; tu będzie pętla przekierowań jak gość nie ma ustawionego company_id
-      (resp/redirect (str "/supplier/" (auth/get-current-users-company-id)))) 
-    
-    
+      (resp/redirect (str "/supplier/" (or (auth/get-current-users-company-id) 0)))) 
+    (FORM-register-to-company)
     (id-context supplier-id
       (id-context buyer-id
         (GET "/hello" []

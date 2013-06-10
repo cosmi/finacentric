@@ -114,7 +114,6 @@
 
 (defroutes company-routes
   (context "/company" {:as request}
-    (FORM-register-to-company)
     (id-context company-id
       (routes-when (auth/logged-to-company? company-id)
         (FORM-add-supplier company-id))))

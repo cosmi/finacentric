@@ -84,19 +84,18 @@
     (binding [*errors* (atom {})]
       (handler request))))
 
-(defmacro errors-validate [error-msg & body]
+(defmacro errors-validate [field error-msg & body]
   `(try
-    ~@body
-
-    (catch Exception e#
-      (throw (ex-info "" {::validation true ::field (conj #'*context* field) ::error-msg ~error-msg})))))
+     ~@body
+     (catch Exception e#
+       (throw (ex-info "" {::validation true ::field (conj #'*context* ~field) ::error-msg ~error-msg})))))
 
 (defmacro try-validate [& body]
   `(try
      ~@body
-     (catch  clojure.lang.ExceptionInfo e#
-       (let [data (ex-data e#)]
-         (if (data ::validation)
-           (set-error! (data ::field) (data ::error-msg))
+     (catch clojure.lang.ExceptionInfo e#
+       (let [data# (ex-data e#)]
+         (if (data# ::validation)
+           (set-error! (data# ::field) (data# ::error-msg))
            (throw e#))))))
 
