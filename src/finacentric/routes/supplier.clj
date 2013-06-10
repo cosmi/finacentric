@@ -83,6 +83,7 @@
   (rule :reg-code (< 0 (count _)) "Pole obowiązkowe"))
 
 (defn register-from-reg-code-form [input errors]
+  (println :Errors errors)
   (form-wrapper
    (with-input input
      (with-errors errors
@@ -103,7 +104,9 @@
                     (db/create-user-from-reg-code!
                      (% :reg-code)
                      (dissoc % :reg-code :repeat-password)))]
-           (resp/redirect (str "supplier")))))
+           (resp/redirect (str "supplier")))
+        "."
+        ))
 
 
 

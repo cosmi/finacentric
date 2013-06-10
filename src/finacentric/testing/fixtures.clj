@@ -47,7 +47,7 @@
 
 (defn create-admin! [email passwd]
   (let [user-id (->
-                 (db/create-user {:email email :admin true})
+                 (db/create-user! {:email email :admin true})
                  (get :id))]
     (db/set-user-pass user-id passwd)
     user-id))
@@ -76,13 +76,24 @@
 (defn create-supplier! [buyer-id data]
   (let [res (form-post (url :company buyer-id :add-supplier)
              data)]
-    (-> res (get-in [:headers "location"])) ;; TODO?
+    (-> res (get-in [:headers "location"])
+        (->> (re-matches #"supplier/([0-9]+)"))
+        second
+        (Integer/parseInt)) ;; TODO? teraz zakłada,że zostanie przekierowany na supplier/company-id
     ))
 
-
-
-
-
+(defn register-user-for-company-by-reg-code! [company-id user-data]
+  (let [reg-token (-> (korma/select db/companies
+                        (where {:id company-id})
+                        (limit 1)
+                        (fields :reg_token))
+                      first
+                      (get :reg_token))]
+    (form-post (url :supplier :register) (assoc user-data :reg-token reg-token))
+    (-> (korma/select db/users
+          (where {:email (user-data :email)}))
+        first
+        (get :id))))
 
   
 
@@ -97,11 +108,20 @@
             (create-user-for-company! company-id {:email "a@dtel.pl" :first_name "Adam" :last_name "Kowalski"} "abcde")
             company-id))]
     
-    
-    (with-logged-user ["a@dtel.pl" "abcde"]
-      (create-supplier! company-id {:name "Druty Sp. z o.o."})
-      (create-supplier! company-id {:name "Kable Sp. z o.o."})
+
+    (let [suppliers (with-logged-user ["a@dtel.pl" "abcde"]
+                      [(create-supplier! company-id {:name "Druty Sp. z o.o."})
+                       (create-supplier! company-id {:name "Kable Sp. z o.o."})])]
+      (register-user-for-company-by-reg-code! (suppliers 0)
+                                              {:email "adam@druty.pl"
+                                               :password "abcde"
+                                               :repeat-password "abcde"})
+      (register-user-for-company-by-reg-code! (suppliers 0)
+                                              {:email "adam@kable.pl"
+                                               :password "abcde"
+                                               :repeat-password "abcde"})
       )
+    
     
 
   

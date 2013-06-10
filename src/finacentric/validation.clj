@@ -88,7 +88,8 @@
   `(try
      ~@body
      (catch Exception e#
-       (throw (ex-info "" {::validation true ::field (conj #'*context* ~field) ::error-msg ~error-msg})))))
+       (set-error! ~field ~error-msg)
+       (throw (ex-info "" {::validation true})))))
 
 (defmacro on-error [& body]
   (throw (Exception. "Lone on-error clause.")))
@@ -104,6 +105,7 @@
        (catch clojure.lang.ExceptionInfo e#
          (let [data# (ex-data e#)]
            (if (data# ::validation)
-             (set-error! (data# ::field) (data# ::error-msg))
+             (do
+               ~@(rest else))
              (throw e#)))))))
 

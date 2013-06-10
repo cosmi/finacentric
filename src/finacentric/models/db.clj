@@ -88,7 +88,7 @@
 (defentity invoice_lines
   (belongs-to invoices))
 
-(defn create-user [user-data]
+(defn create-user! [user-data]
   (insert users (values user-data)))
 
 (defn set-user-pass [user-id pass]
@@ -193,7 +193,7 @@
 
 
 (defn create-supplier-for-company! [company-id data invite-emails]
-  (let [reg-token (crypt/gen-salt)
+  (let [reg-token (crypt/gen-salt) ;;TODO coś łądniejszego
         id (transaction
              (let [data (insert company_datas (values data))
                    supplier (insert companies (values {:name (data :name)
@@ -205,10 +205,25 @@
       (mail/send-reg-token! email reg-token))
     id
     ))
-    
-(defn create-user-from-reg-code! [reg-code user-data]
 
-  )
+(defn get-company-with-reg-code [reg-code]
+  (-> (select companies (where (= :reg_token reg-code)) (limit 1))
+      first))
+
+(defn create-user-from-reg-code! [reg-code user-data]
+  (or
+   (transaction
+     (when-let [company (get-company-with-reg-code reg-code)]
+       (let [user (create-user! (assoc user-data {:company_id (company :id)}))]
+         (update companies
+           (where {:id (company :id)})
+           (set-fields {:reg_token nil}))
+         (user :id))))
+   (println "JEST DUPA")
+   (throw (ex-info "No such code" {:reg-code reg-code}))))
+
+
+
 
 ;; NOWE ZAJEBISTE ZAPYTANIA
 

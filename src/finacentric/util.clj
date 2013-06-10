@@ -79,6 +79,9 @@
            (and (action# obj#)
                 ~@(when redirect-to-url
                     [`(resp/redirect ~redirect-to-url)]))
-           (on-error (render# params# (get-errors))))
+           (on-error
+             (println :errors (get-errors))
+             
+             (render# params# (get-errors))))
          (render# params# (get-errors)))
        )))
