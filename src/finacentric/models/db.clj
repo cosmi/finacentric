@@ -201,7 +201,7 @@
     id
     ))
     
-
+(defn create-user-from-reg-code! [& args])
 
 ;; NOWE ZAJEBISTE ZAPYTANIA
 
