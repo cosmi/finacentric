@@ -76,9 +76,9 @@
      (POST ~url {params# :params :as request#}
        (if-let [obj# (validates? validator# params#)]
          (try-validate
-          (and (action# obj#)
-               ~@(when redirect-to-url
-                   [`(resp/redirect ~redirect-to-url)]))
-          (render# params# (get-errors)))
+           (and (action# obj#)
+                ~@(when redirect-to-url
+                    [`(resp/redirect ~redirect-to-url)]))
+           (on-error (render# params# (get-errors))))
          (render# params# (get-errors)))
        )))

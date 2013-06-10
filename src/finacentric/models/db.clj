@@ -161,6 +161,11 @@
       (where {:id id})
       (set-fields data)))
 
+(defn get-company [id]
+  (-> (select companies
+        (where {:id id})
+        (limit 1))
+      first))
 
 
 (defn create-supplier! [buyer-id seller-id]

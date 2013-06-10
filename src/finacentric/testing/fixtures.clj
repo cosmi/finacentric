@@ -1,5 +1,8 @@
 (ns finacentric.testing.fixtures
   (:use [lobos.core :only (defcommand migrate)])
+  (:use [korma.core :as korma]
+        [clojure.pprint]
+        [korma.db :only (defdb transaction)])
   (:require [clojure.java.jdbc :as sql]
             [lobos.migration :as lm]
             [finacentric.models.db :as db]
@@ -14,7 +17,8 @@
 (defn form-post
   [url args]
   (let [result (http/post (str "http://localhost:3000" url)  {:form-params args :cookies *cookies*})]
-    (assert (= (:status result) 302))
+    (pprint result)
+    (assert (= (:status result) 302) (str "Error, status returned: " (:status result)))
     result))
 
 
@@ -31,7 +35,7 @@
 
 (defn login [login-url user-id pass]
   (let [result (http/post login-url {:form-params {:id user-id :pass pass}})]
-    (assert (= (:status result) 302))
+    (assert (= (:status result) 302) (str "Error, status returned: " (:status result)))
     (:cookies result)))
 
 (defmacro with-logged-user [[user-id pass] & body]
@@ -50,7 +54,11 @@
 
 
 (defn create-company! [name & [domain]]
-  (form-post "/admin/companies/new" {:name name :domain domain}))
+  (form-post "/admin/companies/new" {:name name :domain domain})
+  (-> (select db/companies (where {:name name :domain domain}) (order :id :DESC) (limit 1))
+      first
+      (get :id))
+  )
 (defn add-supplier! [buyer-id seller-id]
   (action-post (url :admin :companies buyer-id :suppliers seller-id :pin) {}))
 
@@ -75,17 +83,7 @@
 
 
 
-(def companies
-  [["D-Tel" "dtel"]
-   ["B-Tel" "btel"]
-   ;; ["Sznurki"]
-   ;; ["Kable"]
 
-   ])
-
-(def suppliers
-  {1 [3 4]
-   2 [3]})
   
 
 
@@ -93,22 +91,24 @@
 (defn init-db []
   (lobos.core/reset)
   (create-admin! "admin" "a1234")
-  (with-logged-user ["admin" "a1234"]
-    (create-company! "D-Tel" "dtel")
-    (create-user-for-company! 1 {:email "a@dtel.pl" :first_name "Adam" :last_name "Kowalski"} "abcde"))
+  (let [company-id 
+        (with-logged-user ["admin" "a1234"]
+          (let [company-id (create-company! "D-Tel" "dtel")]
+            (create-user-for-company! company-id {:email "a@dtel.pl" :first_name "Adam" :last_name "Kowalski"} "abcde")
+            company-id))]
+    
+    
+    (with-logged-user ["a@dtel.pl" "abcde"]
+      (create-supplier! company-id {:name "Druty Sp. z o.o."})
+      (create-supplier! company-id {:name "Kable Sp. z o.o."})
+      )
+    
 
-
-  (with-logged-user ["a@dtel.pl" "abcde"]
-    (create-supplier! 1 {:name "Druty Sp. z o.o."})
-    (create-supplier! 1 {:name "Kable Sp. z o.o."})
-    )
+  
 
 
   
-    ;(doseq [[k,v] suppliers v v] (add-supplier! k v))
-  
-  
-  )
+  ))
   
   
   

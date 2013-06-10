@@ -90,12 +90,20 @@
      (catch Exception e#
        (throw (ex-info "" {::validation true ::field (conj #'*context* ~field) ::error-msg ~error-msg})))))
 
+(defmacro on-error [& body]
+  (throw (Exception. "Lone on-error clause.")))
+
 (defmacro try-validate [& body]
-  `(try
-     ~@body
-     (catch clojure.lang.ExceptionInfo e#
-       (let [data# (ex-data e#)]
-         (if (data# ::validation)
-           (set-error! (data# ::field) (data# ::error-msg))
-           (throw e#))))))
+  (let [else (last body)
+        body (butlast body)]
+    (assert (-> else seq?))
+    (assert (-> else first name (= "on-error")) "On error clause should be wrapped in (on-error ...)")
+    
+    `(try
+       ~@body
+       (catch clojure.lang.ExceptionInfo e#
+         (let [data# (ex-data e#)]
+           (if (data# ::validation)
+             (set-error! (data# ::field) (data# ::error-msg))
+             (throw e#)))))))
 
