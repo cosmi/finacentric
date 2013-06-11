@@ -88,6 +88,8 @@
   `(try
      ~@body
      (catch Exception e#
+       (.printStackTrace e#)
+       
        (set-error! ~field ~error-msg)
        (throw (ex-info "" {::validation true})))))
 

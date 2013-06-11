@@ -4,9 +4,12 @@
         [clojure.pprint]
         [korma.db :only (defdb transaction)])
   (:require [clojure.java.jdbc :as sql]
+            [net.cgrand.enlive-html :as enlive]
             [lobos.migration :as lm]
             [finacentric.models.db :as db]
-            [clj-http.client :as http]))
+            [clj-http.client :as http]
+            [clojure.string :as strings])
+  (:import [java.io.StringReader]))
 
 (def ^:dynamic *cookies* nil)
 
@@ -16,8 +19,26 @@
 
 (defn form-post
   [url args]
-  (let [result (http/post (str "http://localhost:3000" url)  {:form-params args :cookies *cookies*})]
-    (pprint result)
+  (let [result (http/get (str "http://localhost:3000" url)  { :cookies *cookies*})
+        body (-> result :body (java.io.StringReader.) enlive/html-resource)]
+    (assert (= (:status result) 200))
+    (let [forms (->> (enlive/select body [:form])
+                     (filter (fn [form]
+                               (and (-> form :attrs :method strings/lower-case (= "post"))
+                                  (-> form :attrs :action nil?)))))]
+      (assert (-> forms count (= 1)) "More than one form!")
+      (let [form (first forms)
+            unknown-fields (->> args
+                                keys
+                                (remove #(->
+                                          (enlive/select form
+                                            [[#{:input :select :textarea} (enlive/attr= :name (name %))]])
+                                          not-empty)))]
+        (assert (empty? unknown-fields) (apply str "Fields do not exist in the form: " (interpose ", " unknown-fields)))
+          
+          )))
+    (let [result (http/post (str "http://localhost:3000" url)  {:form-params args :cookies *cookies*})]
+;    (pprint result)
     (assert (= (:status result) 302) (str "Error, status returned: " (:status result)))
     result))
 
@@ -89,7 +110,7 @@
                         (fields :reg_token))
                       first
                       (get :reg_token))]
-    (form-post (url :supplier :register) (assoc user-data :reg-token reg-token))
+    (form-post (url :supplier :register) (assoc user-data :reg-code reg-token))
     (-> (korma/select db/users
           (where {:email (user-data :email)}))
         first
@@ -116,11 +137,10 @@
                                               {:email "adam@druty.pl"
                                                :password "abcde"
                                                :repeat-password "abcde"})
-      (register-user-for-company-by-reg-code! (suppliers 0)
+      (register-user-for-company-by-reg-code! (suppliers 1)
                                               {:email "adam@kable.pl"
                                                :password "abcde"
-                                               :repeat-password "abcde"})
-      )
+                                               :repeat-password "abcde"}))
     
     
 

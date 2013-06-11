@@ -19,6 +19,7 @@
                  [http-kit "2.1.1"]
                  [hiccup "1.0.3"]
                  [clj-http "0.6.5"]
+                 [enlive "1.1.1"]
                  [log4j
                   "1.2.15"
                   :exclusions

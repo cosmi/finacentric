@@ -91,8 +91,11 @@
 (defn create-user! [user-data]
   (insert users (values user-data)))
 
+(defn encrypt-pass [pass]
+  (crypt/encrypt pass))
+
 (defn set-user-pass [user-id pass]
-  (let [encrypted (crypt/encrypt pass)]
+  (let [encrypted (encrypt-pass pass)]
     (update users
       (where (= :id user-id))
       (set-fields {:pass encrypted}))))
@@ -210,16 +213,15 @@
   (-> (select companies (where (= :reg_token reg-code)) (limit 1))
       first))
 
-(defn create-user-from-reg-code! [reg-code user-data]
+(defn create-user-from-reg-code! [reg-code user-data password]
   (or
    (transaction
      (when-let [company (get-company-with-reg-code reg-code)]
-       (let [user (create-user! (assoc user-data {:company_id (company :id)}))]
+       (let [user (create-user! (assoc user-data :company_id (company :id) :pass (encrypt-pass password)))]
          (update companies
            (where {:id (company :id)})
            (set-fields {:reg_token nil}))
          (user :id))))
-   (println "JEST DUPA")
    (throw (ex-info "No such code" {:reg-code reg-code}))))
 
 
