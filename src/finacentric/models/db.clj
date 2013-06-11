@@ -16,6 +16,10 @@
 (defmacro select-one [ent & body]
   `(first (select ~ent (limit 1) ~@body)))
 
+
+(defn- to-sql-date [date]
+  (java.sql.Date. date))
+
 (declare companies users company_datas invoices invoices-send invoices-recv invoice_lines)
 
 (defentity users
@@ -77,7 +81,12 @@
   (belongs-to buyer_company {:fk :buyer_id})
   (belongs-to seller_data {:fk :seller_data_id})
   (belongs-to buyer_data {:fk :buyer_data_id})
-  (has-many invoice_lines))
+  (has-many invoice_lines)
+  ;; (prepare (fn [v]
+  ;;            (reduce #(if-let [d (%1 %2)]
+  ;;                       (assoc %1 %2 (to-sql-date d))
+  ;;                       %1) v [:issue_date :sell_date :payment_date :discounted_payment_date])))
+  )
 
 ;; (defentity invoices-send
 ;;   (table :invoices :invoices-send))
@@ -178,6 +187,7 @@
 (defn delete-supplier! [buyer-id seller-id]
   (delete sellers (where {:buyer_id buyer-id :seller_id seller-id})))
 
+
 (defn simple-create-invoice [obj seller-id buyer-id]
   (transaction
     (let [data-ids (group-by :id
@@ -186,7 +196,8 @@
                                (fields [:id :data_id])))
           data-ids #(-> data-ids (get %) (get :data_id))]
       
-      (insert invoices (values (merge obj {:seller_id seller-id :buyer_id buyer-id
+      (insert invoices (values (merge obj
+                                      {:seller_id seller-id :buyer_id buyer-id
                                            :seller_data_id (data-ids seller-id)
                                            :buyer_data_id (data-ids buyer-id)
                                            }))))))
@@ -227,7 +238,7 @@
 
 
 
-;; NOWE ZAJEBISTE ZAPYTANIA
+;; NOWE ZAJEBISTE ZAPYTANIAs;
 
 
 (defn page-filter [page-no per-page]

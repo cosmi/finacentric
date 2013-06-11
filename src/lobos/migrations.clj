@@ -72,7 +72,7 @@
               (varchar :extra 500)
 
               (decimal :allowed_discount_rate 7 4)
-              (decimal :discounted_payment_date 7 4)
+              (date :discounted_payment_date)
               (decimal :discount_rate 7 4)
               (decimal :discounted_net_total 17 4)
               (decimal :discounted_gross_total 17 4)

@@ -1,6 +1,8 @@
 (ns finacentric.validation
   (:use compojure.core)
-  (:import clojure.lang.ExceptionInfo)
+  (:import clojure.lang.ExceptionInfo
+           java.text.SimpleDateFormat)
+  (:import java.sql.Date java.util.GregorianCalendar)
   (:require [noir.validation :as vali]))
 
 
@@ -25,26 +27,29 @@
   
 
 (defmacro rule [field test error-msg]
-  `(let [~'_ (get-input-field ~field)]
-     (if (binding [*context* (conj @#'*context* ~field)]
-           ~test)
-       (set-value! ~field ~'_)
-       (set-error! ~field ~error-msg))))
+  `(let [field# ~field]
+     (let [~'_ (get-input-field field#)]
+       (if (binding [*context* (conj @#'*context* field#)]
+             ~test)
+         (set-value! field# ~'_)
+         (set-error! field# ~error-msg)))))
 
 
 
 
 (defmacro convert
   ([field test]
-  `(let [~'_ (get-input-field ~field)]
-     (let [res#
-           (binding [*context* (conj @#'*context* ~field)]
+  `(let [field# ~field]
+     (let [~'_ (get-input-field field#)
+           res#
+           (binding [*context* (conj @#'*context* field#)]
              ~test)]
-       (set-value! ~field res#))))
+       (set-value! field# res#))))
   ([field test error-msg]
-     `(try
-        (convert ~field ~test)
-        (catch Exception e (set-error! ~field ~error-msg)))))
+     `(let [field# ~field]
+        (try
+        (convert field# ~test)
+        (catch Exception e# (set-error! field# ~error-msg))))))
 
 
 (defmacro option [field test error-msg]
@@ -111,3 +116,28 @@
                ~@(rest else))
              (throw e#)))))))
 
+
+
+
+(defn integer-field [field error-msg]
+  (convert field (Integer/parseInt _) error-msg)
+  )
+
+(defn decimal-field [field scale error-msg-format error-msg-scale]
+  (convert field (bigdec _) error-msg-format)
+  (rule field (-> _ .scale (<= scale)) error-msg-scale)
+  (convert field (.setScale _ scale)))
+
+(defn make-sql-date [year month day]
+  (java.sql.Date. 
+   (.getTimeInMillis 
+    (java.util.GregorianCalendar. year month day))))
+
+(defn parse-date [date-str]
+  (let [[_ & values] (re-matches #"([0-9]{4})-([0-9]{2})-([0-9]{2})" date-str)
+        [year month day] (map #(Integer/parseInt %) values)]
+    (make-sql-date year month day)))
+
+
+(defn date-field [field error-msg-format]
+    (convert field (parse-date _) error-msg-format))

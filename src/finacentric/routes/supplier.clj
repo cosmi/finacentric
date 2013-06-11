@@ -53,10 +53,12 @@
 
 (defvalidator valid-simple-invoice
   (rule :number (<= 2 (count _) 40) "Numer powinno mieć 2 do 40 znaków")
-  (rule :issue_date (<= 2 (count _) 30) "Nazwisko powinno mieć 2 do 40 znaków")
-  (rule :payment_date (<= 2 (count _) 30) "Nazwisko powinno mieć 2 do 40 znaków")
-  (rule :net_total (<= (count _) 50) "Email nie powinien mieć więcej niż 50 znaków")
-  (rule :gross_total (<= (count _) 50) "Email nie powinien mieć więcej niż 50 znaków")
+  (date-field :issue_date "Błędny format daty")
+  (date-field :payment_date "Błędny format daty")
+  (rule :net_total (<= (count _) 50) "Zbyt długi ciąg")
+  (rule :gross_total (<= (count _) 50) "Zbyt długi ciąg")
+  (decimal-field :net_total 2 "Błędny format danych" "Wartość nie powinna mieć więcej niż 2 miejsca po przecinku")
+  (decimal-field :gross_total 2 "Błędny format danych" "Wartość nie powinna mieć więcej niż 2 miejsca po przecinku")
   )
 
 (defn simple-invoice-form [input errors]
@@ -108,7 +110,12 @@
         "."
         ))
 
-
+(defn FORM-simple-invoice [supplier-id buyer-id]
+  (FORM "/simple-invoice-form"
+        #(layout (simple-invoice-form %1 %2))
+        valid-simple-invoice
+        #(db/simple-create-invoice % supplier-id buyer-id)
+        "hello"))
 
 
 
@@ -122,15 +129,7 @@
       (id-context buyer-id
         (GET "/hello" []
           (dashboard supplier-id buyer-id))
-        (GET "/simple-invoice-form" []
-          (layout
-           (simple-invoice-form {} {})))
-        (POST "/simple-invoice-form" {params :params :as request}
-          (if-let [obj (validates? valid-simple-invoice params)]
-                (and (db/simple-create-invoice obj supplier-id buyer-id)
-                     (resp/redirect "hello"))
-                (layout
-                 (simple-invoice-form params (get-errors)))))
+        (FORM-simple-invoice supplier-id buyer-id)
 
         ))))
 

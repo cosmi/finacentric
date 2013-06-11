@@ -59,6 +59,12 @@
     (assert (= (:status result) 302) (str "Error, status returned: " (:status result)))
     (:cookies result)))
 
+(defn user-company-id [email]
+  (->
+   (select db/users (where (= :email email)) (fields :company_id))
+   first
+   :company_id))
+
 (defmacro with-logged-user [[user-id pass] & body]
   `(binding [*cookies* (login "http://localhost:3000/login" ~user-id ~pass)]
      ~@body))
@@ -116,6 +122,9 @@
         first
         (get :id))))
 
+
+(defn create-simple-invoice! [from to data]
+  (form-post (url :supplier from to :simple-invoice-form) data))
   
 
 
@@ -130,25 +139,26 @@
             company-id))]
     
 
-    (let [suppliers (with-logged-user ["a@dtel.pl" "abcde"]
-                      [(create-supplier! company-id {:name "Druty Sp. z o.o."})
-                       (create-supplier! company-id {:name "Kable Sp. z o.o."})])]
-      (register-user-for-company-by-reg-code! (suppliers 0)
-                                              {:email "adam@druty.pl"
-                                               :password "abcde"
-                                               :repeat-password "abcde"})
-      (register-user-for-company-by-reg-code! (suppliers 1)
-                                              {:email "adam@kable.pl"
-                                               :password "abcde"
-                                               :repeat-password "abcde"}))
-    
-    
 
-  
+    (doseq [supp [{:name "Druty Sp. z o.o." :email "adam@druty.pl"}
+                  {:name "Kable Sp. z o.o." :email "adam@kable.pl"}]]
+      (with-logged-user ["a@dtel.pl" "abcde"]
+        (let [supplier-id (create-supplier! company-id {:name (supp :name)})]
+          (register-user-for-company-by-reg-code! supplier-id
+                                                  {:email (supp :email)
+                                                   :password "abcde"
+                                                   :repeat-password "abcde"}))))
 
 
-  
-  ))
+    (with-logged-user ["adam@druty.pl" "abcde"]
+      (let [seller-id (user-company-id "adam@druty.pl")]
+        (create-simple-invoice! seller-id company-id {:number "KR/4/4"
+                                                    :issue_date "2013-04-01"
+                                                    :payment_date "2013-04-15"
+                                                    :net_total 100
+                                                    :gross_total 123})      
+
+      ))))
   
   
   
