@@ -153,10 +153,11 @@
     (with-logged-user ["adam@druty.pl" "abcde"]
       (let [seller-id (user-company-id "adam@druty.pl")]
         (create-simple-invoice! seller-id company-id {:number "KR/4/4"
-                                                    :issue_date "2013-04-01"
-                                                    :payment_date "2013-04-15"
-                                                    :net_total 100
-                                                    :gross_total 123})      
+                                                      :issue_date "2013-04-01"
+                                                      :sell_date "2013-04-01"
+                                                      :payment_date "2013-04-15"
+                                                      :net_total 100
+                                                      :gross_total 123})      
 
       ))))
   

@@ -267,5 +267,5 @@
                (where (not= buyer-id :companies.id))
                (fields "companies.*" :sellers.buyer_id)
                )
-             filters)
-     exec))
+           filters)
+   exec))

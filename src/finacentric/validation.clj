@@ -120,8 +120,7 @@
 
 
 (defn integer-field [field error-msg]
-  (convert field (Integer/parseInt _) error-msg)
-  )
+  (convert field (Integer/parseInt _) error-msg))
 
 (defn decimal-field [field scale error-msg-format error-msg-scale]
   (convert field (bigdec _) error-msg-format)
@@ -138,6 +137,6 @@
         [year month day] (map #(Integer/parseInt %) values)]
     (make-sql-date year month day)))
 
-
 (defn date-field [field error-msg-format]
     (convert field (parse-date _) error-msg-format))
+

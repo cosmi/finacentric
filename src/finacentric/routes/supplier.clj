@@ -54,6 +54,7 @@
 (defvalidator valid-simple-invoice
   (rule :number (<= 2 (count _) 40) "Numer powinno mieć 2 do 40 znaków")
   (date-field :issue_date "Błędny format daty")
+  (date-field :sell_date "Błędny format daty")
   (date-field :payment_date "Błędny format daty")
   (rule :net_total (<= (count _) 50) "Zbyt długi ciąg")
   (rule :gross_total (<= (count _) 50) "Zbyt długi ciąg")
@@ -67,10 +68,13 @@
      (with-errors errors
        (text-input :number "Numer" 40)
        (date-input :issue_date "Data wystawienia" 30)
-       (date-input :payment_date "Data wystawienia" 30)
+       (date-input :sell_date "Data sprzedaży" 10)
+       (date-input :payment_date "Termin płatności" 30)
        (decimal-input :net_total "Wartość netto" 30)
        (decimal-input :gross_total "Wartość brutto" 30)
        ))))
+
+
 
 
 ;;; REGISTER FROM REG-CODE
@@ -130,7 +134,6 @@
         (GET "/hello" []
           (dashboard supplier-id buyer-id))
         (FORM-simple-invoice supplier-id buyer-id)
-
         ))))
 
 
