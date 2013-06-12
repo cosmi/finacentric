@@ -1,0 +1,33 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>Login to finacentric</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="{{context}}/css/bootstrap.min.css" rel="stylesheet" type="text/css"></link>
+    <link href="{{context}}/css/bootstrap-responsive.min.css" rel="stylesheet" type="text/css"></link>
+    <link href="{{context}}/css/screen.css" rel="stylesheet" type="text/css"></link>
+    <link href="{{context}}/assets/css/fcentric.css" rel="stylesheet" type="text/css"></link>
+    <link href="{{context}}/assets/css/login.css" rel="stylesheet" type="text/css"></link>
+  </head>
+  <body>
+    <div class="container">
+
+      <form class="form-signin" method="post">
+        <h2 class="form-signin-heading">Sign in</h2>
+        {% if errors.id %}
+        <div class="alert alert-error">{{errors.id}}</div>
+        {% endif %}
+        <input type="text" name="id" class="input-block-level" placeholder="Email address" value="{{input.id}}">
+        <input type="password" name="pass" class="input-block-level" placeholder="Password" value="{{input.pass}}">
+        <button class="btn btn-large btn-primary" type="submit">Sign in</button>
+      </form>
+
+    </div> <!-- /container -->
+
+    <script type="text/javascript">
+      var context = "{{context}}";
+    </script>
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+    <script type="text/javascript" src="{{context}}/js/bootstrap.min.js"></script>
+  </body>
+</html>
