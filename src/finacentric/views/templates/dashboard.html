@@ -11,21 +11,56 @@ Is it me you're looking for?
 </div>
 
 
-<table class="table table-bordered">
-<!-- <thead> -->
-<!--                 <tr> -->
-<!--                   <th>#</th> -->
-<!--                   <th>First Name</th> -->
-<!--                   <th>Last Name</th> -->
-<!--                   <th>Username</th> -->
-<!--                 </tr> -->
-<!--               </thead> -->
+<table class="table table-striped">
+  <colgroup>
+    <col span="1" style="width: 10px;">
+    <col span="1" style="width: 10%;">
+    <col span="1" >
+    <col span="1" style="width: 10%;">      
+    <col span="1" style="width: 10%;">      
+    <col span="1" style="width: 10%;">
+    <col span="1" style="width: 10%;">      
+    <col span="1" style="width: 10%;"> 
+  </colgroup>
+  <thead>
+    <tr>
+      <th><input type="checkbox" name="selected-all"/></th>
+      <th>Numer</th>
+      <th>Opis</th>
+      <th>Data wystawienia</th>
+      <th>Termin płatności</th>
+      <th>Netto</th>
+      <th>Brutto</th>
+      <th>Stan</th> 
+    </tr>
+  </thead>
 <tbody>
 {% for i in invoices %}
     <tr>
+      <td><input type="checkbox" name="selected[{{i.id}}]"/></td>
       <td>{{i.number}}</td>
+      <td>{{i.description}}</td>
       <td>{{i.issue_date}}</td>
       <td>{{i.payment_date}}</td>
+      <td>{{i.net_total}}</td>
+      <td>{{i.gross_total}}</td>
+      <th>
+        
+        {% if i.corrected %} 
+        Korekta
+        {% else %}
+        {% if i.discount_accepted %} 
+        Dyskont!
+        {% else %}
+        {% if i.accepted %} 
+        Zaakceptowana
+        {% else %}
+        Czeka
+        {% endif %}
+        {% endif %}
+        {% endif %}
+        
+      </th>
     </tr>
 {% endfor %}
     

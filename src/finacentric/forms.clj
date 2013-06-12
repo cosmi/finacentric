@@ -49,8 +49,8 @@
       [:div.error error]
       ))))
 
-(def date-input text-input)
-(def decimal-input text-input)
+(def date-input text-input) ;TODO
+(def decimal-input text-input) ;TODO
 
 (defmacro with-input [input & body]
   `(binding [*input* ~input]

@@ -60,6 +60,7 @@
               (integer :seller_data_id [:refer :company_datas :id])
               (integer :buyer_data_id [:refer :company_datas :id])
               (varchar :number 30)
+              (varchar :description 30)
               (unique [:number :buyer_id])
               (date :issue_date)
               (date :sell_date)
@@ -78,7 +79,9 @@
               (decimal :discounted_gross_total 17 4)
 
               (boolean :accepted)
-              (boolean :discount_accepted)))
+              (boolean :discount_accepted)
+              (boolean :corrected)
+              ))
 
 
       (create

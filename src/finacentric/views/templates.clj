@@ -1,7 +1,8 @@
 (ns finacentric.views.templates
   (:use [clabango.filters :only [context-lookup]]
         [clabango.parser :only [string->ast ast->groups]]
-        [clabango.tags]))
+        [clabango.tags]
+        [clojure.pprint]))
 
 (deftemplatetag "firstof" [[{args :args}] context]
   {:string (some identity (map #(context-lookup context %) args))

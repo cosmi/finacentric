@@ -17,14 +17,14 @@
             [korma.core :as korma]))
 
 
-(def ^:dynamic *supplier-id* nil)
-(def ^:dynamic *buyer-id* nil)
 (def ^:dynamic *context* nil)
 
 (defn current-supplier-id []
   *supplier-id*)
 (defn current-buyer-id []
   *buyer-id*)
+
+
 
 
 
@@ -36,13 +36,12 @@
   (db/get-invoices from to (db/page-filter page per-page)))
 
 
-(defn dashboard [supplier-id buyer-id]
-  (binding [*supplier-id* supplier-id
-            *buyer-id* buyer-id
-            *context* (str "/supplier/" supplier-id "/" buyer-id)]
-    (layout/render
-     "dashboard.html" {:context *context*
-                       :invoices (prepare-invoices (current-supplier-id) (current-buyer-id) 0 100)})))
+(defn dashboard [supplier-id buyer-id page per-page]
+  ;(binding [*context* (str "/supplier/" supplier-id "/" buyer-id)]
+  (layout/render
+   "dashboard.html" {:invoices (db/get-invoices
+                                supplier-id buyer-id
+                                (db/page-filter page per-page))}))
 
 (defn form-wrapper [content]
   (hiccup/html [:form {:method "post"}
@@ -58,8 +57,10 @@
   (date-field :payment_date "Błędny format daty")
   (rule :net_total (<= (count _) 50) "Zbyt długi ciąg")
   (rule :gross_total (<= (count _) 50) "Zbyt długi ciąg")
-  (decimal-field :net_total 2 "Błędny format danych" "Wartość nie powinna mieć więcej niż 2 miejsca po przecinku")
-  (decimal-field :gross_total 2 "Błędny format danych" "Wartość nie powinna mieć więcej niż 2 miejsca po przecinku")
+  (decimal-field :net_total 2 "Błędny format danych"
+                 "Wartość nie powinna mieć więcej niż 2 miejsca po przecinku")
+  (decimal-field :gross_total 2 "Błędny format danych"
+                 "Wartość nie powinna mieć więcej niż 2 miejsca po przecinku")
   )
 
 (defn simple-invoice-form [input errors]
@@ -101,7 +102,7 @@
 
 (defn FORM-register-to-company []
   (FORM "/register"
-        #(layout (register-from-reg-code-form %1 %2))
+        (fn [input errors] (layout (register-from-reg-code-form input errors)))
         register-from-reg-code-validator
         #(let [id (errors-validate
                       :reg-code
@@ -130,10 +131,13 @@
       (resp/redirect (str "/supplier/" (or (auth/get-current-users-company-id) 0)))) 
     (FORM-register-to-company)
     (id-context supplier-id
-      (id-context buyer-id
-        (GET "/hello" []
-          (dashboard supplier-id buyer-id))
-        (FORM-simple-invoice supplier-id buyer-id)
-        ))))
+      (routes-when (auth/logged-to-company? supplier-id)
+        (id-context buyer-id
+          (GET "/hello" []
+            (with-pagination page-no
+              (with-page-size 30 page-size
+                (dashboard supplier-id buyer-id page-no page-size))))
+          (FORM-simple-invoice supplier-id buyer-id)
+          )))))
 
 

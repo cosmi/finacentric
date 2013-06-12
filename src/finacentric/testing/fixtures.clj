@@ -32,13 +32,14 @@
                                 keys
                                 (remove #(->
                                           (enlive/select form
-                                            [[#{:input :select :textarea} (enlive/attr= :name (name %))]])
+                                            [[#{:input :select :textarea}
+                                              (enlive/attr= :name (name %))]])
                                           not-empty)))]
-        (assert (empty? unknown-fields) (apply str "Fields do not exist in the form: " (interpose ", " unknown-fields)))
-          
-          )))
-    (let [result (http/post (str "http://localhost:3000" url)  {:form-params args :cookies *cookies*})]
-;    (pprint result)
+        (assert (empty? unknown-fields)
+                (apply str "Fields do not exist in the form: "
+                       (interpose ", " unknown-fields))))))
+    (let [result (http/post (str "http://localhost:3000" url)
+                            {:form-params args :cookies *cookies*})]
     (assert (= (:status result) 302) (str "Error, status returned: " (:status result)))
     result))
 
@@ -159,9 +160,9 @@
                                                       :net_total 100
                                                       :gross_total 123})      
 
-      ))))
-  
-  
+        ))))
+
+
   
 
     
