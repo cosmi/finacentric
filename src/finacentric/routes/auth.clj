@@ -1,40 +1,22 @@
 (ns finacentric.routes.auth
-  (:use compojure.core)
+  (:use compojure.core
+        finacentric.util
+        finacentric.validation
+        finacentric.forms)
   (:require [finacentric.views.layout :as layout]
             [noir.session :as session]
             [noir.response :as resp]
             [noir.validation :as vali]
             [noir.util.crypt :as crypt]
-            [finacentric.models.db :as db]))
+            [finacentric.models.db :as db]
+            [hiccup.core :as hiccup]))
 
-;; (defn valid? [id pass pass1]
-;;   (vali/rule (vali/has-value? id)
-;;              [:id "user ID is required"])
-;;   (vali/rule (vali/min-length? pass 5)
-;;              [:pass "password must be at least 5 characters"])
-;;   (vali/rule (= pass pass1)
-;;              [:pass1 "entered passwords do not match"])
-;;   (not (vali/errors? :id :pass :pass1)))
+(defvalidator valid-login
+  (rule :id (or (= "admin" _) (vali/is-email? _)) "Niepoprawny adres e-mail")
+  (rule :pass #(true) ""))
 
-;; (defn register [& [id]]
-;;   (layout/render
-;;    "registration.html"
-;;    {:id id
-;;     :id-error (vali/on-error :id first)
-;;     :pass-error (vali/on-error :pass first)
-;;     :pass1-error (vali/on-error :pass1 first)}))
-
-;; (defn handle-registration [id pass pass1]
-;;   (if (valid? id pass pass1)
-;;     (try
-;;       (do
-;;         (db/create-user! {:id id :pass (crypt/encrypt pass)})
-;;         (session/put! :user-id id)
-;;         (resp/redirect "/"))
-;;       (catch Exception ex
-;;         (vali/rule false [:id (.getMessage ex)])
-;;         (register)))
-;;     (register id)))
+(defn login-form [input errors]
+  (layout/render "app/login.html" {:input input :errors errors}))
 
 (defn profile []
   (layout/render
@@ -45,35 +27,33 @@
   (db/update-user (session/get :user-id) first-name last-name email)
   (profile))
 
+(defn- session-put-user [user]
+  (session/put! :user-id (user :id)))
+
 (defn handle-login [id pass]
   (let [user (db/find-user id)]
-    (if (and user (crypt/compare pass (:pass user)))
-      (session/put! :user-id (user :id)))
-    (resp/redirect "/")))
+    (prn user id pass)
+    (when (and user (crypt/compare pass (:pass user)))
+      (session-put-user user))))
 
 (defn logout []
   (session/clear!)
   (resp/redirect "/"))
 
-
 (defroutes auth-routes
-  ;; (GET "/register" []
-  ;;      (register))
 
-  ;; (POST "/register" [id pass pass1]
-  ;;       (handle-registration id pass pass1))
-
-  ;; (GET "/profile" [] (profile))
-
-  ;; (POST "/update-profile" {params :params} (update-profile params))
-
-  (POST "/login" [id pass]
-        (handle-login id pass))
-
+  (FORM "/login"
+        (fn [input errors] (login-form input errors))
+        valid-login
+        (fn [input] (if (handle-login (input :id) (input :pass))
+                     (resp/redirect "/")
+                     (login-form (dissoc input :pass) {:email "Niepoprawny login lub hasło"}))))
+  
   (GET "/logout" []
        (logout)))
 
 
+;; Helpers
 
 (defn logged-as-admin? []
   (db/is-admin? (session/get :user-id)))
