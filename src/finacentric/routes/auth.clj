@@ -11,6 +11,25 @@
             [finacentric.models.db :as db]
             [hiccup.core :as hiccup]))
 
+(def logged-in-redirect "/")
+(def logged-out-redirect "/")
+
+;; Helpers
+
+(defn logged-in? []
+  (session/get :user-id))
+
+(defn logged-as-admin? []
+  (db/is-admin? (session/get :user-id)))
+
+(defn logged-to-company? [company-id]
+  (db/user-to-company-access? (session/get :user-id) company-id))
+
+(defn get-current-users-company-id []
+  (db/get-users-company-id (session/get :user-id)))
+
+;; Stuff
+
 (defvalidator valid-login
   (rule :id (or (= "admin" _) (vali/is-email? _)) "Niepoprawny adres e-mail")
   (rule :pass #(true) ""))
@@ -38,29 +57,26 @@
 
 (defn logout []
   (session/clear!)
-  (resp/redirect "/"))
+  (resp/redirect logged-out-redirect))
 
 (defroutes auth-routes
 
+  ;; Gdy uzytkownik jest zalogowany, to nie pokazujemy ekranu logowania
+  (context "" {:as request}
+           (if-not (logged-in?)
+             (constantly nil)
+             (routes
+              (GET "/login" [] (resp/redirect logged-in-redirect))
+              (POST "/login" [] (resp/redirect logged-in-redirect)))))
+  
   (FORM "/login"
         (fn [input errors] (login-form input errors))
         valid-login
         (fn [input] (if (handle-login (input :id) (input :pass))
-                     (resp/redirect "/")
+                     (resp/redirect logged-in-redirect)
                      (login-form (dissoc input :pass) {:email "Niepoprawny login lub hasło"}))))
   
   (GET "/logout" []
        (logout)))
 
 
-;; Helpers
-
-(defn logged-as-admin? []
-  (db/is-admin? (session/get :user-id)))
-
-
-(defn logged-to-company? [company-id]
-  (db/user-to-company-access? (session/get :user-id) company-id))
-
-(defn get-current-users-company-id []
-  (db/get-users-company-id (session/get :user-id)))
