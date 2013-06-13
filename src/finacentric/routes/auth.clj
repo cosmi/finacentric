@@ -11,9 +11,6 @@
             [finacentric.models.db :as db]
             [hiccup.core :as hiccup]))
 
-(def logged-in-redirect "/")
-(def logged-out-redirect "/")
-
 ;; Helpers
 
 (defn logged-in? []
@@ -27,6 +24,11 @@
 
 (defn get-current-users-company-id []
   (db/get-users-company-id (session/get :user-id)))
+
+;; Pseudo constants
+
+(defn logged-in-redirect [] "/supplier/hello")
+(defn logged-out-redirect [] "/login")
 
 ;; Stuff
 
@@ -57,7 +59,7 @@
 
 (defn logout []
   (session/clear!)
-  (resp/redirect logged-out-redirect))
+  (resp/redirect (logged-out-redirect)))
 
 (defroutes auth-routes
 
@@ -66,17 +68,20 @@
            (if-not (logged-in?)
              (constantly nil)
              (routes
-              (GET "/login" [] (resp/redirect logged-in-redirect))
-              (POST "/login" [] (resp/redirect logged-in-redirect)))))
+              (GET "/login" [] (resp/redirect (logged-in-redirect)))
+              (POST "/login" [] (resp/redirect (logged-in-redirect))))))
   
   (FORM "/login"
         (fn [input errors] (login-form input errors))
         valid-login
         (fn [input] (if (handle-login (input :id) (input :pass))
-                     (resp/redirect logged-in-redirect)
+                     (resp/redirect (logged-in-redirect))
                      (login-form (dissoc input :pass) {:email "Niepoprawny login lub hasło"}))))
   
+  (POST "/logout" []
+        (logout))
+  
   (GET "/logout" []
-       (logout)))
+       (hiccup/html [:form {:method :post} [:button "Logout"]])))
 
 
