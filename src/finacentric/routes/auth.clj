@@ -82,6 +82,6 @@
         (logout))
   
   (GET "/logout" []
-       (hiccup/html [:form {:method :post} [:button "Logout"]])))
+       (layout/render "app/logout.html")))
 
 
