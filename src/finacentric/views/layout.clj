@@ -2,6 +2,7 @@
   (:use noir.request)
   (:require [clabango.parser :as parser]
             [clabango.tags :as cl-tags]
+            [clabango.filters :as cl-filters]
             [finacentric.views.templates :as tags]
             [noir.session :as session]))
 
@@ -24,3 +25,4 @@
         (tags/extract-block block)
         parser/groups->parsed
         parser/realize)))
+

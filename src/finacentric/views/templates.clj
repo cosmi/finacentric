@@ -1,5 +1,5 @@
 (ns finacentric.views.templates
-  (:use [clabango.filters :only [context-lookup]]
+  (:use [clabango.filters :only [context-lookup deftemplatefilter]]
         [clabango.parser :only [string->ast ast->groups]]
         [clabango.tags]
         [clojure.pprint]))
@@ -40,3 +40,11 @@
 (deftemplatetag "debug" [nodes context]
   (prn nodes)
   (prn context))
+
+
+
+;; (deftemplatefilter "format" [node body arg]
+;;   (prn node body arg)
+;;   (when body
+;;     (format arg body)))
+

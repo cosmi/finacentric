@@ -69,10 +69,12 @@
               (decimal :paid_already 17 4)
               (decimal :net_total 17 4)
               (decimal :gross_total 17 4)
+              (varchar :currency 8 (default "PLN"))
               
               (varchar :extra 500)
 
-              (decimal :allowed_discount_rate 7 4)
+              (decimal :required_discount_rate 7 4) ; wymagana zniżka za przyspieszenie
+              
               (date :discounted_payment_date)
               (decimal :discount_rate 7 4)
               (decimal :discounted_net_total 17 4)

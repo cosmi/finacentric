@@ -21,7 +21,7 @@
 
 (defn layout [& content]
   (layout/render
-   "layout.html" {:content (apply str (flatten content))}))
+   "app/sup_base.html" {:content (apply str (flatten content))}))
 
 (defn prepare-invoices [from to page per-page]
   (db/get-invoices from to (db/page-filter page per-page)))

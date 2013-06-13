@@ -1,4 +1,4 @@
-(ns finacentric.routes.company
+*(ns finacentric.routes.company
   (:use compojure.core)
   (:use clojure.pprint)
   (:use finacentric.util
@@ -17,32 +17,25 @@
             [korma.core :as korma]))
 
 
-(def ^:dynamic *supplier-id* nil)
-(def ^:dynamic *buyer-id* nil)
 (def ^:dynamic *context* nil)
 
-(defn current-supplier-id []
-  *supplier-id*)
-(defn current-buyer-id []
-  *buyer-id*)
 
 
 
 (defn layout [& content]
   (layout/render
-   "layout.html" {:content (apply str (flatten content))}))
+   "app/co_base.html" {:content (apply str (flatten content))}))
 
 (defn prepare-invoices [from to page per-page]
   (db/get-invoices from to (db/page-filter page per-page)))
 
 
 (defn dashboard [supplier-id buyer-id]
-  (binding [*supplier-id* supplier-id
-            *buyer-id* buyer-id
-            *context* (str "/supplier/" supplier-id "/" buyer-id)]
+  (binding [*context* (str "/supplier/" supplier-id "/" buyer-id)]
     (layout/render
-     "dashboard.html" {:context *context*
-                       :invoices (prepare-invoices (current-supplier-id) (current-buyer-id) 0 100)})))
+     "app/co_dashboard.html" {:context *context*
+                       :invoices nil ;TODO
+                       })))
 
 (defn form-wrapper [content]
   (hiccup/html [:form {:method "post"}
@@ -114,8 +107,7 @@
 
 (defroutes company-routes
   (context "/company" {:as request}
-    (id-context company-id
+    (with-int-param [company-id (auth/get-current-users-company-id)]
       (routes-when (auth/logged-to-company? company-id)
-        (FORM-add-supplier company-id))))
-  )
-
+        (FORM-add-supplier company-id)))))
+  

@@ -102,8 +102,7 @@
 ;; non-admin-actions:
 
 (defn create-supplier! [buyer-id data]
-  (let [res (form-post (url :company buyer-id
-                            :add-supplier)
+  (let [res (form-post (url :company :add-supplier)
              data)]
     (-> res (get-in [:headers "location"])
         (->> (re-matches #"supplier/([0-9]+)"))

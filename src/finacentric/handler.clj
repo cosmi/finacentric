@@ -70,7 +70,8 @@
         (app req)))))
 
 ;;append your application routes to the all-routes vector
-(def all-routes [auth-routes home-routes company-routes supplier-routes admin-routes app-routes ])
+(def all-routes [#'auth-routes #'home-routes #'company-routes
+                 #'supplier-routes #'admin-routes #'app-routes ])
 (def app (->
           (middleware/app-handler all-routes)
           (finacentric.validation/wrap-validation)
