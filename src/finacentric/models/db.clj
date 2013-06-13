@@ -143,6 +143,18 @@
       first
       (get :company_id)))
 
+
+(defn get-suppliers-first-buyer-id [supplier-id]
+  (-> (select sellers
+        (where {:seller_id supplier-id})
+        (fields :buyer_id)
+        (limit 1))
+      first
+      (get :buyer_id)))
+
+
+
+
 (defn user-to-company-access? [user-id company-id]
   (-> (select users
         (fields :id :company_id)

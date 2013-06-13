@@ -49,6 +49,12 @@
      (with-integer ~id
        (routes ~@body))))
 
+
+(defmacro with-int-param [[id default-value] & body]
+  `(with-integer ~id
+     (let [~id (or ~id ~default-value)]
+       (routes ~@body))))
+
 (defn current-url []
   (noir.request/*request* :uri))
 

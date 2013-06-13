@@ -130,14 +130,15 @@
     (GET "/" []
       (resp/redirect (str "/supplier/" (or (auth/get-current-users-company-id) 0)))) 
     (FORM-register-to-company)
-    (id-context supplier-id
+    (with-int-param [supplier-id (auth/get-current-users-company-id)]
       (routes-when (auth/logged-to-company? supplier-id)
-        (id-context buyer-id
-          (GET "/hello" []
-            (with-pagination page-no
-              (with-page-size 30 page-size
-                (dashboard supplier-id buyer-id page-no page-size))))
-          (FORM-simple-invoice supplier-id buyer-id)
-          )))))
+        (with-int-param [buyer-id (db/get-suppliers-first-buyer-id supplier-id)]
+          (routes-when buyer-id
+            (GET "/hello" []
+              (with-pagination page-no
+                (with-page-size 30 page-size
+                  (dashboard supplier-id buyer-id page-no page-size))))
+            (FORM-simple-invoice supplier-id buyer-id)
+            ))))))
 
 
