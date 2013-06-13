@@ -24,10 +24,6 @@
 (defn current-buyer-id []
   *buyer-id*)
 
-
-
-
-
 (defn layout [& content]
   (layout/render
    "layout.html" {:content (apply str (flatten content))}))
@@ -39,7 +35,7 @@
 (defn dashboard [supplier-id buyer-id page per-page]
   ;(binding [*context* (str "/supplier/" supplier-id "/" buyer-id)]
   (layout/render
-   "dashboard.html" {:invoices (db/get-invoices
+   "app/sup_dashboard.html" {:invoices (db/get-invoices
                                 supplier-id buyer-id
                                 (db/page-filter page per-page))}))
 
