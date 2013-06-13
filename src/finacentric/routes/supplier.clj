@@ -19,11 +19,6 @@
 
 (def ^:dynamic *context* nil)
 
-(defn current-supplier-id []
-  *supplier-id*)
-(defn current-buyer-id []
-  *buyer-id*)
-
 (defn layout [& content]
   (layout/render
    "layout.html" {:content (apply str (flatten content))}))
