@@ -10,6 +10,7 @@ Is it me you're looking for?
  
 </div>
 
+<a href="simple-invoice-form">Nowa faktura</a>
 
 <table class="table table-striped">
   <colgroup>
@@ -44,7 +45,7 @@ Is it me you're looking for?
       <td>{{i.payment_date}}</td>
       <td>{{i.net_total}}</td>
       <td>{{i.gross_total}}</td>
-      <th>
+      <td>
         
         {% if i.corrected %} 
         Korekta
@@ -60,7 +61,7 @@ Is it me you're looking for?
         {% endif %}
         {% endif %}
         
-      </th>
+      </td>
     </tr>
 {% endfor %}
     
