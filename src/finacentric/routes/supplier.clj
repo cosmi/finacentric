@@ -39,6 +39,12 @@
                                 supplier-id buyer-id
                                 (db/page-filter page per-page))}))
 
+
+(defn invoice-view [supplier-id buyer-id invoice]
+  (layout/render
+   "app/sup_invoice.html" {:i invoice}))
+
+
 (defn form-wrapper [content]
   (hiccup/html [:form {:method "post"}
                 [:fieldset content]
@@ -118,6 +124,10 @@
         #(db/simple-create-invoice % supplier-id buyer-id)
         "hello"))
 
+(defn invoice-details [supplier-id buyer-id invoice-id]
+  (when-let [invoice (db/get-invoice invoice-id supplier-id buyer-id)]
+    (invoice-view supplier-id buyer-id invoice)))
+
 
 
 
@@ -135,6 +145,9 @@
                 (with-page-size 30 page-size
                   (dashboard supplier-id buyer-id page-no page-size))))
             (FORM-simple-invoice supplier-id buyer-id)
-            ))))))
+
+            (GET "/invoice/:id" [id]
+              (with-integer id
+                (invoice-details supplier-id buyer-id id)))))))))
 
 

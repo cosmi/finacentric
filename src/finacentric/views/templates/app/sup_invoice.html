@@ -5,8 +5,8 @@
 
 {% block content %}
 <div class="alert alert-info">
-<h4>Hello</h4>
-Is it me you're looking for?
+<h4>Faktura</h4>
+Czy to ta faktura jest tą, którą szukasz?
  
 </div>
 
@@ -36,10 +36,9 @@ Is it me you're looking for?
     </tr>
   </thead>
 <tbody>
-{% for i in invoices %}
     <tr>
       <td><input type="checkbox" name="selected[{{i.id}}]"/></td>
-      <td><a href="invoice/{{i.id}}">{{i.number}}</a></td>
+      <td>{{i.number}}</td>
       <td>{{i.description}}</td>
       <td>{{i.issue_date}}</td>
       <td>{{i.payment_date}}</td>
@@ -63,7 +62,6 @@ Is it me you're looking for?
         
       </td>
     </tr>
-{% endfor %}
     
 </table>
 

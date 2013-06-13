@@ -267,6 +267,16 @@
            filters)
    exec))
 
+(defn get-invoice [invoice-id supplier-id buyer-id]
+  (->
+   (select invoices
+     (where {:seller_id supplier-id
+             :buyer_id buyer-id
+             :id invoice-id})
+     (limit 1))
+   first))
+
+
 (defn fetch-potential-suppliers [buyer-id & filters]
   (->
    (reduce #(%2 %1)
