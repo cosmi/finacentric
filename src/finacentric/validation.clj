@@ -15,6 +15,7 @@
 
 
 (defn set-error! [field text]
+  ;; todo : jak już jest błąd, to nie zmieniaj
   (swap! *errors* assoc-in (conj *context* field) text))
 
 (defn set-value! [field value]
@@ -100,6 +101,12 @@
 
 (defmacro on-error [& body]
   (throw (Exception. "Lone on-error clause.")))
+
+
+(defn validation-error [field error-msg]
+  (set-error! field error-msg)
+  (throw (ex-info "" {::validation true})))
+
 
 (defmacro try-validate [& body]
   (let [else (last body)
