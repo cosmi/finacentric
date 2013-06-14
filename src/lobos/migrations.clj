@@ -83,7 +83,7 @@
               (boolean :discount_accepted)
               (boolean :corrected)
 
-              (varchar :file_id 20)
+              (varchar :file_id 32)
               ))
 
 

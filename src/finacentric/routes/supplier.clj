@@ -37,9 +37,10 @@
                                 (db/page-filter page per-page))}))
 
 
-(defn invoice-view [supplier-id buyer-id invoice]
+(defn invoice-view [invoice-id supplier-id buyer-id invoice]
+  (prn invoice)
   (layout/render
-   "app/sup_invoice.html" {:i invoice}))
+   "app/sup_invoice.html" {:i (assoc invoice :id invoice-id)}))
 
 
 (defn form-wrapper [content]
@@ -60,7 +61,7 @@
                  "Wartość nie powinna mieć więcej niż 2 miejsca po przecinku")
   (decimal-field :gross_total 2 "Błędny format danych"
                  "Wartość nie powinna mieć więcej niż 2 miejsca po przecinku")
-  (convert :invoice (if (vali/valid-file? _) _ nil))
+  (convert :invoice (if (vali/valid-file? _) (do (prn _) _) nil))
   (option :invoice (= "application/pdf" (:content-type _)) "Niepoprwany typ dokumentu")
   (option :invoice (<= (:size _) INVOICE-FILE-SIZE-LIMIT) "Plik z fakturą jest zbyt duży"))
 
@@ -82,7 +83,7 @@
                  (try
                    (files/store-file! (-> input :invoice :tempfile)
                                       (-> input :invoice :content-type) {})
-                   (catch Exception e nil)))
+                   (catch Exception e (.printStackTrace e) nil)))
         input (dissoc (if upload (assoc input :file_id upload) input) :invoice)]
     (and (input :invoice) (not upload)
          (throw-validation-error :invoice "Błąd podczas zapisywania pliku"))
@@ -138,8 +139,14 @@
 
 (defn invoice-details [supplier-id buyer-id invoice-id]
   (when-let [invoice (db/get-invoice invoice-id supplier-id buyer-id)]
-    (invoice-view supplier-id buyer-id invoice)))
+    (invoice-view invoice-id supplier-id buyer-id invoice)))
 
+(defn invoice-file [supplier-id buyer-id invoice-id]
+  (when-let [invoice (db/get-invoice invoice-id supplier-id buyer-id)]
+    (prn invoice)
+    (when (invoice :file_id)
+      (when-let [file (files/get-file (invoice :file_id))]
+        (files/response file (str (invoice :number) ".pdf"))))))
 
 (defroutes supplier-routes
   (context "/supplier" {:as request}
@@ -158,6 +165,9 @@
 
             (GET "/invoice/:id" [id]
               (with-integer id
-                (invoice-details supplier-id buyer-id id)))))))))
+                (invoice-details supplier-id buyer-id id)))
+            (GET "/invoice/:id/file" [id]
+                 (with-integer id
+                   (invoice-file supplier-id buyer-id id)))))))))
 
 

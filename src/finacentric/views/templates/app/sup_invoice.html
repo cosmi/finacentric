@@ -166,5 +166,10 @@
 Zaakceptowane? {{i.accepted}}
 Dyskont zaakceptowany? {{i.discount_accepted}}
 Korekta wykonana? {{i.corrected}}
+
+{% if i.file_id %}
+<a href="/supplier/invoice/{{i.id}}/file">Plik</a>
+{% endif %}
+
 </div>
 {% endblock %}

@@ -276,7 +276,6 @@
      (limit 1))
    first))
 
-
 (defn fetch-potential-suppliers [buyer-id & filters]
   (->
    (reduce #(%2 %1)
