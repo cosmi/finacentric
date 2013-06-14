@@ -78,10 +78,14 @@
 
 (defn- handle-simple-invoice-form [input supplier-id buyer-id]
   ;; file upload?
-  (when-let [upload (errors-validate :invoice "Błąd podczas zapisywania pliku"
-                   (files/store-file! (-> input :invoice :tempfile)
-                                      (-> input :invoice :content-type) {}))]
-    (db/simple-create-invoice input supplier-id buyer-id)))
+  (if-let [upload
+             (try
+               (files/store-file! (-> input :invoice :tempfile)
+                                  (-> input :invoice :content-type) {})
+               (catch Exception e nil))]
+    (db/simple-create-invoice (assoc input :file_id upload) supplier-id buyer-id)
+    (throw-validation-error :invoice "Błąd podczas zapisywania pliku")
+    ))
 
 
 ;;; REGISTER FROM REG-CODE
@@ -112,13 +116,14 @@
   (FORM "/register"
         (fn [input errors] (layout (register-from-reg-code-form input errors)))
         register-from-reg-code-validator
-        #(let [id (errors-validate
-                      :reg-code
-                      "Niepoprawny kod rejestracyjny"
+        #(let [id (try
                     (db/create-user-from-reg-code!
                      (% :reg-code)
                      (dissoc % :reg-code :repeat-password :password)
-                     (% :password)))]
+                     (% :password))
+                    (catch clojure.lang.ExceptionInfo e#
+                      (throw-validation-error :reg-code
+                                              "Niepoprawny kod rejestracyjny")))]
            (resp/redirect (str "supplier")))
         "."
         ))

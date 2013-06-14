@@ -70,7 +70,6 @@
               (decimal :net_total 17 4)
               (decimal :gross_total 17 4)
               (varchar :currency 8 (default "PLN"))
-              
               (varchar :extra 500)
 
               (decimal :required_discount_rate 7 4) ; wymagana zniżka za przyspieszenie
@@ -83,6 +82,8 @@
               (boolean :accepted)
               (boolean :discount_accepted)
               (boolean :corrected)
+
+              (varchar :file_id 20)
               ))
 
 

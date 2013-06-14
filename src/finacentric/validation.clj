@@ -93,20 +93,20 @@
     (binding [*errors* (atom {})]
       (handler request))))
 
-(defmacro errors-validate [field error-msg & body]
-  `(try
-     ~@body
-     (catch Exception e#
-       (.printStackTrace e#)
+;; (defmacro errors-validate [field error-msg & body]
+;;   `(try
+;;      ~@body
+;;      (catch Exception e#
+;;        (.printStackTrace e#)
        
-       (set-error! ~field ~error-msg)
-       (throw (ex-info "" {::validation true})))))
+;;        (set-error! ~field ~error-msg)
+;;        (throw (ex-info "" {::validation true})))))
 
 (defmacro on-error [& body]
   (throw (Exception. "Lone on-error clause.")))
 
 
-(defn validation-error [field error-msg]
+(defn throw-validation-error [field error-msg]
   (set-error! field error-msg)
   (throw (ex-info "" {::validation true})))
 
