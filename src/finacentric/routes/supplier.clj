@@ -60,9 +60,9 @@
                  "Wartość nie powinna mieć więcej niż 2 miejsca po przecinku")
   (decimal-field :gross_total 2 "Błędny format danych"
                  "Wartość nie powinna mieć więcej niż 2 miejsca po przecinku")
-  (rule :invoice (<= (:size _) INVOICE-FILE-SIZE-LIMIT) "Plik z fakturą jest zbyt duży")
-  (rule :invoice (= "application/pdf" (:content-type _)) "Niepoprwany typ dokumentu")
-  (rule :invoice (vali/valid-file? _) "Niepopwany załącznik"))
+  (convert :invoice (if (vali/valid-file? _) _ nil))
+  (option :invoice (= "application/pdf" (:content-type _)) "Niepoprwany typ dokumentu")
+  (option :invoice (<= (:size _) INVOICE-FILE-SIZE-LIMIT) "Plik z fakturą jest zbyt duży"))
 
 (defn simple-invoice-form [input errors]
   (form-wrapper
@@ -78,14 +78,15 @@
 
 (defn- handle-simple-invoice-form [input supplier-id buyer-id]
   ;; file upload?
-  (if-let [upload
-             (try
-               (files/store-file! (-> input :invoice :tempfile)
-                                  (-> input :invoice :content-type) {})
-               (catch Exception e nil))]
-    (db/simple-create-invoice (assoc input :file_id upload) supplier-id buyer-id)
-    (throw-validation-error :invoice "Błąd podczas zapisywania pliku")
-    ))
+  (let [upload (when (input :invoice)
+                 (try
+                   (files/store-file! (-> input :invoice :tempfile)
+                                      (-> input :invoice :content-type) {})
+                   (catch Exception e nil)))
+        input (dissoc (if upload (assoc input :file_id upload) input) :invoice)]
+    (and (input :invoice) (not upload)
+         (throw-validation-error :invoice "Błąd podczas zapisywania pliku"))
+    (db/simple-create-invoice input supplier-id buyer-id)))
 
 
 ;;; REGISTER FROM REG-CODE
