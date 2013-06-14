@@ -11,7 +11,15 @@
 (def ^{:dynamic true :private true} *errors*)
 (def ^{:dynamic true :private true} *input*)
 (def ^{:dynamic true :private true} *output*)
+(def ^{:dynamic true :private true} *optional* false)
 (def ^{:dynamic true :private true} *context* [])
+
+
+(defn empty-field? [value]
+  (cond (nil? value) true
+        (coll? value) (empty? value)
+        (string? value) (.isEmpty ^String value)
+        :else false))
 
 
 (defn set-error! [field text]
@@ -25,38 +33,44 @@
 
 (defn get-input-field [field]
   (get @*input* field))
-  
+
+(defn has-error? [field]
+  (-> *errors* deref (get-in *context*) (get field) not-empty))
+
 
 (defmacro rule [field test error-msg]
   `(let [field# ~field]
-     (let [~'_ (get-input-field field#)]
-       (if (binding [*context* (conj @#'*context* field#)]
-             ~test)
-         (set-value! field# ~'_)
-         (set-error! field# ~error-msg)))))
-
+     (when-not (has-error? field#)
+       (let [~'_ (get-input-field field#)]
+         (when-not (and #'*optional* (empty-field? ~'_))
+           (if (binding [*context* (conj @#'*context* field#)]
+                 ~test)
+             (set-value! field# ~'_)
+             (set-error! field# ~error-msg)))))))
 
 
 
 (defmacro convert
   ([field test]
-  `(let [field# ~field]
-     (let [~'_ (get-input-field field#)
-           res#
-           (binding [*context* (conj @#'*context* field#)]
-             ~test)]
-       (set-value! field# res#))))
+     `(let [field# ~field]
+        (when-not (has-error? field#)
+          (let [~'_ (get-input-field field#)]
+            (when-not (and #'*optional* (empty-field? ~'_))
+              (let [res# (binding [*context* (conj @#'*context* field#)]
+                           ~test)]
+                (set-value! field# res#)))))))
   ([field test error-msg]
      `(let [field# ~field]
         (try
-        (convert field# ~test)
-        (catch Exception e# (set-error! field# ~error-msg))))))
+          (convert field# ~test)
+          (catch Exception e# (set-error! field# ~error-msg))))))
 
 
-(defmacro option [field test error-msg]
- `(do
-    (convert ~field (not-empty ~'_))
-    (rule ~field (or (nil? ~'_) ~test) ~error-msg)))
+
+;; (defmacro option [field test error-msg]
+;;  `(do
+;;     (convert ~field (not-empty ~'_))
+;;     (rule ~field (or (nil? ~'_) ~test) ~error-msg)))
 
 
 
@@ -127,15 +141,24 @@
              (throw e#)))))))
 
 
+(defmacro optional [& body]
+  `(binding [*optional* true]
+     ~@body))
+
+(defmacro with-field [field & body]
+  `(doto ~field ~@body))
+
+
 
 
 (defn integer-field [field error-msg]
   (convert field (Integer/parseInt _) error-msg))
 
 (defn decimal-field [field scale error-msg-format error-msg-scale]
-  (convert field (bigdec (clojure.string/replace _ #"," ".")) error-msg-format)
-  (when-not (has-errors?) (rule field (-> _ .scale (<= scale)) error-msg-scale))
-  (when-not (has-errors?) (convert field (.setScale _ scale))))
+  (with-field field
+    (convert (bigdec (clojure.string/replace _ #"," ".")) error-msg-format)
+    (rule (-> _ .scale (<= scale)) error-msg-scale)
+    (convert (.setScale _ scale))))
 
 (defn make-sql-date [year month day]
   (java.sql.Date. 

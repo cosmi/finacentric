@@ -83,11 +83,11 @@
   ;; (rule :email1 (<= (count _) 50) "Email nie powinien mieć więcej niż 50 znaków")
   ;; (option :email2 (vali/is-email? _) "Niepoprawny format adresu email")
   ;; (option :email2 (<= (count _) 50) "Email nie powinien mieć więcej niż 50 znaków")
-  (option :address_street (<= (count _) 80) "Ulica nie powinna mieć więcej niż 80 znaków")
-  (option :address_street_no (<= (count _) 20) "Numer nie powinien mieć więcej niż 20 znaków")
-  (option :nip (vali-util/is-nip? _) "Niepoprawny format NIP (proszę zapisać same cyfry, bez pauz)")
-  (option :regon (vali-util/is-regon? _) "Niepoprawny format REGON")
-  )
+  (optional
+    (rule :address_street (<= (count _) 80) "Ulica nie powinna mieć więcej niż 80 znaków")
+    (rule :address_street_no (<= (count _) 20) "Numer nie powinien mieć więcej niż 20 znaków")
+    (rule :nip (vali-util/is-nip? _) "Niepoprawny format NIP (proszę zapisać same cyfry, bez pauz)")
+    (rule :regon (vali-util/is-regon? _) "Niepoprawny format REGON")))
 
 
 

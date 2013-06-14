@@ -61,9 +61,11 @@
                  "Wartość nie powinna mieć więcej niż 2 miejsca po przecinku")
   (decimal-field :gross_total 2 "Błędny format danych"
                  "Wartość nie powinna mieć więcej niż 2 miejsca po przecinku")
-  (convert :invoice (if (vali/valid-file? _) (do (prn _) _) nil))
-  (option :invoice (= "application/pdf" (:content-type _)) "Niepoprwany typ dokumentu")
-  (option :invoice (<= (:size _) INVOICE-FILE-SIZE-LIMIT) "Plik z fakturą jest zbyt duży"))
+  (optional
+    (with-field :invoice
+      (convert (if (vali/valid-file? _) (do (prn _) _) nil))
+      (rule (= "application/pdf" (:content-type _)) "Niepoprwany typ dokumentu")
+      (rule (<= (:size _) INVOICE-FILE-SIZE-LIMIT) "Plik z fakturą jest zbyt duży"))))
 
 (defn simple-invoice-form [input errors]
   (form-wrapper
@@ -94,8 +96,9 @@
 (defvalidator register-from-reg-code-validator
   (rule :email (vali/is-email? _) "Niepoprawny format adresu email")
   (rule :email (<= (count _) 50) "Email nie powinien mieć więcej niż 50 znaków")
-  (option :first_name (<= 2 (count _) 30) "Imię powinno mieć 2 do 30 znaków")
-  (option :last_name (<= 2 (count _) 40) "Nazwisko powinno mieć 2 do 40 znaków")
+  (optional
+    (rule :first_name (<= 2 (count _) 30) "Imię powinno mieć 2 do 30 znaków")
+    (rule :last_name (<= 2 (count _) 40) "Nazwisko powinno mieć 2 do 40 znaków"))
   (rule :password (<= 5 (count _) 50) "Hasło powinno mieć 5 do 50 znaków")
   (rule :password (re-matches #"[a-zA-Z0-9-_!@#$%^&*]*" _) "Hasło zawiera niedozwolone znaki")
   (rule :repeat-password (= (get-field :password) _) "Hasła się nie zgadzają")
