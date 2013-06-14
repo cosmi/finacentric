@@ -17,7 +17,7 @@
             [hiccup.core :as hiccup]
             [korma.core :as korma]))
 
-(def INVOICE-FILE-SIZE-LIMIT (* 50 1024))
+(def INVOICE-FILE-SIZE-LIMIT (* 150 1024))
 
 (def ^:dynamic *context* nil)
 
