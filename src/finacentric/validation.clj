@@ -80,6 +80,9 @@
 (defn get-errors []
   (-> *errors* deref (get-in *context*)))
 
+(defn has-errors? []
+  (not (empty? (get-errors))))
+
 (defn get-field [field]
   (-> *input* deref (get field)))
 
@@ -123,9 +126,9 @@
   (convert field (Integer/parseInt _) error-msg))
 
 (defn decimal-field [field scale error-msg-format error-msg-scale]
-  (convert field (bigdec _) error-msg-format)
-  (rule field (-> _ .scale (<= scale)) error-msg-scale)
-  (convert field (.setScale _ scale)))
+  (convert field (bigdec (clojure.string/replace _ #"," ".")) error-msg-format)
+  (when-not (has-errors?) (rule field (-> _ .scale (<= scale)) error-msg-scale))
+  (when-not (has-errors?) (convert field (.setScale _ scale))))
 
 (defn make-sql-date [year month day]
   (java.sql.Date. 

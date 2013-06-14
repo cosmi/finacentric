@@ -7,6 +7,7 @@
   (:require [finacentric.views.layout :as layout]
             [finacentric.ajax :as ajax]
             [finacentric.routes.auth :as auth]
+            [finacentric.files :as files]
             [noir.session :as session]
             [noir.response :as resp]
             [noir.validation :as vali]
@@ -16,6 +17,7 @@
             [hiccup.core :as hiccup]
             [korma.core :as korma]))
 
+(def INVOICE-FILE-SIZE-LIMIT (* 50 1024))
 
 (def ^:dynamic *context* nil)
 
@@ -41,14 +43,14 @@
 
 
 (defn form-wrapper [content]
-  (hiccup/html [:form {:method "post"}
+  (hiccup/html [:form {:method "post" :enctype "multipart/form-data"}
                 [:fieldset content]
                 [:button {:type "submit" :class "btn"} "OK"]]))
 
-
+;; Invoice Form
 
 (defvalidator valid-simple-invoice
-  (rule :number (<= 2 (count _) 40) "Numer powinno mieć 2 do 40 znaków")
+  (rule :number (<= 2 (count _) 40) "Numer powinien mieć 2 do 40 znaków")
   (date-field :issue_date "Błędny format daty")
   (date-field :sell_date "Błędny format daty")
   (date-field :payment_date "Błędny format daty")
@@ -58,7 +60,9 @@
                  "Wartość nie powinna mieć więcej niż 2 miejsca po przecinku")
   (decimal-field :gross_total 2 "Błędny format danych"
                  "Wartość nie powinna mieć więcej niż 2 miejsca po przecinku")
-  )
+  (rule :invoice (<= (:size _) INVOICE-FILE-SIZE-LIMIT) "Plik z fakturą jest zbyt duży")
+  (rule :invoice (= "application/pdf" (:content-type _)) "Niepoprwany typ dokumentu")
+  (rule :invoice (vali/valid-file? _) "Niepopwany załącznik"))
 
 (defn simple-invoice-form [input errors]
   (form-wrapper
@@ -70,9 +74,14 @@
        (date-input :payment_date "Termin płatności" 30)
        (decimal-input :net_total "Wartość netto" 30)
        (decimal-input :gross_total "Wartość brutto" 30)
-       ))))
+       (file-input :invoice "Elektroniczna faktura (PDF)")))))
 
-
+(defn- handle-simple-invoice-form [input supplier-id buyer-id]
+  ;; file upload?
+  (when-let [upload (errors-validate :invoice "Błąd podczas zapisywania pliku"
+                   (files/store-file! (-> input :invoice :tempfile)
+                                      (-> input :invoice :content-type) {}))]
+    (db/simple-create-invoice input supplier-id buyer-id)))
 
 
 ;;; REGISTER FROM REG-CODE
@@ -97,6 +106,8 @@
        (text-input :first_name "Imię" 30)
        (text-input :last_name "Nazwisko" 40)))))
 
+;; Routes
+
 (defn FORM-register-to-company []
   (FORM "/register"
         (fn [input errors] (layout (register-from-reg-code-form input errors)))
@@ -116,14 +127,12 @@
   (FORM "/simple-invoice-form"
         #(layout (simple-invoice-form %1 %2))
         valid-simple-invoice
-        #(db/simple-create-invoice % supplier-id buyer-id)
+        #(handle-simple-invoice-form % supplier-id buyer-id)
         "hello"))
 
 (defn invoice-details [supplier-id buyer-id invoice-id]
   (when-let [invoice (db/get-invoice invoice-id supplier-id buyer-id)]
     (invoice-view supplier-id buyer-id invoice)))
-
-
 
 
 (defroutes supplier-routes

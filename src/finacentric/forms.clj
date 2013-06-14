@@ -20,6 +20,14 @@
            (name (first *context*))
            (map #(str "[" (name %) "]") (rest (conj *context* field))))))
 
+(defn file-input [field label]
+  (hiccup/html
+   (list
+    [:label label]
+    [:input {:type "file" :name (get-field-name field)}]
+    (when-let [error (get-error field)]
+      [:div.error error]))))
+
 (defn text-input [field label max-len]
   (hiccup/html
    (list
