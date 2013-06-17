@@ -38,7 +38,6 @@
 
 
 (defn invoice-view [invoice-id supplier-id buyer-id invoice]
-  (prn invoice)
   (layout/render
    "app/sup_invoice.html" {:i (assoc invoice :id invoice-id)}))
 
@@ -61,9 +60,9 @@
                  "Wartość nie powinna mieć więcej niż 2 miejsca po przecinku")
   (decimal-field :gross_total 2 "Błędny format danych"
                  "Wartość nie powinna mieć więcej niż 2 miejsca po przecinku")
+  (convert :invoice (if (vali/valid-file? _) _ nil))
   (optional
     (with-field :invoice
-      (convert (if (vali/valid-file? _) (do (prn _) _) nil))
       (rule (= "application/pdf" (:content-type _)) "Niepoprwany typ dokumentu")
       (rule (<= (:size _) INVOICE-FILE-SIZE-LIMIT) "Plik z fakturą jest zbyt duży"))))
 
