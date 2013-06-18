@@ -267,6 +267,22 @@
            filters)
    exec))
 
+
+
+(defn get-invoices-with-suppliers [buyer-id & filters]
+  (->
+   (reduce #(%2 %1)
+           (-> (select* invoices)
+               (where {:buyer_id buyer-id})
+               (join :left
+                     companies
+                     (= :invoices.seller_id :companies.id)
+                     )
+               (fields "invoices.*" :companies.name))
+           filters)
+   exec))
+
+
 (defn get-invoice [invoice-id supplier-id buyer-id]
   (->
    (select invoices

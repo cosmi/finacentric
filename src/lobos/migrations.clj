@@ -72,16 +72,19 @@
               (varchar :currency 8 (default "PLN"))
               (varchar :extra 500)
 
-              (decimal :required_discount_rate 7 4) ; wymagana zniżka za przyspieszenie
+              (decimal :annual_discount_rate 7 4) ; wymagana zniżka za przyspieszenie
+              (date :earliest_discount_date) ; najwcześniejsza możliwa opcja zniżki
               
               (date :discounted_payment_date)
               (decimal :discount_rate 7 4)
               (decimal :discounted_net_total 17 4)
               (decimal :discounted_gross_total 17 4)
 
-              (boolean :accepted)
-              (boolean :discount_accepted)
-              (boolean :corrected)
+              (timestamp :accepted)
+              (timestamp :discount_accepted)
+              (timestamp :discount_confirmed)
+              (timestamp :corrected)
+              (timestamp :correction_received)
 
               (varchar :file_id 32)
               ))

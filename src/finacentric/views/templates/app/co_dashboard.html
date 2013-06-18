@@ -15,6 +15,7 @@ Is it me you're looking for?
 <table class="table table-striped">
   <colgroup>
     <col span="1" style="width: 10px;">
+    <col span="1" >
     <col span="1" style="width: 10%;">
     <col span="1" >
     <col span="1" style="width: 10%;">      
@@ -26,6 +27,7 @@ Is it me you're looking for?
   <thead>
     <tr>
       <th><input type="checkbox" name="selected-all"/></th>
+      <th>Kontrahent</th>
       <th>Numer</th>
       <th>Opis</th>
       <th>Data wystawienia</th>
@@ -39,6 +41,7 @@ Is it me you're looking for?
 {% for i in invoices %}
     <tr>
       <td><input type="checkbox" name="selected[{{i.id}}]"/></td>
+      <td><a href="invoice/{{i.id}}">{{i.name}}</a></td>
       <td><a href="invoice/{{i.id}}">{{i.number}}</a></td>
       <td>{{i.description}}</td>
       <td>{{i.issue_date}}</td>

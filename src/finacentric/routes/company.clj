@@ -17,10 +17,6 @@
             [korma.core :as korma]))
 
 
-(def ^:dynamic *context* nil)
-
-
-
 
 (defn layout [& content]
   (layout/render
@@ -30,12 +26,11 @@
   (db/get-invoices from to (db/page-filter page per-page)))
 
 
-(defn dashboard [supplier-id buyer-id]
-  (binding [*context* (str "/supplier/" supplier-id "/" buyer-id)]
-    (layout/render
-     "app/co_dashboard.html" {:context *context*
-                       :invoices nil ;TODO
-                       })))
+(defn dashboard [supplier-id invoices]
+  (layout/render
+     "app/co_dashboard.html" {:invoices invoices}))
+
+
 
 (defn form-wrapper [content]
   (hiccup/html [:form {:method "post"}
@@ -91,6 +86,8 @@
 
 
 
+
+
 (defn FORM-add-supplier [company-id]
   (FORM "/add-supplier"
               #(layout (create-supplier-form %1 %2))
@@ -103,11 +100,18 @@
                               (remove nil?)))]
                  (resp/redirect (str "supplier/" id)))))
 
-
+(defn hello [company-id]
+  (with-pagination page-no
+    (with-page-size 30 page-size
+      (dashboard company-id
+                 (db/get-invoices-with-suppliers company-id
+                   (db/page-filter page-no page-size))))))
 
 (defroutes company-routes
   (context "/company" {:as request}
     (with-int-param [company-id (auth/get-current-users-company-id)]
       (routes-when (auth/logged-to-company? company-id)
-        (FORM-add-supplier company-id)))))
+        (FORM-add-supplier company-id)
+        (GET "/hello" []
+          (hello company-id))))))
   

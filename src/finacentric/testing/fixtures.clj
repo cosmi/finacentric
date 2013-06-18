@@ -124,7 +124,7 @@
         (get :id))))
 
 
-(defn create-simple-invoice! [from to data]
+(defn create-simple-invoice! [data]
   (form-post (url :supplier :simple-invoice-form) data))
   
 
@@ -152,7 +152,6 @@
 
 
     (with-logged-user ["adam@druty.pl" "abcde"]
-      (let [seller-id (user-company-id "adam@druty.pl")]
         (doseq [data [
                       {:number "KR/4/1"
                        :issue_date "2013-04-01"
@@ -179,10 +178,42 @@
                        :net_total 1500
                        :gross_total 1845}
                       ]]
-          (create-simple-invoice! seller-id company-id data))
+          (create-simple-invoice! data))
+        )
+
+    (with-logged-user ["adam@kable.pl" "abcde"]
+        (doseq [data [
+                      {:number "FV/4/1"
+                       :issue_date "2013-04-01"
+                       :sell_date "2013-04-01"
+                       :payment_date "2013-04-15"
+                       :net_total 100
+                       :gross_total 123}
+                      {:number "FV/4/2"
+                       :issue_date "2013-04-01"
+                       :sell_date "2013-04-01"
+                       :payment_date "2013-04-15"
+                       :net_total 1100
+                       :gross_total 1123}
+                      {:number "FV/5/1"
+                       :issue_date "2013-05-03"
+                       :sell_date "2013-05-03"
+                       :payment_date "2013-05-23"
+                       :net_total 2000
+                       :gross_total 2460}
+                      {:number "FV/5/2"
+                       :issue_date "2013-05-13"
+                       :sell_date "2013-05-13"
+                       :payment_date "2013-05-30"
+                       :net_total 1500
+                       :gross_total 1845}
+                      ]]
+          (create-simple-invoice! data))
         
 
-        ))))
+        )
+
+    ))
 
 
   
