@@ -66,9 +66,13 @@
               (date :sell_date)
               (date :payment_date)
               (varchar :payment_mode 30)
-              (decimal :paid_already 17 4)
-              (decimal :net_total 17 4)
-              (decimal :gross_total 17 4)
+
+              (decimal :paid_already 15 2)
+
+              
+              (decimal :net_total 15 2)
+              (decimal :gross_total 15 2)
+
               (varchar :currency 8 (default "PLN"))
               (varchar :extra 500)
 
@@ -77,8 +81,12 @@
               
               (date :discounted_payment_date)
               (decimal :discount_rate 7 4)
-              (decimal :discounted_net_total 17 4)
-              (decimal :discounted_gross_total 17 4)
+              
+              (decimal :discounted_net_total 15 2)
+              (decimal :discounted_gross_total 15 2)
+
+              
+              
 
               (timestamp :accepted)
               (timestamp :discount_accepted)
@@ -87,9 +95,28 @@
               (timestamp :correction_received)
 
               (varchar :file_id 32)
+              
+              (varchar :correction_file_id 32)
               ))
 
+      ;; (create 
+      ;;  (table :tax_rates
+      ;;         (integer :id :primary-key :auto-inc)
+      ;;         (date :start_date)
+      ;;         (date :end_date)
+      ;;         (varchar :name 30)
+      ;;         (decimal :rate 7 2)))
+      
+      ;; (create
+      ;;  (table :invoice_totals
+      ;;         (integer :rate_id [:refer :tax_rates :id])
+      ;;         (integer :invoice_id [:refer :invoices :id])
+      ;;         (unique [:rate_id :invoice_id])
+      ;;         (decimal :net_total 15 2)
+      ;;         (decimal :gross_total 15 2)
+      ;;         (decimal :discount_rate 7 4)))
 
+      
       (create
        (table :invoice_lines
               (integer :invoice_id [:refer :invoices :id])
@@ -98,10 +125,10 @@
               (varchar :name 60)
               (decimal :amount 17 4)
               (varchar :unit 10)
-              (decimal :net_unit_price 17 4)
-              (decimal :net_price 17 4)
-              (decimal :gross_unit_price 17 4)
-              (decimal :gross_price 17 4)
+              (decimal :net_unit_price 15 2)
+              (decimal :net_price 15 2)
+              (decimal :gross_unit_price 15 2)
+              (decimal :gross_price 15 2)
               (decimal :vat 5 2)
               (varchar :extra 500))))
   (down []

@@ -22,6 +22,11 @@ Is it me you're looking for?
     <col span="1" style="width: 10%;">
     <col span="1" style="width: 10%;">      
     <col span="1" style="width: 10%;"> 
+ 
+    <col span="1" style="width: 10%;">      
+    <col span="1" style="width: 10%;">
+    <col span="1" style="width: 10%;">      
+    <col span="1" style="width: 10%;"> 
   </colgroup>
   <thead>
     <tr>
@@ -32,6 +37,10 @@ Is it me you're looking for?
       <th>Termin płatności</th>
       <th>Netto</th>
       <th>Brutto</th>
+      <th>Roczny dyskont</th>
+      <th>Netto</th>
+      <th>Brutto</th>
+      <th>Dyskont</th>
       <th>Stan</th> 
     </tr>
   </thead>
@@ -47,6 +56,13 @@ Is it me you're looking for?
       <td>{{i.payment_date}}</td>
       <td>{{i.net_total}}</td>
       <td>{{i.gross_total}}</td>
+
+
+      <td>{{i.annual_discount_rate}}</td>
+      <td>{{i.discounted_net_total}}</td>
+      <td>{{i.discounted_gross_total}}</td>
+      <td>{{i.discount_rate}}</td>
+
       <td>
         
         {% if i.corrected %} 

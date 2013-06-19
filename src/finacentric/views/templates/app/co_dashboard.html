@@ -1,5 +1,5 @@
 
-{% extends "finacentric/views/templates/app/sup_base.html" %}
+{% extends "finacentric/views/templates/app/co_base.html" %}
 
 
 
@@ -23,6 +23,10 @@ Is it me you're looking for?
     <col span="1" style="width: 10%;">
     <col span="1" style="width: 10%;">      
     <col span="1" style="width: 10%;"> 
+    <col span="1" style="width: 10%;">      
+    <col span="1" style="width: 10%;">      
+    <col span="1" style="width: 10%;">
+    <col span="1" style="width: 10%;">   
   </colgroup>
   <thead>
     <tr>
@@ -34,6 +38,10 @@ Is it me you're looking for?
       <th>Termin płatności</th>
       <th>Netto</th>
       <th>Brutto</th>
+      <th>Roczny dyskont</th>
+      <th>Netto</th>
+      <th>Brutto</th>
+      <th>Dyskont</th>
       <th>Stan</th> 
     </tr>
   </thead>
@@ -42,28 +50,26 @@ Is it me you're looking for?
     <tr>
       <td><input type="checkbox" name="selected[{{i.id}}]"/></td>
       <td><a href="invoice/{{i.id}}">{{i.name}}</a></td>
-      <td><a href="invoice/{{i.id}}">{{i.number}}</a></td>
+      <td><a href="invoice/{{i.id}}/offer-discount">{{i.number}}</a></td>
       <td>{{i.description}}</td>
       <td>{{i.issue_date}}</td>
       <td>{{i.payment_date}}</td>
       <td>{{i.net_total}}</td>
       <td>{{i.gross_total}}</td>
+
+      <td>{{i.annual_discount_rate}}</td>
+      <td>{{i.discounted_net_total}}</td>
+      <td>{{i.discounted_gross_total}}</td>
+      <td>{{i.discount_rate}}</td>
+
       <td>
-        
-        {% if i.corrected %} 
-        Korekta
-        {% else %}
-        {% if i.discount_accepted %} 
-        Dyskont!
-        {% else %}
-        {% if i.accepted %} 
-        Zaakceptowana
-        {% else %}
-        Czeka
-        {% endif %}
-        {% endif %}
-        {% endif %}
-        
+       {% if not i.accepted %}
+       <a href="#" class="ajaxify" data-url="invoice/{{i.id}}/accept">
+         Zaakceptuj
+       </a>
+       {% else %}
+         Zaakceptowane!
+       {% endif %}
       </td>
     </tr>
 {% endfor %}

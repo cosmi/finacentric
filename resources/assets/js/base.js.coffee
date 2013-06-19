@@ -1,3 +1,5 @@
+console.log "dupa"
+
 
 confirmationModal = ($el, fun) ->
   modalHeader = $el.data('modal-header');

@@ -5,6 +5,7 @@
         finacentric.validation
         finacentric.forms)
   (:require [finacentric.views.layout :as layout]
+            [finacentric.models.invoices :as invoices]
             [finacentric.ajax :as ajax]
             [finacentric.routes.auth :as auth]
             [finacentric.validation-utils :as vali-util]
@@ -39,24 +40,24 @@
 
 
 
-(defvalidator valid-simple-invoice
-  (rule :number (<= 2 (count _) 40) "Numer powinno mieć 2 do 40 znaków")
-  (rule :issue_date (<= 2 (count _) 30) "Nazwisko powinno mieć 2 do 40 znaków")
-  (rule :payment_date (<= 2 (count _) 30) "Nazwisko powinno mieć 2 do 40 znaków")
-  (rule :net_total (<= (count _) 50) "Email nie powinien mieć więcej niż 50 znaków")
-  (rule :gross_total (<= (count _) 50) "Email nie powinien mieć więcej niż 50 znaków")
-  )
+;; (defvalidator valid-simple-invoice
+;;   (rule :number (<= 2 (count _) 40) "Numer powinno mieć 2 do 40 znaków")
+;;   (rule :issue_date (<= 2 (count _) 30) "Nazwisko powinno mieć 2 do 40 znaków")
+;;   (rule :payment_date (<= 2 (count _) 30) "Nazwisko powinno mieć 2 do 40 znaków")
+;;   (rule :net_total (<= (count _) 50) "Email nie powinien mieć więcej niż 50 znaków")
+;;   (rule :gross_total (<= (count _) 50) "Email nie powinien mieć więcej niż 50 znaków")
+;;   )
 
-(defn simple-invoice-form [input errors]
-  (form-wrapper
-   (with-input input
-     (with-errors errors
-       (text-input :number "Numer" 40)
-       (date-input :issue_date "Data wystawienia" 30)
-       (date-input :payment_date "Data wystawienia" 30)
-       (decimal-input :net_total "Wartość netto" 30)
-       (decimal-input :gross_total "Wartość brutto" 30)
-       ))))
+;; (defn simple-invoice-form [input errors]
+;;   (form-wrapper
+;;    (with-input input
+;;      (with-errors errors
+;;        (text-input :number "Numer" 40)
+;;        (date-input :issue_date "Data wystawienia" 30)
+;;        (date-input :payment_date "Data wystawienia" 30)
+;;        (decimal-input :net_total "Wartość netto" 30)
+;;        (decimal-input :gross_total "Wartość brutto" 30)
+;;        ))))
 
 (defn create-supplier-form [input errors]
   (form-wrapper
@@ -87,7 +88,6 @@
 
 
 
-
 (defn FORM-add-supplier [company-id]
   (FORM "/add-supplier"
               #(layout (create-supplier-form %1 %2))
@@ -99,6 +99,35 @@
                               (map %)
                               (remove nil?)))]
                  (resp/redirect (str "supplier/" id)))))
+
+
+(defvalidator validate-offer-discount-form
+  (date-field :earliest-date "Błędny format daty")
+  (decimal-field :annual-rate 4 "Błędny format danych"
+                 "Wartość nie powinna mieć więcej niż 4 miejsca po przecinku"))
+
+(defn offer-discount-form [input errors]
+  (form-wrapper
+   (with-input input
+     (with-errors errors
+       (decimal-input :annual-rate "Roczny zarobek (%)" 40)
+       (date-input :earliest-date "Data wystawienia" 30)
+       ))))
+
+
+
+
+(defn FORM-offer-discount [company-id invoice-id]
+  (FORM "/offer-discount"
+        #(layout (offer-discount-form %1 %2))
+        validate-offer-discount-form
+        #(do (invoices/invoice-offer-discount!
+              company-id invoice-id
+              (% :annual-rate)
+              (% :earliest-date))
+              
+           (resp/redirect "..")))
+  )
 
 (defn hello [company-id]
   (with-pagination page-no
@@ -113,5 +142,17 @@
       (routes-when (auth/logged-to-company? company-id)
         (FORM-add-supplier company-id)
         (GET "/hello" []
-          (hello company-id))))))
+          (hello company-id))
+        (context "/invoice" []
+          (id-context invoice-id
+            (POST "/accept" []
+              (invoices/invoice-accept! company-id invoice-id))
+            (routes-when (invoices/has-state? company-id invoice-id :accepted)
+              (FORM-offer-discount company-id invoice-id))
+
+
+            ))))))
+
+
+            
   
