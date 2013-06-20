@@ -27,7 +27,13 @@
 
 ;; Pseudo constants
 
-(defn logged-in-redirect [] "/supplier/hello")
+(def ^:private SUPPLIER-DASHBOARD "/supplier/hello")
+(def ^:private COMPANY-DASHBOARD "/company/hello")
+
+(defn logged-in-redirect []
+  (if (db/get-suppliers-first-buyer-id (get-current-users-company-id))
+    SUPPLIER-DASHBOARD
+    COMPANY-DASHBOARD))
 (defn logged-out-redirect [] "/login")
 
 ;; Stuff
