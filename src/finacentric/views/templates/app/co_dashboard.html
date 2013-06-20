@@ -65,26 +65,31 @@ Is it me you're looking for?
       <td>{{i.state}}</td>
 
       <td>
-        {% if i.accepted %}
-        Zaakceptowane!
-        <a href="#" class="ajaxify" data-url="invoice/{{i.id}}/accept-cancel">
-          Anuluj
-        </a>
-        {% else %}
-        {% if i.rejected %}
-        Odrzucone!
-        <a href="#" class="ajaxify" data-url="invoice/{{i.id}}/reject-cancel">
-          Anuluj
-        </a>
-        {% else %}
+        {% switch i.state %}
+        ???
+        {% case :input %}
         <a href="#" class="ajaxify" data-url="invoice/{{i.id}}/accept">
           Zaakceptuj
         </a>
         <a href="#" class="ajaxify" data-url="invoice/{{i.id}}/reject">
           Odrzuć
         </a>
-        {% endif %}
-        {% endif %}
+        {% case :accepted %}
+        Zaakceptowane!
+        <a href="#" class="ajaxify" data-url="invoice/{{i.id}}/accept-cancel">
+          Anuluj
+        </a>
+        {% case :rejected %}
+        Odrzucone!
+        <a href="#" class="ajaxify" data-url="invoice/{{i.id}}/reject-cancel">
+          Anuluj
+        </a>
+        {% case :discount_offered %}
+        {% case :discount_accepted %}
+        {% case :discount_confirmed %}
+        {% case :correction_done %}
+        {% case :correction_received %}
+        {% endswitch %}
       </td>
     </tr>
 {% endfor %}

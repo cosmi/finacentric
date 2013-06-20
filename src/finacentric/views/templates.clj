@@ -42,6 +42,38 @@
   (prn context))
 
 
+(deftemplatetag "case" [nodes context]
+  {:nodes nodes :context context})
+
+
+(deftemplatetag "switch" "endswitch" [[switch-node & nodes] context]
+  (let [args (:args switch-node)
+        nodes (butlast nodes)
+        _ (assert (= (count args) 1) "Switch should have exactly one arg")
+        sym (first args)
+        [default nodes] (split-with #(not= (:tag-name %) "case") nodes)
+        nodes (loop [[case-node & nodes] nodes res {}]
+                (if-not case-node
+                  res
+                  (let [[body others] (split-with #(not= (:tag-name %) "case") nodes)
+                        _ (assert (-> case-node :args count (= 1))
+                                  (str "Case wrongly defined: " args))
+                        case-value (-> case-node :args first read-string)]
+                    (assert (not (contains? res case-value))
+                            (str "Doubled case: " (prn-str case-value)))
+                    (recur others (assoc res case-value body)))))]
+
+        ;; (partition-by #(= (:tag-name %) "case") nodes)
+        ;; cases (partition-all 2 nodes)
+        ;; _ (assert (every? #(-> % count (= 2))) "Switch error 1")
+        ;; _ (assert (every? #(-> % first count (= 1))) "Switch error 2")
+        ;; _ (assert (every? #(-> % first first :tag-name (= "case")) "Switch error 3"))
+        ;; cases (into (for [[[case-val] body] cases]
+        ;;         [(-> case-val :args first read-string)
+        ;;          body]))
+  {:nodes (get nodes (context-lookup context sym) default)}))
+
+
 
 ;; (deftemplatefilter "format" [node body arg]
 ;;   (prn node body arg)
