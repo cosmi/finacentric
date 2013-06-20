@@ -79,19 +79,26 @@ Is it me you're looking for?
         <a href="#" class="ajaxify" data-url="invoice/{{i.id}}/accept-cancel">
           Anuluj
         </a>
+        <a href="invoice/{{i.id}}/offer-discount">
+          Zaproponuj dyskont
+        </a>
         {% case :rejected %}
         Odrzucone!
         <a href="#" class="ajaxify" data-url="invoice/{{i.id}}/reject-cancel">
           Anuluj
         </a>
         {% case :discount_offered %}
+        <a href="invoice/{{i.id}}/offer-discount">
+          Zmień dyskont
+        </a>
         {% case :discount_accepted %}
         {% case :discount_confirmed %}
         {% case :correction_done %}
         {% case :correction_received %}
         {% endswitch %}
       </td>
-    </tr>
+    <
+/tr>
 {% endfor %}
     
 </table>

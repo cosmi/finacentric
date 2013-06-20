@@ -29,15 +29,15 @@
        ret#)))
 
 (def state-filters
-  {:input {:accepted nil
+  '{:input {:accepted nil
            :rejected nil}
    :accepted {:accepted [not= nil]
               :annual_discount_rate nil
               :earliest_discount_date nil}
    :rejected {:rejected [not= nil]}
    :discount_offered {:annual_discount_rate [not= nil]
-                    :earliest_discount_date [not= nil]
-                    :discount_accepted nil}
+                      :earliest_discount_date [not= nil]
+                      :discount_accepted nil}
    :discount_accepted {:discount_accepted [not= nil]
                        :discount_confirmed nil}
    :discount_confirmed {:discount_confirmed [not= nil]
@@ -54,7 +54,8 @@
            (apply every-pred
                   (for [[k, v] values]
                     (if (vector? v)
-                      (let [[f & args] v]
+                      (let [[f & args] v
+                            f (eval f)]
                         #(apply f (get % k) args))
                       #(= (get % k) v))))])))
 
@@ -69,28 +70,32 @@
 
 (defmacro at-state [query state]
   `(where ~query (state-filters ~state)))
+(defmacro at-states [query state]
+  `(where ~query (state-filters ~state)))
+
+;; (defn prn-and-exec [query]
+;;   (println "QUERY:" (as-sql query))
+;;   (exec query))
+
+(defmacro check-invoice [invoice-id & tests]
+  `(->
+    (select* db/invoices)
+    (where (~'= :id ~invoice-id))
+    ~@tests
+    (aggregate (~'count :*) :cnt)
+    exec
+    first :cnt
+    (> 0)))
 
 
-(defn reachable? [party-id invoice-id]
-  (->
-   (select db/invoices
-     (where (and (or (= party-id :buyer_id)
-                     (= party-id :seller_id))
-                 (= :id invoice-id)))
-     (aggregate (count :*) :cnt))
-   first :cnt
-   (> 0)))
+(defmacro is-buyer? [query company-id]
+  `(where ~query {:buyer_id ~company-id}))
+(defmacro is-seller? [query company-id]
+  `(where ~query {:seller_id ~company-id}))
 
-(defn has-state? [party-id invoice-id state]
-  (->
-   (select db/invoices
-     (where (and (or (= party-id :buyer_id)
-                     (= party-id :seller_id))
-                 (= :id invoice-id)))
-     (at-state state)
-     (aggregate (count :*) :cnt))
-   first :cnt
-   (> 0)))
+(defmacro has-state? [query & states]
+  (assert (every? keyword states) "States cannot accept dynamic value")
+  `(where ~query (~'or ~@(map state-filters states))))
   
   
 
@@ -131,11 +136,12 @@
       (set-fields {:rejected nil}))))
 
 (defn invoice-offer-discount! [company-id invoice-id annual-rate earliest-date]
+  (prn :DUPA annual-rate earliest-date)
   (throw-on-nil
     (update db/invoices
       (where {:buyer_id company-id
               :id invoice-id})
-      (at-state :accepted)
+      (has-state? :accepted :discount_offered)
       (set-fields {:annual_discount_rate annual-rate
                    :earliest_discount_date earliest-date}
                    
@@ -185,12 +191,13 @@ z dokładnością do 4 cyfr po przecinku"
      :discounted_gross_total new-gross-value
      :discount_rate discount-rate}))
 
-(defn invoice-accept-discount! [supplier-id invoice-id new-payment-date]
+(defn invoice-accept-discount! [supplier-id invoice-id annual-rate new-payment-date]
     (transaction
       (let [values (get-discount-values invoice-id new-payment-date)]
         (update db/invoices
           (where {:seller_id supplier-id
-                  :invoice_id invoice-id})
+                  :invoice_id invoice-id
+                  :annual_discount_rate annual-rate})
           (at-state :discount_offered)
           (set-fields values)))))
 

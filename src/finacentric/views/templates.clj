@@ -56,12 +56,13 @@
                 (if-not case-node
                   res
                   (let [[body others] (split-with #(not= (:tag-name %) "case") nodes)
-                        _ (assert (-> case-node :args count (= 1))
-                                  (str "Case wrongly defined: " args))
-                        case-value (-> case-node :args first read-string)]
-                    (assert (not (contains? res case-value))
-                            (str "Doubled case: " (prn-str case-value)))
-                    (recur others (assoc res case-value body)))))]
+                        _ (assert (-> case-node :args count (>= 1))
+                                  (str "Empty case"))
+                        case-values (->> case-node :args (map read-string))]
+                    (assert (every? #(not (contains? res %)) case-values)
+                            (str "Doubled case: "
+                                 (some #(when (contains? res %) %) case-values)))
+                    (recur others (reduce #(assoc % %2 body) res case-values)))))]
 
         ;; (partition-by #(= (:tag-name %) "case") nodes)
         ;; cases (partition-all 2 nodes)

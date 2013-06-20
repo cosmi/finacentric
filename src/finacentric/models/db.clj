@@ -256,7 +256,7 @@
 (defn page-filter [page-no per-page]
   #(page % page-no per-page))
 
-(defn sort-by [field & [dir]]
+(defn sorted-by [field & [dir]]
   #(order % field dir))
 
 
@@ -291,6 +291,13 @@
      (where {:seller_id supplier-id
              :buyer_id buyer-id
              :id invoice-id})
+     (limit 1))
+   first))
+
+(defn get-invoice-unchecked [invoice-id]
+  (->
+   (select invoices
+     (where {:id invoice-id})
      (limit 1))
    first))
 

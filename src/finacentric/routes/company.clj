@@ -102,16 +102,18 @@
 
 
 (defvalidator validate-offer-discount-form
-  (date-field :earliest-date "Błędny format daty")
-  (decimal-field :annual-rate 4 "Błędny format danych"
-                 "Wartość nie powinna mieć więcej niż 4 miejsca po przecinku"))
+  (date-field :earliest_discount_date  "Błędny format daty")
+  (decimal-field :annual_discount_rate 4 "Błędny format danych"
+                 "Wartość nie powinna mieć więcej niż 4 miejsca po przecinku")
+  (rule :annual_discount_rate (< _ 100) "Wartość nie może przekraczać 100%")
+  )
 
 (defn offer-discount-form [input errors]
   (form-wrapper
    (with-input input
      (with-errors errors
-       (decimal-input :annual-rate "Roczny zarobek (%)" 40)
-       (date-input :earliest-date "Data wystawienia" 30)
+       (decimal-input :annual_discount_rate "Roczny zarobek (%)" 40)
+       (date-input :earliest_discount_date "Najwcześniejsza możliwa data płatności" 30)
        ))))
 
 
@@ -119,15 +121,20 @@
 
 (defn FORM-offer-discount [company-id invoice-id]
   (FORM "/offer-discount"
-        #(layout (offer-discount-form %1 %2))
+        (fn [input errors]
+          (let [input (if-not (nil? input)
+                        input
+                        (db/get-invoice-unchecked invoice-id))]
+            (layout (offer-discount-form input errors))))
         validate-offer-discount-form
-        #(do (invoices/invoice-offer-discount!
+        #(do (prn %)
+             (invoices/invoice-offer-discount!
               company-id invoice-id
-              (% :annual-rate)
-              (% :earliest-date))
-              
-           (resp/redirect "..")))
-  )
+              (% :annual_discount_rate)
+              (% :earliest_discount_date))
+           (resp/redirect "."))))
+
+
 
 (defn hello [company-id]
   (with-pagination page-no
@@ -136,7 +143,7 @@
                  (->>
                   (db/get-invoices-with-suppliers company-id
                     (db/page-filter page-no page-size)
-                    (db/sort-by :id)
+                    (db/sorted-by :id)
                     invoices/not-rejected-filter)
                   (map invoices/append-state))))))
 
@@ -157,7 +164,10 @@
               (invoices/invoice-accept-cancel! company-id invoice-id))
             (POST "/reject-cancel" []
               (invoices/invoice-reject-cancel! company-id invoice-id))
-            (routes-when (invoices/has-state? company-id invoice-id :accepted)
+            (routes-when (invoices/check-invoice
+                          invoice-id
+                          (invoices/is-buyer? company-id)
+                          (invoices/has-state? :accepted :discount_offered))
               (FORM-offer-discount company-id invoice-id))
 
 
