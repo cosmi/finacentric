@@ -133,8 +133,12 @@
   (with-pagination page-no
     (with-page-size 30 page-size
       (dashboard company-id
-                 (db/get-invoices-with-suppliers company-id
-                   (db/page-filter page-no page-size))))))
+                 (->>
+                  (db/get-invoices-with-suppliers company-id
+                    (db/page-filter page-no page-size)
+                    (db/sort-by :id)
+                    invoices/not-rejected-filter)
+                  (map invoices/append-state))))))
 
 (defroutes company-routes
   (context "/company" {:as request}
@@ -147,6 +151,12 @@
           (id-context invoice-id
             (POST "/accept" []
               (invoices/invoice-accept! company-id invoice-id))
+            (POST "/reject" []
+              (invoices/invoice-reject! company-id invoice-id))
+            (POST "/accept-cancel" []
+              (invoices/invoice-accept-cancel! company-id invoice-id))
+            (POST "/reject-cancel" []
+              (invoices/invoice-reject-cancel! company-id invoice-id))
             (routes-when (invoices/has-state? company-id invoice-id :accepted)
               (FORM-offer-discount company-id invoice-id))
 

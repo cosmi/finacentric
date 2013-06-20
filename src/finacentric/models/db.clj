@@ -256,6 +256,8 @@
 (defn page-filter [page-no per-page]
   #(page % page-no per-page))
 
+(defn sort-by [field & [dir]]
+  #(order % field dir))
 
 
 

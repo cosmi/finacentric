@@ -5,6 +5,7 @@
         finacentric.validation
         finacentric.forms)
   (:require [finacentric.views.layout :as layout]
+            [finacentric.models.invoices :as invoices]
             [finacentric.ajax :as ajax]
             [finacentric.routes.auth :as auth]
             [finacentric.files :as files]
@@ -32,9 +33,13 @@
 (defn dashboard [supplier-id buyer-id page per-page]
   ;(binding [*context* (str "/supplier/" supplier-id "/" buyer-id)]
   (layout/render
-   "app/sup_dashboard.html" {:invoices (db/get-invoices
-                                supplier-id buyer-id
-                                (db/page-filter page per-page))}))
+   "app/sup_dashboard.html" {:invoices
+                             (->>
+                              (db/get-invoices
+                               supplier-id buyer-id
+                               (db/page-filter page per-page))
+                              (map invoices/append-state)
+                              )}))
 
 
 (defn invoice-view [invoice-id supplier-id buyer-id invoice]

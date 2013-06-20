@@ -13,21 +13,22 @@ Is it me you're looking for?
 <a href="simple-invoice-form">Nowa faktura</a>
 
 <table class="table table-striped">
-  <colgroup>
-    <col span="1" style="width: 10px;">
-    <col span="1" style="width: 10%;">
-    <col span="1" >
-    <col span="1" style="width: 10%;">      
-    <col span="1" style="width: 10%;">      
-    <col span="1" style="width: 10%;">
-    <col span="1" style="width: 10%;">      
-    <col span="1" style="width: 10%;"> 
+  <!-- <colgroup> -->
+  <!--   <col span="1" style="width: 10px;"> -->
+  <!--   <col span="1" style="width: 10%;"> -->
+  <!--   <col span="1" > -->
+  <!--   <col span="1" style="width: 10%;">       -->
+  <!--   <col span="1" style="width: 10%;">       -->
+  <!--   <col span="1" style="width: 10%;"> -->
+  <!--   <col span="1" style="width: 10%;">       -->
+  <!--   <col span="1" style="width: 10%;">  -->
  
-    <col span="1" style="width: 10%;">      
-    <col span="1" style="width: 10%;">
-    <col span="1" style="width: 10%;">      
-    <col span="1" style="width: 10%;"> 
-  </colgroup>
+  <!--   <col span="1" style="width: 10%;">       -->
+  <!--   <col span="1" style="width: 10%;"> -->
+  <!--   <col span="1" style="width: 10%;"> -->
+  <!--   <col span="1" style="width: 10%;">        -->
+  <!--   <col span="1" style="width: 10%;">  -->
+  <!-- </colgroup> -->
   <thead>
     <tr>
       <th><input type="checkbox" name="selected-all"/></th>
@@ -42,6 +43,7 @@ Is it me you're looking for?
       <th>Brutto</th>
       <th>Dyskont</th>
       <th>Stan</th> 
+      <th>Akcje</th> 
     </tr>
   </thead>
 <tbody>
@@ -62,23 +64,19 @@ Is it me you're looking for?
       <td>{{i.discounted_net_total}}</td>
       <td>{{i.discounted_gross_total}}</td>
       <td>{{i.discount_rate}}</td>
-
+      <td>{{i.state}}</td>
       <td>
-        
-        {% if i.corrected %} 
-        Korekta
+        {% if i.accepted %}
+        Zaakceptowane!
+        Super, co nie?
         {% else %}
-        {% if i.discount_accepted %} 
-        Dyskont!
+        {% if i.rejected %}
+        Odrzucone!
+        Bardzo nam przykro :(
         {% else %}
-        {% if i.accepted %} 
-        Zaakceptowana
-        {% else %}
-        Czeka
+        Wciąż czeka na akceptację
         {% endif %}
         {% endif %}
-        {% endif %}
-        
       </td>
     </tr>
 {% endfor %}

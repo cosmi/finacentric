@@ -87,8 +87,8 @@
 
               
               
-
               (timestamp :accepted)
+              (timestamp :rejected)
               (timestamp :discount_accepted)
               (timestamp :discount_confirmed)
               (timestamp :corrected)

@@ -29,10 +29,12 @@
        ret#)))
 
 (def state-filters
-  {:input {:accepted nil}
+  {:input {:accepted nil
+           :rejected nil}
    :accepted {:accepted [not= nil]
               :annual_discount_rate nil
               :earliest_discount_date nil}
+   :rejected {:rejected [not= nil]}
    :discount_offered {:annual_discount_rate [not= nil]
                     :earliest_discount_date [not= nil]
                     :discount_accepted nil}
@@ -44,6 +46,26 @@
                      :correction_received nil}
    :correction_received {:correction_received [not= nil]}
    })
+
+(def state-checkers
+  (into {}
+        (for [[state, values] state-filters]
+          [state
+           (apply every-pred
+                  (for [[k, v] values]
+                    (if (vector? v)
+                      (let [[f & args] v]
+                        #(apply f (get % k) args))
+                      #(= (get % k) v))))])))
+
+(defn get-state [invoice]
+  (->> state-checkers
+       (filter (fn [[s,f]] (f invoice)))
+       first
+       first))
+
+(defn append-state [invoice]
+  (assoc invoice :state (get-state invoice)))
 
 (defmacro at-state [query state]
   `(where ~query (state-filters ~state)))
@@ -82,6 +104,31 @@
               :id invoice-id})
       (at-state :input)
       (set-fields {:accepted (sqlfn :now)}))))
+
+
+(defn invoice-reject! [company-id invoice-id]
+  (throw-on-nil
+    (update db/invoices
+      (where {:buyer_id company-id
+              :id invoice-id})
+      (at-state :input)
+      (set-fields {:rejected (sqlfn :now)}))))
+
+(defn invoice-accept-cancel! [company-id invoice-id]
+  (throw-on-nil
+    (update db/invoices
+      (where {:buyer_id company-id
+              :id invoice-id})
+      (at-state :accepted)
+      (set-fields {:accepted nil}))))
+
+(defn invoice-reject-cancel! [company-id invoice-id]
+  (throw-on-nil
+    (update db/invoices
+      (where {:buyer_id company-id
+              :id invoice-id})
+      (at-state :rejected)
+      (set-fields {:rejected nil}))))
 
 (defn invoice-offer-discount! [company-id invoice-id annual-rate earliest-date]
   (throw-on-nil
@@ -153,4 +200,7 @@ z dokładnością do 4 cyfr po przecinku"
 (defn invoice-correction-done! [company-id invoice-id]
   )
 
-  
+
+
+(def not-rejected-filter
+  #(where % {:rejected nil}))

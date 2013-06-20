@@ -43,6 +43,7 @@ Is it me you're looking for?
       <th>Brutto</th>
       <th>Dyskont</th>
       <th>Stan</th> 
+      <th>Akcje</th> 
     </tr>
   </thead>
 <tbody>
@@ -61,15 +62,29 @@ Is it me you're looking for?
       <td>{{i.discounted_net_total}}</td>
       <td>{{i.discounted_gross_total}}</td>
       <td>{{i.discount_rate}}</td>
+      <td>{{i.state}}</td>
 
       <td>
-       {% if not i.accepted %}
-       <a href="#" class="ajaxify" data-url="invoice/{{i.id}}/accept">
-         Zaakceptuj
-       </a>
-       {% else %}
-         Zaakceptowane!
-       {% endif %}
+        {% if i.accepted %}
+        Zaakceptowane!
+        <a href="#" class="ajaxify" data-url="invoice/{{i.id}}/accept-cancel">
+          Anuluj
+        </a>
+        {% else %}
+        {% if i.rejected %}
+        Odrzucone!
+        <a href="#" class="ajaxify" data-url="invoice/{{i.id}}/reject-cancel">
+          Anuluj
+        </a>
+        {% else %}
+        <a href="#" class="ajaxify" data-url="invoice/{{i.id}}/accept">
+          Zaakceptuj
+        </a>
+        <a href="#" class="ajaxify" data-url="invoice/{{i.id}}/reject">
+          Odrzuć
+        </a>
+        {% endif %}
+        {% endif %}
       </td>
     </tr>
 {% endfor %}
