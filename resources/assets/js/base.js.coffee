@@ -1,5 +1,3 @@
-console.log "dupa"
-
 
 confirmationModal = ($el, fun) ->
   modalHeader = $el.data('modal-header');
@@ -39,6 +37,7 @@ handleResponse = ($el, response, status, xhr, requestUrl) ->
   if reload then window.location.reload false
 
 $(document).ready ->
+  # Ajaxify
   $('body').on "click", ".ajaxify", (e) ->
     e.preventDefault();
     url = $(this).data "url";
@@ -53,3 +52,14 @@ $(document).ready ->
       confirmationModal($element, process);
     else
       process();
+
+$(document).ready ->
+  # Sorting
+  $('body').on "click", ".sorting", (e) ->
+    e.preventDefault();
+    column = $(e.target);
+    sorting = column.data('sorting')
+    if sorting && document.URL.indexOf("?") != -1
+      window.location = window.location + "&sorting=" + sorting;
+    else if sorting
+      window.location = window.location + "?sorting=" + sorting;
