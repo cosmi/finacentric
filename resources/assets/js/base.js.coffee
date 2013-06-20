@@ -59,7 +59,8 @@ $(document).ready ->
     e.preventDefault();
     column = $(e.target);
     sorting = column.data('sorting')
+    dir = if column.hasClass('asc') then "desc" else "asc";
     if sorting && document.URL.indexOf("?") != -1
-      window.location = window.location + "&sorting=" + sorting;
+      window.location = window.location + "&sort=" + sorting + "&dir=" + dir;
     else if sorting
-      window.location = window.location + "?sorting=" + sorting;
+      window.location = window.location + "?sort=" + sorting + "&dir=" + dir;
