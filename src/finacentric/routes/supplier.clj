@@ -150,7 +150,6 @@
 
 (defn invoice-file [supplier-id buyer-id invoice-id]
   (when-let [invoice (db/get-invoice invoice-id supplier-id buyer-id)]
-    (prn invoice)
     (when (invoice :file_id)
       (when-let [file (files/get-file (invoice :file_id))]
         (files/response file (str (invoice :number) ".pdf"))))))

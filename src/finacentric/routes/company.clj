@@ -1,4 +1,4 @@
-*(ns finacentric.routes.company
+(ns finacentric.routes.company
   (:use compojure.core)
   (:use clojure.pprint)
   (:use finacentric.util
@@ -6,6 +6,7 @@
         finacentric.forms)
   (:require [finacentric.views.layout :as layout]
             [finacentric.models.invoices :as invoices]
+            [finacentric.files :as files]
             [finacentric.ajax :as ajax]
             [finacentric.routes.auth :as auth]
             [finacentric.validation-utils :as vali-util]
@@ -31,33 +32,28 @@
   (layout/render
      "app/co_dashboard.html" {:invoices invoices}))
 
-
-
 (defn form-wrapper [content]
   (hiccup/html [:form {:method "post"}
                 [:fieldset content]
                 [:button {:type "submit" :class "btn"} "OK"]]))
 
+;; Invoice Details
 
+(defn invoice-view [invoice-id invoice]
+  (layout/render
+   "app/co_invoice.html" {:i (assoc invoice :id invoice-id)}))
 
-;; (defvalidator valid-simple-invoice
-;;   (rule :number (<= 2 (count _) 40) "Numer powinno mieć 2 do 40 znaków")
-;;   (rule :issue_date (<= 2 (count _) 30) "Nazwisko powinno mieć 2 do 40 znaków")
-;;   (rule :payment_date (<= 2 (count _) 30) "Nazwisko powinno mieć 2 do 40 znaków")
-;;   (rule :net_total (<= (count _) 50) "Email nie powinien mieć więcej niż 50 znaków")
-;;   (rule :gross_total (<= (count _) 50) "Email nie powinien mieć więcej niż 50 znaków")
-;;   )
+(defn invoice-details [company-id invoice-id]
+  (when-let [invoice (db/get-invoice-for-company invoice-id company-id)]
+    (invoice-view invoice-id invoice)))
 
-;; (defn simple-invoice-form [input errors]
-;;   (form-wrapper
-;;    (with-input input
-;;      (with-errors errors
-;;        (text-input :number "Numer" 40)
-;;        (date-input :issue_date "Data wystawienia" 30)
-;;        (date-input :payment_date "Data wystawienia" 30)
-;;        (decimal-input :net_total "Wartość netto" 30)
-;;        (decimal-input :gross_total "Wartość brutto" 30)
-;;        ))))
+(defn invoice-file [company-id invoice-id]
+  (when-let [invoice (db/get-invoice-for-company invoice-id company-id)]
+    (when (invoice :file_id)
+      (when-let [file (files/get-file (invoice :file_id))]
+        (files/response file (str (invoice :number) ".pdf"))))))
+
+;; Forms & Stuff
 
 (defn create-supplier-form [input errors]
   (form-wrapper
@@ -156,6 +152,10 @@
           (hello company-id))
         (context "/invoice" []
           (id-context invoice-id
+            (GET "/" []
+              (invoice-details company-id invoice-id))
+            (GET "/file" []
+              (invoice-file company-id invoice-id))
             (POST "/accept" []
               (invoices/invoice-accept! company-id invoice-id))
             (POST "/reject" []

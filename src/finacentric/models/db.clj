@@ -294,6 +294,14 @@
      (limit 1))
    first))
 
+(defn get-invoice-for-company [invoice-id company-id]
+  (->
+   (select invoices
+     (where {:buyer_id company-id
+             :id invoice-id})
+     (limit 1))
+   first))
+
 (defn get-invoice-unchecked [invoice-id]
   (->
    (select invoices

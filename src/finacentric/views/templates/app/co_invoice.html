@@ -1,0 +1,171 @@
+
+{% extends "finacentric/views/templates/app/sup_base.html" %}
+
+
+
+{% block content %}
+<div class="alert alert-info">
+  <h4>Faktura</h4>
+  Czy to ta faktura jest tą, którą szukasz?
+  
+</div>
+<h1> Faktura </h1>
+
+<div class="row-fluid">
+  <span class="span8"> 
+    <div class="row-fluid">
+      <span class="span6">
+        Numer:
+      </span>
+      <span class="span6">
+        {{ i.number }}
+      </span>
+    </div>
+    <div>
+      Opis:
+    </div>
+    <div>
+      {% if i.description %}
+      {{ i.description }}
+      {% else %}
+      &lt;brak opisu&gt;
+      {% endif %}
+    </div>
+  </span>
+
+  <span class="span4">
+    <div class="row-fluid">
+      <span class="span6">
+        Data sprzedaży:
+      </span>
+      <span class="span6">
+        {{ i.sell_date }}
+      </span>
+    </div>
+    <div class="row-fluid">
+      <span class="span6">
+        Data wystawienia:
+      </span>
+      <span class="span6">
+        {{ i.issue_date }}
+      </span>
+    </div>
+    <div class="row-fluid">
+      <span class="span6">
+        Termin płatności:
+      </span>
+      <span class="span6">
+        {{ i.payment_date }}
+      </span>
+    </div>
+    <div class="row-fluid">
+      <span class="span6">
+        Metoda płatności:
+      </span>
+      <span class="span6">
+        {{ i.payment_mode }}
+      </span>
+    </div>
+  </span>
+</div>
+
+
+<div class="row-fluid">
+  <span class="span4">
+    <div class="row-fluid">
+      <span class="span6">
+        Wartość netto:
+      </span>
+      <span class="span6">
+        {{i.net_total}} {{ i.currency }}
+      </span>
+    </div> 
+    <div class="row-fluid">
+      <span class="span6">
+        Podatek VAT:
+      </span>
+      <span class="span6">
+        {{ i.vat }} {{ i.currency }}
+      </span>
+    </div>
+    <div class="row-fluid">
+      <span class="span6">
+        Wartość brutto:
+      </span>
+      <span class="span6">
+        {{ i.gross_total }} {{ i.currency }}
+      </span>
+    </div>
+  </span>
+
+  <span class="span4">
+
+    {% if i.discount_rate %}
+    <div class="row-fluid">
+      <span class="span6">
+        Wymagana zniżka:
+      </span>
+      <span class="span6">
+        {{ i.discount_rate }}%
+      </span>
+    </div>
+    {% endif %}
+
+
+    {% if i.discounted_payment_date %}
+    <div class="row-fluid">
+      <span class="span6">
+        Przyspieszony dzień płatności:
+      </span>
+      <span class="span6">
+        {{ i.discounted_payment_date }}
+      </span>
+    </div>
+
+  </span>
+
+  <span class="span4">
+    <div>
+      Wartości po obniżce:
+    </div>
+    <div class="row-fluid">
+      <span class="span6">
+        Wartość netto:
+      </span>
+      <span class="span6">
+        {{ i.discounted_net_total }} {{ i.currency }}
+      </span>
+    </div>
+    <div class="row-fluid">
+      <span class="span6">
+        Podatek VAT:
+      </span>
+      <span class="span6">
+        {{ i.discounted_vat }} {{ i.currency }}
+      </span>
+    </div>
+    <div class="row-fluid">
+      <span class="span6">
+        Wartość brutto:
+      </span>
+      <span class="span6">
+        {{ i.discounted_gross_total }} {{ i.currency }}
+      </span>
+    </div>
+
+    {% endif %}
+
+  </span>
+
+</div>
+
+Zaakceptowane? {{i.accepted}}
+Dyskont zaakceptowany? {{i.discount_accepted}}
+Korekta wykonana? {{i.corrected}}
+
+{% if i.file_id %}
+<a href="/company/invoice/{{i.id}}/file">Plik</a>
+{% endif %}
+
+</div>
+{% endblock %}
