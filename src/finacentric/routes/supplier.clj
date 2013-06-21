@@ -95,9 +95,9 @@
          (throw-validation-error :invoice "Błąd podczas zapisywania pliku"))
     (db/simple-create-invoice input supplier-id buyer-id)))
 
-;; Invoice Adjust Form
+;; Invoice Correction Form
 
-(defvalidator valid-adjust-invoice
+(defvalidator valid-correction-invoice
   (date-field :payment_date "Błędny format daty")
   (rule :net_total (<= (count _) 50) "Zbyt długi ciąg")
   (rule :gross_total (<= (count _) 50) "Zbyt długi ciąg")
@@ -111,7 +111,7 @@
       (rule (= "application/pdf" (:content-type _)) "Niepoprwany typ dokumentu")
       (rule (<= (:size _) INVOICE-FILE-SIZE-LIMIT) "Plik z fakturą jest zbyt duży"))))
 
-(defn adjust-invoice-form [input errors]
+(defn correction-invoice-form [input errors]
   (form-wrapper
    (with-input input
      (with-errors errors
@@ -123,7 +123,7 @@
        (decimal-input :gross_total "Wartość brutto" 30)
        (file-input :invoice "Elektroniczna faktura (PDF)")))))
 
-(defn- handle-adjust-invoice-form [input supplier-id buyer-id]
+(defn- handle-correction-invoice-form [input supplier-id buyer-id]
   ;; file upload?
   (let [upload (when (input :invoice)
                  (try
@@ -184,11 +184,11 @@
         #(handle-simple-invoice-form % supplier-id buyer-id)
         "hello"))
 
-(defn FORM-adjust-invoice [supplier-id buyer-id]
-  (FORM "/adjust"
-        #(layout (adjust-invoice-form %1 %2))
-        valid-adjust-invoice
-        #(handle-adjust-invoice-form % supplier-id buyer-id)))
+(defn FORM-correction-invoice [supplier-id buyer-id]
+  (FORM "/correction"
+        #(layout (correction-invoice-form %1 %2))
+        valid-correction-invoice
+        #(handle-correction-invoice-form % supplier-id buyer-id)))
 
 (defn invoice-details [supplier-id buyer-id invoice-id]
   (when-let [invoice (db/get-invoice invoice-id supplier-id buyer-id)]
@@ -227,7 +227,7 @@
                   (routes-when (invoices/check-invoice
                                 invoice-id
                                 (invoices/has-state? :discount_confirmed :correction_done :correction_received))
-                    (FORM-adjust-invoice supplier-id buyer-id))
+                    (FORM-correction-invoice supplier-id buyer-id))
 
                   (GET "/file" []
                     (invoice-file supplier-id buyer-id invoice-id)))))))))))
