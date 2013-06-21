@@ -144,6 +144,50 @@
         #(handle-simple-invoice-form % supplier-id buyer-id)
         "hello"))
 
+
+;; DISCOUNT ACCEPT FORM
+(defvalidator valid-discount-accept-form
+  (date-field :discounted_payment_date "Błędny format daty")
+  (date-field :earliest_discount_date "Błędny format daty")
+  
+  (decimal-field :net_total 4 "Błędny format danych"
+                 "Wartość nie powinna mieć więcej niż 2 miejsca po przecinku")
+  )
+
+(defn discount-accept-form [input errors]
+  (form-wrapper
+   (with-input input
+     (with-errors errors
+       (date-input :discounted_payment_date "Data wystawienia" 30)
+       (hidden-input :annual_discount_rate)
+       (hidden-input :earliest_discount_date)
+       ))))
+
+
+(defn FORM-discount-accept [invoice-id supplier-id]
+  (FORM "/simple-invoice-form"
+        (fn [input errors]
+          (let [input (if (nil? input)
+                        (db/get-invoice invoice-id)
+                        input
+                        )]
+            (layout (discount-accept-form input errors))))
+        valid-discount-accept-form
+        #(try
+           (invoices/invoice-accept-discount!
+            supplier-id invoice-id
+            (% :annual_discount_rate)
+            (% :discounted_payment_date)
+            (% :earliest_discount_date))
+           (catch Exception e
+             (.printStackTrace e)
+             (throw-validation-error :discounted_payment_date
+                                     "Nastąpił błąd, spróbuj ponownie.")))))
+
+
+
+
+
 (defn invoice-details [supplier-id buyer-id invoice-id]
   (when-let [invoice (db/get-invoice invoice-id supplier-id buyer-id)]
     (invoice-view invoice-id supplier-id buyer-id invoice)))
@@ -153,6 +197,11 @@
     (when (invoice :file_id)
       (when-let [file (files/get-file (invoice :file_id))]
         (files/response file (str (invoice :number) ".pdf"))))))
+
+
+
+
+
 
 (defroutes supplier-routes
   (context "/supplier" {:as request}

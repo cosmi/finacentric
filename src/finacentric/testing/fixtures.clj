@@ -129,6 +129,15 @@
   
 
 
+(defn accept-invoice! [id]
+  (action-post (url :company :invoice id :accept) {}))
+
+(defn reject-invoice! [id]
+  (action-post (url :company :invoice id :reject) {}))
+  
+(defn offer-discount! [id date rate]
+  (form-post (url :company :invoice id :offer-discount) {:earliest_discount_date date :annual_discount_rate rate}))
+
 
 (defn init-db []
   (lobos.core/reset)
@@ -212,8 +221,16 @@
         
 
         )
+    (with-logged-user ["a@dtel.pl" "abcde"]
+      (accept-invoice! 3)
+      (accept-invoice! 5)
+      (reject-invoice! 2)
+      (offer-discount! 3 "2013-05-15" 10.5)
+      (offer-discount! 3 "2013-05-15" 11.5))
+      
 
-    ))
+      )
+    )
 
 
   

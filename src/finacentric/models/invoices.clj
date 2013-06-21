@@ -191,13 +191,14 @@ z dokładnością do 4 cyfr po przecinku"
      :discounted_gross_total new-gross-value
      :discount_rate discount-rate}))
 
-(defn invoice-accept-discount! [supplier-id invoice-id annual-rate new-payment-date]
+(defn invoice-accept-discount! [supplier-id invoice-id annual-rate new-payment-date earliest-date]
     (transaction
       (let [values (get-discount-values invoice-id new-payment-date)]
         (update db/invoices
           (where {:seller_id supplier-id
                   :invoice_id invoice-id
-                  :annual_discount_rate annual-rate})
+                  :annual_discount_rate annual-rate
+                  :earliest_discount_date earliest-date})
           (at-state :discount_offered)
           (set-fields values)))))
 

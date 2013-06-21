@@ -37,6 +37,12 @@
       [:div.error error]
       ))))
 
+
+(defn hidden-input [field]
+  (hiccup/html
+   [:input {:type "hidden" :name (get-field-name field) :value (get-value field)}]))
+
+
 (defn pass-input [field label max-len]
   (hiccup/html
    (list
