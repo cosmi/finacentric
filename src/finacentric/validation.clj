@@ -42,7 +42,7 @@
   `(let [field# ~field]
      (when-not (has-error? field#)
        (let [~'_ (get-input-field field#)]
-         (when-not (and #'*optional* (empty-field? ~'_))
+         (when-not (and @#'*optional* (empty-field? ~'_))
            (if (binding [*context* (conj @#'*context* field#)]
                  ~test)
              (set-value! field# ~'_)
@@ -55,7 +55,7 @@
      `(let [field# ~field]
         (when-not (has-error? field#)
           (let [~'_ (get-input-field field#)]
-            (when-not (and #'*optional* (empty-field? ~'_))
+            (when-not (and @#'*optional* (empty-field? ~'_))
               (let [res# (binding [*context* (conj @#'*context* field#)]
                            ~test)]
                 (set-value! field# res#)))))))
