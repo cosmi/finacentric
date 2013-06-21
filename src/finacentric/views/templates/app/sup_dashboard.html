@@ -50,7 +50,6 @@ Is it me you're looking for?
 {% for i in invoices %}
     <tr>
       <td><input type="checkbox" name="selected[{{i.id}}]"/></td>
-      <td>{{i.supplier}}</td>
       <td><a href="invoice/{{i.id}}">{{i.number}}</a></td>
 
       <td>{{i.description}}</td>
