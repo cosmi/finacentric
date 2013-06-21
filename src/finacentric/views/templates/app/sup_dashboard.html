@@ -65,17 +65,34 @@ Is it me you're looking for?
       <td>{{i.discount_rate}}</td>
       <td>{{i.state}}</td>
       <td>
-        {% if i.accepted %}
-        Zaakceptowane!
-        Super, co nie?
-        {% else %}
-        {% if i.rejected %}
-        Odrzucone!
-        Bardzo nam przykro :(
-        {% else %}
-        Wciąż czeka na akceptację
-        {% endif %}
-        {% endif %}
+         {% switch i.state %}
+        ???
+        {% case :input %}
+        Czeka na weryfikację
+         <a href="invoice/{{i.id}}/edit">
+          Edytuj (TODO)
+        </a>
+        {% case :accepted %}
+        Faktura została zweryfikowana poprawnie.
+        {% case :rejected %}
+        Faktura odrzucona przez kontrahenta.
+         <a href="invoice/{{i.id}}/edit">
+          Popraw (TODO)
+         </a>
+
+        {% case :discount_offered %}
+        <a href="invoice/{{i.id}}/discount-accept">
+          Zgódź się na dyskont
+        </a>
+        {% case :discount_accepted %}
+        Przyspieszona data płatności wybrana
+        <a href="invoice/{{i.id}}/discount-accept">
+          Zmień ją
+        </a>
+        {% case :discount_confirmed %}
+        {% case :correction_done %}
+        {% case :correction_received %}
+        {% endswitch %}
       </td>
     </tr>
 {% endfor %}

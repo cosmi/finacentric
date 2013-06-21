@@ -78,6 +78,7 @@
   (form-wrapper
    (with-input input
      (with-errors errors
+       ;; opcjonalne pola mogą zepsuć edycję chyba (?)
        (text-input :number "Numer" 40)
        (date-input :issue_date "Data wystawienia" 30)
        (date-input :sell_date "Data sprzedaży" 10)
@@ -98,6 +99,19 @@
          (throw-validation-error :invoice "Błąd podczas zapisywania pliku"))
     (db/simple-create-invoice input supplier-id buyer-id)))
 
+(defn- handle-simple-invoice-form-edit [invoice-id input]
+  ;; file upload? TODO: wyciagnac upload do osobnego pliki (może nawet to zrobić jako walidator cośtam input).
+  (let [upload (when (input :invoice)
+                 (try
+                   (files/store-file! (-> input :invoice :tempfile)
+                                      (-> input :invoice :content-type) {})
+                   (catch Exception e (.printStackTrace e) nil)))
+        input (dissoc (if upload (assoc input :file_id upload) input) :invoice)]
+    (and (input :invoice) (not upload)
+         (throw-validation-error :invoice "Błąd podczas zapisywania pliku"))
+    (db/simple-save-invoice invoice-id input)))
+
+
 ;; Invoice Correction Form
 
 (defvalidator valid-correction-invoice
@@ -108,6 +122,8 @@
                  "Wartość nie powinna mieć więcej niż 2 miejsca po przecinku")
   (decimal-field :gross_total 2 "Błędny format danych"
                  "Wartość nie powinna mieć więcej niż 2 miejsca po przecinku")
+
+  (rule :gross_total (< (get-field :net_total) _) "Wartość brutto jest mniejsza niż netto")
   (convert :invoice (if (vali/valid-file? _) _ nil))
   (optional
     (with-field :invoice
@@ -128,6 +144,7 @@
 
 (defn- handle-correction-invoice-form [input supplier-id buyer-id]
   ;; file upload?
+  ;; TODO na razie to ma w kontent skopiowany z tworzenia inwojsa
   (let [upload (when (input :invoice)
                  (try
                    (files/store-file! (-> input :invoice :tempfile)
@@ -137,6 +154,7 @@
     (and (input :invoice) (not upload)
          (throw-validation-error :invoice "Błąd podczas zapisywania pliku"))
     (db/simple-create-invoice input supplier-id buyer-id)))
+
 
 
 ;;; REGISTER FROM REG-CODE
@@ -186,6 +204,20 @@
         valid-simple-invoice
         #(handle-simple-invoice-form % supplier-id buyer-id)
         "hello"))
+
+(defn FORM-simple-invoice-edit [invoice-id]
+  (routes-when (invoices/check-invoice
+                invoice-id
+                (invoices/has-state? :input :rejected))
+  (FORM "/edit"
+        (fn [inp errors]
+          (let [inp (if (nil? inp)
+                      (db/get-invoice-unchecked invoice-id)
+                      inp)]
+            (layout (simple-invoice-form inp errors))))
+        valid-simple-invoice
+        #(handle-simple-invoice-form-edit invoice-id %)
+        ".")))
 
 ;; DISCOUNT ACCEPT FORM
 (defvalidator valid-discount-accept-form
@@ -240,7 +272,7 @@
              (catch Exception e
                (.printStackTrace e)
                (throw-validation-error :discounted_payment_date
-                                       "Nastąpił błąd, spróbuj ponownie.")))))
+                                       "Nastąpił błąd, spróbuj ponownie."))))))
 
 
 
@@ -295,7 +327,9 @@
                                 (invoices/has-state? :discount_confirmed :correction_done :correction_received))
                     (FORM-correction-invoice supplier-id buyer-id))
 
+                  (FORM-simple-invoice-edit invoice-id)
                   (FORM-discount-accept invoice-id supplier-id)
+                  
                 
                   (GET "/file" []
                     (invoice-file supplier-id buyer-id invoice-id)))))))))))

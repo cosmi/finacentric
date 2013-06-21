@@ -214,6 +214,13 @@
                                            :buyer_data_id (data-ids buyer-id)
                                            }))))))
 
+(defn simple-save-invoice [invoice-id data]
+  (update invoices
+          (where {:id invoice-id})
+          (set-fields
+           data)))
+
+
 
 
 
