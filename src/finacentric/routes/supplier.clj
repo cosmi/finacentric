@@ -98,9 +98,6 @@
 ;; Invoice Adjust Form
 
 (defvalidator valid-adjust-invoice
-  (rule :number (<= 2 (count _) 40) "Numer powinien mieć 2 do 40 znaków")
-  (date-field :issue_date "Błędny format daty")
-  (date-field :sell_date "Błędny format daty")
   (date-field :payment_date "Błędny format daty")
   (rule :net_total (<= (count _) 50) "Zbyt długi ciąg")
   (rule :gross_total (<= (count _) 50) "Zbyt długi ciąg")
@@ -220,12 +217,19 @@
 
             (context "/invoice" []
               (id-context invoice-id
-                (GET "/" []
-                  (invoice-details supplier-id buyer-id invoice-id))
-                
-                (FORM-adjust-invoice supplier-id buyer-id)
+                (routes-when (invoices/check-invoice
+                              invoice-id
+                              (invoices/is-seller? supplier-id))
+                  
+                  (GET "/" []
+                    (invoice-details supplier-id buyer-id invoice-id))
 
-                (GET "/file" []
-                  (invoice-file supplier-id buyer-id invoice-id))))))))))
+                  (routes-when (invoices/check-invoice
+                                invoice-id
+                                (invoices/has-state? :discount_confirmed :correction_done :correction_received))
+                    (FORM-adjust-invoice supplier-id buyer-id))
+
+                  (GET "/file" []
+                    (invoice-file supplier-id buyer-id invoice-id)))))))))))
 
 
