@@ -2,7 +2,8 @@
   (:require [finacentric.models.db :as db])
   (:use [korma.core :as korma]
         [korma.db :only (defdb transaction)])
-  (:require [clj-time.core :as time])
+  (:require [clj-time.core :as time]
+            [clj-time.coerce :as coerce])
   (:import [org.joda.time Days LocalDate]))
 
 
@@ -136,7 +137,6 @@
       (set-fields {:rejected nil}))))
 
 (defn invoice-offer-discount! [company-id invoice-id annual-rate earliest-date]
-  (prn :DUPA annual-rate earliest-date)
   (throw-on-nil
     (update db/invoices
       (where {:buyer_id company-id
@@ -147,9 +147,6 @@
                    
                    ))))
 
-(defn sql-date-to-joda [^java.sql.Date value]
-  (org.joda.time.LocalDate/fromDateFields value)
-  )
 
 (defn calculate-discount-rate
   "Przy początkowej i końcowej dacie zwraca wyliczony dyskont;
@@ -158,9 +155,8 @@ z dokładnością do 4 cyfr po przecinku"
   [annual-percent-rate first-date last-date]
   {:pre [(< annual-percent-rate 100.)]
    :post [(< % 100.)]}
-   
-  (let [first-date (sql-date-to-joda first-date)
-        last-date (sql-date-to-joda last-date)
+  (let [first-date (coerce/from-sql-date first-date)
+        last-date (coerce/from-sql-date last-date)
         _ (assert (-> first-date (.compareTo last-date) (<= 0)))
         days-diff (.getDays (org.joda.time.Days/daysBetween first-date last-date))
         date-diff (/ days-diff 365.)
@@ -176,11 +172,12 @@ z dokładnością do 4 cyfr po przecinku"
   (* old-value (- 100M discount-value) 0.01M))
 
 (defn get-discount-values [invoice-id new-payment-date]
+  (prn :NEW new-payment-date)
   (let [invoice (->
                  (select db/invoices
                    (where {:id invoice-id})
-                   (at-state :discount_offered)
-                   first))
+                   (at-state :discount_offered))
+                 first)
         discount-rate (calculate-discount-rate
                        (invoice :annual_discount_rate)
                        new-payment-date
@@ -196,7 +193,7 @@ z dokładnością do 4 cyfr po przecinku"
       (let [values (get-discount-values invoice-id new-payment-date)]
         (update db/invoices
           (where {:seller_id supplier-id
-                  :invoice_id invoice-id
+                  :id invoice-id
                   :annual_discount_rate annual-rate
                   :earliest_discount_date earliest-date})
           (at-state :discount_offered)

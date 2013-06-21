@@ -16,7 +16,10 @@
             [noir.util.crypt :as crypt]
             [finacentric.models.db :as db]
             [hiccup.core :as hiccup]
-            [korma.core :as korma]))
+            [korma.core :as korma])
+  
+  (:require [clj-time.core :as time]
+            [clj-time.coerce :as coerce]))
 
 (def INVOICE-FILE-SIZE-LIMIT (* 150 1024))
 
@@ -95,9 +98,9 @@
          (throw-validation-error :invoice "Błąd podczas zapisywania pliku"))
     (db/simple-create-invoice input supplier-id buyer-id)))
 
-;; Invoice Adjust Form
+;; Invoice Correction Form
 
-(defvalidator valid-adjust-invoice
+(defvalidator valid-correction-invoice
   (date-field :payment_date "Błędny format daty")
   (rule :net_total (<= (count _) 50) "Zbyt długi ciąg")
   (rule :gross_total (<= (count _) 50) "Zbyt długi ciąg")
@@ -111,19 +114,19 @@
       (rule (= "application/pdf" (:content-type _)) "Niepoprwany typ dokumentu")
       (rule (<= (:size _) INVOICE-FILE-SIZE-LIMIT) "Plik z fakturą jest zbyt duży"))))
 
-(defn adjust-invoice-form [input errors]
+(defn correction-invoice-form [input errors]
   (form-wrapper
    (with-input input
      (with-errors errors
-       (text-input :number "Numer" 40)
-       (date-input :issue_date "Data wystawienia" 30)
-       (date-input :sell_date "Data sprzedaży" 10)
-       (date-input :payment_date "Termin płatności" 30)
+       (text-input :number "Numer" 40 true)
+       (date-input :issue_date "Data wystawienia" 30 true)
+       (date-input :sell_date "Data sprzedaży" 10 true)
+       (date-input :payment_date "Termin płatności" 30 true)
        (decimal-input :net_total "Wartość netto" 30)
        (decimal-input :gross_total "Wartość brutto" 30)
-       (file-input :invoice "Elektroniczna faktura (PDF)")))))
+       (file-input :invoice "Korekta faktury (PDF)")))))
 
-(defn- handle-adjust-invoice-form [input supplier-id buyer-id]
+(defn- handle-correction-invoice-form [input supplier-id buyer-id]
   ;; file upload?
   (let [upload (when (input :invoice)
                  (try
@@ -184,23 +187,34 @@
         #(handle-simple-invoice-form % supplier-id buyer-id)
         "hello"))
 
-
 ;; DISCOUNT ACCEPT FORM
 (defvalidator valid-discount-accept-form
   (date-field :discounted_payment_date "Błędny format daty")
   (date-field :earliest_discount_date "Błędny format daty")
   
-  (decimal-field :net_total 4 "Błędny format danych"
+  (date-field :payment_date "Błędny format daty")
+  (rule :discounted_payment_date
+        (-> (coerce/from-sql-date _)
+            (.compareTo (coerce/from-sql-date (get-field :earliest_discount_date)))
+            (>= 0)) "Kontrahent nie godzi się na tak wczesną datę płatności.")
+  (rule :discounted_payment_date
+        (-> (coerce/from-sql-date _)
+            (.compareTo (coerce/from-sql-date (get-field :payment_date)))
+            (< 0)) "Nowa data musi być wcześniejsza, niż oryginalna data płatności.")
+  (decimal-field :annual_discount_rate 4 "Błędny format danych"
                  "Wartość nie powinna mieć więcej niż 2 miejsca po przecinku")
   )
 
 (defn discount-accept-form [input errors]
+  (clojure.pprint/pprint input)
+  (clojure.pprint/pprint errors)
   (form-wrapper
    (with-input input
      (with-errors errors
        (date-input :discounted_payment_date "Data wystawienia" 30)
        (hidden-input :annual_discount_rate)
        (hidden-input :earliest_discount_date)
+       (hidden-input :payment_date)
        ))))
 
 
@@ -211,7 +225,7 @@
     (FORM "/discount-accept"
           (fn [input errors]
             (let [input (if (nil? input)
-                          (db/get-invoice invoice-id)
+                          (db/get-invoice-unchecked invoice-id)
                           input
                           )]
               (layout (discount-accept-form input errors))))
@@ -222,19 +236,20 @@
               (% :annual_discount_rate)
               (% :discounted_payment_date)
               (% :earliest_discount_date))
+             (resp/redirect ".")
              (catch Exception e
                (.printStackTrace e)
                (throw-validation-error :discounted_payment_date
-                                       "Nastąpił błąd, spróbuj ponownie."))))))
+                                       "Nastąpił błąd, spróbuj ponownie.")))))
 
 
 
 
-(defn FORM-adjust-invoice [supplier-id buyer-id]
-  (FORM "/adjust"
-        #(layout (adjust-invoice-form %1 %2))
-        valid-adjust-invoice
-        #(handle-adjust-invoice-form % supplier-id buyer-id)))
+(defn FORM-correction-invoice [supplier-id buyer-id]
+  (FORM "/correction"
+        #(layout (correction-invoice-form %1 %2))
+        valid-correction-invoice
+        #(handle-correction-invoice-form % supplier-id buyer-id)))
 
 (defn invoice-details [supplier-id buyer-id invoice-id]
   (when-let [invoice (db/get-invoice invoice-id supplier-id buyer-id)]
@@ -278,9 +293,9 @@
                   (routes-when (invoices/check-invoice
                                 invoice-id
                                 (invoices/has-state? :discount_confirmed :correction_done :correction_received))
-                    (FORM-adjust-invoice supplier-id buyer-id))
+                    (FORM-correction-invoice supplier-id buyer-id))
 
-                  (FORM-discount-accept supplier-id buyer-id)
+                  (FORM-discount-accept invoice-id supplier-id)
                 
                   (GET "/file" []
                     (invoice-file supplier-id buyer-id invoice-id)))))))))))

@@ -2,7 +2,9 @@
   (:use compojure.core)
   (:import clojure.lang.ExceptionInfo
            java.text.SimpleDateFormat)
-  (:import java.sql.Date java.util.GregorianCalendar)
+  
+  (:require [clj-time.core :as time]
+            [clj-time.coerce :as coerce])
   (:require [noir.validation :as vali]))
 
 
@@ -161,9 +163,8 @@
     (convert (.setScale _ scale))))
 
 (defn make-sql-date [year month day]
-  (java.sql.Date. 
-   (.getTimeInMillis 
-    (java.util.GregorianCalendar. year month day))))
+  (coerce/to-sql-date
+    (time/date-time year month day)))
 
 (defn parse-date [date-str]
   (let [[_ & values] (re-matches #"([0-9]{4})-([0-9]{2})-([0-9]{2})" date-str)

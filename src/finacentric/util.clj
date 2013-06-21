@@ -1,6 +1,9 @@
 (ns finacentric.util
   (:use [compojure.core]
         [finacentric.validation])
+  
+  (:require [clj-time.core :as time]
+            [clj-time.coerce :as coerce])
   (:require [noir.io :as io]
             [markdown.core :as md]
             [noir.request]
@@ -91,3 +94,8 @@
              (render# params# (get-errors))))
          (render# params# (get-errors)))
        )))
+
+
+(defn sql-date-to-joda [^java.sql.Date value]
+  (org.joda.time.LocalDate/fromDateFields value)
+  )
