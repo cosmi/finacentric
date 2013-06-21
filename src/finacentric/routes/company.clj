@@ -28,9 +28,12 @@
   (db/get-invoices from to (db/page-filter page per-page)))
 
 
-(defn dashboard [supplier-id invoices]
+(defn dashboard [supplier-id invoices sort-column sort-dir]
+  (prn sort-column sort-dir)
   (layout/render
-     "app/co_dashboard.html" {:invoices invoices}))
+   "app/co_dashboard.html" {:invoices invoices
+                            :s {:col (name sort-column)
+                                :dir (clojure.string/lower-case (name sort-dir))}}))
 
 (defn form-wrapper [content]
   (hiccup/html [:form {:method "post"}
@@ -130,26 +133,35 @@
               (% :earliest_discount_date))
            (resp/redirect "."))))
 
+(def SORT-COLUMNS {:name :companies.name
+                   :number :number
+                   :payment_date :payment_date
+                   :issue_date :issue_date})
+(def SORT-DIRS {:desc :DESC
+                :asc :ASC})
 
-
-(defn hello [company-id]
+(defn hello [company-id sort-column sort-dir]
   (with-pagination page-no
     (with-page-size 30 page-size
       (dashboard company-id
                  (->>
                   (db/get-invoices-with-suppliers company-id
                     (db/page-filter page-no page-size)
-                    (db/sorted-by :id)
+                    (db/sorted-by sort-column sort-dir)
                     invoices/not-rejected-filter)
-                  (map invoices/append-state))))))
+                  (map invoices/append-state))
+                 sort-column
+                 sort-dir))))
 
 (defroutes company-routes
   (context "/company" {:as request}
     (with-int-param [company-id (auth/get-current-users-company-id)]
       (routes-when (auth/logged-to-company? company-id)
         (FORM-add-supplier company-id)
-        (GET "/hello" []
-          (hello company-id))
+        (GET "/hello" [sort dir]
+          (let [sort (or (get SORT-COLUMNS (keyword sort)) :id)
+                dir (or (get SORT-DIRS (keyword dir)) :ASC)]
+            (hello company-id sort dir)))
         (context "/invoice" []
           (id-context invoice-id
             (GET "/" []

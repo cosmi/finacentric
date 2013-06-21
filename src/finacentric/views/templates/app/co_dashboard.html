@@ -10,8 +10,6 @@ Is it me you're looking for?
  
 </div>
 
-<a href="simple-invoice-form">Nowa faktura</a>
-
 <table class="table table-striped">
   <colgroup>
     <col span="1" style="width: 10px;">
@@ -31,11 +29,15 @@ Is it me you're looking for?
   <thead>
     <tr>
       <th><input type="checkbox" name="selected-all"/></th>
-      <th class="sorting" data-sorting="supplier">Kontrahent</th>
-      <th>Numer</th>
+      <th class="sorting {% ifequal s.col "companies.name" %}{{s.dir}}{% endifequal %}" 
+          data-sorting="name">Kontrahent</th>
+      <th class="sorting {% ifequal s.col "number" %}{{s.dir}}{% endifequal %}" 
+          data-sorting="number">Numer</th>
       <th>Opis</th>
-      <th>Data wystawienia</th>
-      <th>Termin płatności</th>
+      <th class="sorting {% ifequal s.col "issue_date" %}{{s.dir}}{% endifequal %}" 
+          data-sorting="issue_date">Data wystawienia</th>
+      <th class="sorting {% ifequal s.col "payment_date" %}{{s.dir}}{% endifequal %}" 
+          data-sorting="payment_date">Termin płatności</th>
       <th>Netto</th>
       <th>Brutto</th>
       <th>Roczny dyskont</th>
