@@ -53,14 +53,19 @@ $(document).ready ->
     else
       process();
 
+parseUrl = ( url = location.href ) ->
+  params = {}
+  (( parts = part.split( "=" )) && params[parts[0]] = parts[1] for part in (url.split "?").pop().split "&" if url.indexOf( "?" ) != -1) && params || {}
+
 $(document).ready ->
   # Sorting
   $('body').on "click", ".sorting", (e) ->
     e.preventDefault();
     column = $(e.target);
     sorting = column.data('sorting')
-    dir = if column.hasClass('asc') then "desc" else "asc";
-    if sorting && document.URL.indexOf("?") != -1
-      window.location = window.location + "&sort=" + sorting + "&dir=" + dir;
-    else if sorting
-      window.location = window.location + "?sort=" + sorting + "&dir=" + dir;
+    url = window.location.protocol + "//" + window.location.host + "" + window.location.pathname
+    params = parseUrl(document.URL)
+    dir = if column.hasClass('asc') then "desc" else "asc"
+    params['dir'] = dir
+    params['sort'] = sorting
+    window.location = url + "?" + $.param(params)
