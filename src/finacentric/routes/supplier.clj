@@ -205,24 +205,27 @@
 
 
 (defn FORM-discount-accept [invoice-id supplier-id]
-  (FORM "/simple-invoice-form"
-        (fn [input errors]
-          (let [input (if (nil? input)
-                        (db/get-invoice invoice-id)
-                        input
-                        )]
-            (layout (discount-accept-form input errors))))
-        valid-discount-accept-form
-        #(try
-           (invoices/invoice-accept-discount!
-            supplier-id invoice-id
-            (% :annual_discount_rate)
-            (% :discounted_payment_date)
-            (% :earliest_discount_date))
-           (catch Exception e
-             (.printStackTrace e)
-             (throw-validation-error :discounted_payment_date
-                                     "Nastąpił błąd, spróbuj ponownie.")))))
+  (routes-when (invoices/check-invoice
+                invoice-id
+                (invoices/has-state? :discount_offered :discount_accepted))
+    (FORM "/discount-accept"
+          (fn [input errors]
+            (let [input (if (nil? input)
+                          (db/get-invoice invoice-id)
+                          input
+                          )]
+              (layout (discount-accept-form input errors))))
+          valid-discount-accept-form
+          #(try
+             (invoices/invoice-accept-discount!
+              supplier-id invoice-id
+              (% :annual_discount_rate)
+              (% :discounted_payment_date)
+              (% :earliest_discount_date))
+             (catch Exception e
+               (.printStackTrace e)
+               (throw-validation-error :discounted_payment_date
+                                       "Nastąpił błąd, spróbuj ponownie."))))))
 
 
 
@@ -277,6 +280,8 @@
                                 (invoices/has-state? :discount_confirmed :correction_done :correction_received))
                     (FORM-adjust-invoice supplier-id buyer-id))
 
+                  (FORM-discount-accept supplier-id buyer-id)
+                
                   (GET "/file" []
                     (invoice-file supplier-id buyer-id invoice-id)))))))))))
 
