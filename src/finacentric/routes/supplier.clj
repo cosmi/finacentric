@@ -95,6 +95,49 @@
          (throw-validation-error :invoice "Błąd podczas zapisywania pliku"))
     (db/simple-create-invoice input supplier-id buyer-id)))
 
+;; Invoice Adjust Form
+
+(defvalidator valid-adjust-invoice
+  (rule :number (<= 2 (count _) 40) "Numer powinien mieć 2 do 40 znaków")
+  (date-field :issue_date "Błędny format daty")
+  (date-field :sell_date "Błędny format daty")
+  (date-field :payment_date "Błędny format daty")
+  (rule :net_total (<= (count _) 50) "Zbyt długi ciąg")
+  (rule :gross_total (<= (count _) 50) "Zbyt długi ciąg")
+  (decimal-field :net_total 2 "Błędny format danych"
+                 "Wartość nie powinna mieć więcej niż 2 miejsca po przecinku")
+  (decimal-field :gross_total 2 "Błędny format danych"
+                 "Wartość nie powinna mieć więcej niż 2 miejsca po przecinku")
+  (convert :invoice (if (vali/valid-file? _) _ nil))
+  (optional
+    (with-field :invoice
+      (rule (= "application/pdf" (:content-type _)) "Niepoprwany typ dokumentu")
+      (rule (<= (:size _) INVOICE-FILE-SIZE-LIMIT) "Plik z fakturą jest zbyt duży"))))
+
+(defn adjust-invoice-form [input errors]
+  (form-wrapper
+   (with-input input
+     (with-errors errors
+       (text-input :number "Numer" 40)
+       (date-input :issue_date "Data wystawienia" 30)
+       (date-input :sell_date "Data sprzedaży" 10)
+       (date-input :payment_date "Termin płatności" 30)
+       (decimal-input :net_total "Wartość netto" 30)
+       (decimal-input :gross_total "Wartość brutto" 30)
+       (file-input :invoice "Elektroniczna faktura (PDF)")))))
+
+(defn- handle-adjust-invoice-form [input supplier-id buyer-id]
+  ;; file upload?
+  (let [upload (when (input :invoice)
+                 (try
+                   (files/store-file! (-> input :invoice :tempfile)
+                                      (-> input :invoice :content-type) {})
+                   (catch Exception e (.printStackTrace e) nil)))
+        input (dissoc (if upload (assoc input :file_id upload) input) :invoice)]
+    (and (input :invoice) (not upload)
+         (throw-validation-error :invoice "Błąd podczas zapisywania pliku"))
+    (db/simple-create-invoice input supplier-id buyer-id)))
+
 
 ;;; REGISTER FROM REG-CODE
 (defvalidator register-from-reg-code-validator
@@ -144,6 +187,12 @@
         #(handle-simple-invoice-form % supplier-id buyer-id)
         "hello"))
 
+(defn FORM-adjust-invoice [supplier-id buyer-id]
+  (FORM "/adjust"
+        #(layout (adjust-invoice-form %1 %2))
+        valid-adjust-invoice
+        #(handle-adjust-invoice-form % supplier-id buyer-id)))
+
 (defn invoice-details [supplier-id buyer-id invoice-id]
   (when-let [invoice (db/get-invoice invoice-id supplier-id buyer-id)]
     (invoice-view invoice-id supplier-id buyer-id invoice)))
@@ -169,11 +218,14 @@
                   (dashboard supplier-id buyer-id page-no page-size))))
             (FORM-simple-invoice supplier-id buyer-id)
 
-            (GET "/invoice/:id" [id]
-              (with-integer id
-                (invoice-details supplier-id buyer-id id)))
-            (GET "/invoice/:id/file" [id]
-                 (with-integer id
-                   (invoice-file supplier-id buyer-id id)))))))))
+            (context "/invoice" []
+              (id-context invoice-id
+                (GET "/" []
+                  (invoice-details supplier-id buyer-id invoice-id))
+                
+                (FORM-adjust-invoice supplier-id buyer-id)
+
+                (GET "/file" []
+                  (invoice-file supplier-id buyer-id invoice-id))))))))))
 
 
