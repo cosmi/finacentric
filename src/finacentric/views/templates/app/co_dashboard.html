@@ -38,8 +38,10 @@ Is it me you're looking for?
           data-sorting="issue_date">Data wystawienia</th>
       <th class="sorting {% ifequal s.col "payment_date" %}{{s.dir}}{% endifequal %}" 
           data-sorting="payment_date">Termin płatności</th>
-      <th>Netto</th>
-      <th>Brutto</th>
+      <th class="sorting {% ifequal s.col "net_total" %}{{s.dir}}{% endifequal %}" 
+          data-sorting="net_total">Netto</th>
+      <th class="sorting {% ifequal s.col "gross_total" %}{{s.dir}}{% endifequal %}" 
+          data-sorting="gross_total">Brutto</th>
       <th>Roczny dyskont</th>
       <th>Netto</th>
       <th>Brutto</th>

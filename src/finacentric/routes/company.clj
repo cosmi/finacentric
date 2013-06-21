@@ -136,7 +136,9 @@
 (def SORT-COLUMNS {:name :companies.name
                    :number :number
                    :payment_date :payment_date
-                   :issue_date :issue_date})
+                   :issue_date :issue_date
+                   :net_total :net_total
+                   :gross_total :gross_total})
 (def SORT-DIRS {:desc :DESC
                 :asc :ASC})
 
