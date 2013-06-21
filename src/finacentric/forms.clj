@@ -33,7 +33,10 @@
      (hiccup/html
       (list
        [:label label]
-       [:input {:type "text" :name (get-field-name field) :value (get-value field) :maxlength max-len :disabled "disabled"}]
+       [:input (cond->
+                {:type "text" :name (get-field-name field) :value (get-value field) :maxlength max-len}
+                disabled?
+                (assoc :disabled true))]
        (when-let [error (get-error field)]
          [:div.error error]))))
   ([field label max-len]

@@ -115,13 +115,13 @@
   (form-wrapper
    (with-input input
      (with-errors errors
-       (text-input :number "Numer" 40)
-       (date-input :issue_date "Data wystawienia" 30)
-       (date-input :sell_date "Data sprzedaży" 10)
-       (date-input :payment_date "Termin płatności" 30)
+       (text-input :number "Numer" 40 true)
+       (date-input :issue_date "Data wystawienia" 30 true)
+       (date-input :sell_date "Data sprzedaży" 10 true)
+       (date-input :payment_date "Termin płatności" 30 true)
        (decimal-input :net_total "Wartość netto" 30)
        (decimal-input :gross_total "Wartość brutto" 30)
-       (file-input :invoice "Elektroniczna faktura (PDF)")))))
+       (file-input :invoice "Korekta faktury (PDF)")))))
 
 (defn- handle-correction-invoice-form [input supplier-id buyer-id]
   ;; file upload?
