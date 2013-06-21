@@ -28,14 +28,16 @@
     (when-let [error (get-error field)]
       [:div.error error]))))
 
-(defn text-input [field label max-len]
-  (hiccup/html
-   (list
-    [:label label]
-    [:input {:type "text" :name (get-field-name field) :value (get-value field) :maxlength max-len}]
-    (when-let [error (get-error field)]
-      [:div.error error]
-      ))))
+(defn text-input
+  ([field label max-len disabled?]
+     (hiccup/html
+      (list
+       [:label label]
+       [:input {:type "text" :name (get-field-name field) :value (get-value field) :maxlength max-len :disabled "disabled"}]
+       (when-let [error (get-error field)]
+         [:div.error error]))))
+  ([field label max-len]
+     (text-input field label max-len false)))
 
 
 (defn hidden-input [field]
