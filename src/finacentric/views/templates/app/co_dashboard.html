@@ -97,7 +97,7 @@ Is it me you're looking for?
         </a>
         {% case :discount_accepted %}
         Żądana data płatności: {{i.discounted_payment_date}}
-        <a href="#" class="ajaxify" data-url="invoice/{{i.id}}/confirm-discount">
+        <a href="#" class="ajaxify" data-url="invoice/{{i.id}}/confirm-discount?date={{i.discounted_payment_date}}">
           Potwierdź wypłatę (TODO)
         </a>
         {% case :discount_confirmed %}
