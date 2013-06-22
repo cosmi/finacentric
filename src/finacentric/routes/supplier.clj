@@ -99,7 +99,7 @@
          (throw-validation-error :invoice "Błąd podczas zapisywania pliku"))
     (db/simple-create-invoice input supplier-id buyer-id)))
 
-(defn- handle-simple-invoice-form-edit [invoice-id input]
+(defn- handle-simple-invoice-form-edit [input supplier-id invoice-id ]
   ;; file upload? TODO: wyciagnac upload do osobnego pliki (może nawet to zrobić jako walidator cośtam input).
   (let [upload (when (input :invoice)
                  (try
@@ -109,7 +109,7 @@
         input (dissoc (if upload (assoc input :file_id upload) input) :invoice)]
     (and (input :invoice) (not upload)
          (throw-validation-error :invoice "Błąd podczas zapisywania pliku"))
-    (db/simple-save-invoice invoice-id input)))
+    (invoices/invoice-simple-edit! supplier-id invoice-id input)))
 
 
 ;; Invoice Correction Form
@@ -205,7 +205,7 @@
         #(handle-simple-invoice-form % supplier-id buyer-id)
         "hello"))
 
-(defn FORM-simple-invoice-edit [invoice-id]
+(defn FORM-simple-invoice-edit [supplier-id invoice-id]
   (routes-when (invoices/check-invoice
                 invoice-id
                 (invoices/has-state? :input :rejected))
@@ -216,7 +216,7 @@
                       inp)]
             (layout (simple-invoice-form inp errors))))
         valid-simple-invoice
-        #(handle-simple-invoice-form-edit invoice-id %)
+        #(handle-simple-invoice-form-edit % supplier-id invoice-id)
         ".")))
 
 ;; DISCOUNT ACCEPT FORM
@@ -327,7 +327,7 @@
                                 (invoices/has-state? :discount_confirmed :correction_done :correction_received))
                     (FORM-correction-invoice supplier-id buyer-id))
 
-                  (FORM-simple-invoice-edit invoice-id)
+                  (FORM-simple-invoice-edit invoice-id supplier-id)
                   (FORM-discount-accept invoice-id supplier-id)
                   
                 

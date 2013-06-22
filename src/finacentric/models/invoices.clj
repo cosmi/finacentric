@@ -99,9 +99,18 @@
   `(where ~query (~'or ~@(map state-filters states))))
   
   
-
 (defn invoice-input! [supplier-id buyer-id data]
   (db/simple-create-invoice data supplier-id buyer-id))
+
+
+(defn invoice-simple-edit! [supplier-id invoice-id data]
+  (throw-on-nil
+    (update db/invoices
+      (where {:seller_id supplier-id
+              :id invoice-id})
+      (has-state? :input :rejected)
+      (set-fields (assoc data
+                    :rejected nil)))))
 
 (defn invoice-accept! [company-id invoice-id]
   (throw-on-nil
