@@ -33,6 +33,8 @@ handleResponse = ($el, response, status, xhr, requestUrl) ->
           window.location.reload false
         when "redirect"
           window.location.href = entry.url
+        when "write-vals"              
+          console.log "TODO!"
   reload = if $el.hasClass('no-reload') then false else response.length==0;
   if reload then window.location.reload false
 
