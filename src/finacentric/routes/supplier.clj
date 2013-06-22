@@ -50,10 +50,13 @@
    "app/sup_invoice.html" {:i (assoc invoice :id invoice-id)}))
 
 
-(defn form-wrapper [content]
-  (hiccup/html [:form {:method "post" :enctype "multipart/form-data"}
+(defn form-wrapper ([attrs content]
+  (hiccup/html [:form (merge {:method "post" :enctype "multipart/form-data"}
+                             attrs)
                 [:fieldset content]
                 [:button {:type "submit" :class "btn"} "OK"]]))
+  ([content]
+     (form-wrapper {} content)))
 
 ;; Invoice Form
 
@@ -237,12 +240,26 @@
                  "Wartość nie powinna mieć więcej niż 2 miejsca po przecinku")
   )
 
-(defn discount-accept-form [input errors]
-  (clojure.pprint/pprint input)
-  (clojure.pprint/pprint errors)
+(defn discount-accept-form [invoice-id input errors]
   (form-wrapper
+   {:class "on-change-ajaxify" :data-url "calculate-discount"}
    (with-input input
      (with-errors errors
+       (hiccup/html (list
+                     [:p "Najwcześniejsza możliwa data płatności: "
+                        (input :earliest_discount_date)]
+                     [:p "Data płatności na fakturze: "
+                      (input :payment_date)]
+                     [:p "Koszt przyspieszonej płatności: "
+                      (input :annual_discount_rate)
+                      "% (w skali roku)"]
+
+                     [:p "Wartość netto po obniżce: "
+                      [:span {:class "target discounted_net_total"} "[Wpisz datę poniżej]"]]
+                     [:p "Wartość brutto po obniżce: "
+                      [:span {:class "target discounted_gross_total"} "[Wpisz datę poniżej]"]]
+                     
+                     ))
        (date-input :discounted_payment_date "Data wystawienia" 30)
        (hidden-input :annual_discount_rate)
        (hidden-input :earliest_discount_date)
@@ -254,13 +271,17 @@
   (routes-when (invoices/check-invoice
                 invoice-id
                 (invoices/has-state? :discount_offered :discount_accepted))
+    (ajax/JSON "/calculate-discount" {params :params}
+          (if-let [params (validates? discount-accept-form params)]
+            (ajax/write-vals (invoices/get-discount-values invoice-id (params :discounted_payment_date)))
+            []))
     (FORM "/discount-accept"
           (fn [input errors]
             (let [input (if (nil? input)
                           (db/get-invoice-unchecked invoice-id)
                           input
                           )]
-              (layout (discount-accept-form input errors))))
+              (layout (discount-accept-form invoice-id input errors))))
           valid-discount-accept-form
           #(try
              (invoices/invoice-accept-discount!

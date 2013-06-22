@@ -7,6 +7,9 @@
 (defn redirect [url]
    [{:method "redirect" :url url}])
 
+(defn write-vals [values]
+   [{:method "write-vals" :values values}])
+
 (defmacro JSON [path args & body]
   `(POST ~path ~args {:body (json/write-str (do ~@body))
                 :status 200

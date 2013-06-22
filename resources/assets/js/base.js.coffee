@@ -53,6 +53,22 @@ $(document).ready ->
     else
       process();
 
+$(document).ready ->
+  # On-change-ajaxify
+  $('body').on "change key-down", "form.on-change-ajaxify *", (e) ->
+    e.preventDefault();
+    url = $(this).data "url";
+    data = $(this).serialize();
+    $element = $(this);
+    process = () ->
+      $.post(url, data, (data, status, xhr) ->
+        handleResponse($element, data, status, xhr, url)).fail (xhr, status, error) ->
+        handleResponse($element, xhr.responseText, status, xhr, url);
+    if $element.data('modal-header')?
+      confirmationModal($element, process);
+    else
+      process();
+
 parseUrl = ( url = location.href ) ->
   params = {}
   (( parts = part.split( "=" )) && params[parts[0]] = parts[1] for part in (url.split "?").pop().split "&" if url.indexOf( "?" ) != -1) && params || {}

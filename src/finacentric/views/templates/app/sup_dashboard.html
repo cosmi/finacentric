@@ -85,7 +85,7 @@ Is it me you're looking for?
           Zgódź się na dyskont
         </a>
         {% case :discount_accepted %}
-        Przyspieszona data płatności wybrana
+        Przyspieszona data płatności: {{i.discounted_payment_date}}
         <a href="invoice/{{i.id}}/discount-accept">
           Zmień ją
         </a>

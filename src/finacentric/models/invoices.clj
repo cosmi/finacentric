@@ -185,7 +185,7 @@ z dokładnością do 4 cyfr po przecinku"
   (let [invoice (->
                  (select db/invoices
                    (where {:id invoice-id})
-                   (at-state :discount_offered))
+                   (has-state? :discount_offered :discount_accepted))
                  first)
         discount-rate (calculate-discount-rate
                        (invoice :annual_discount_rate)
@@ -195,18 +195,21 @@ z dokładnością do 4 cyfr po przecinku"
         new-gross-value (apply-discount (invoice :gross_total) discount-rate)]
     {:discounted_net_total new-net-value
      :discounted_gross_total new-gross-value
-     :discount_rate discount-rate}))
+     :discount_rate discount-rate
+     :discounted_payment_date new-payment-date}))
 
 (defn invoice-accept-discount! [supplier-id invoice-id annual-rate new-payment-date earliest-date]
-    (transaction
+    (throw-on-nil
+     (transaction
       (let [values (get-discount-values invoice-id new-payment-date)]
         (update db/invoices
-          (where {:seller_id supplier-id
-                  :id invoice-id
-                  :annual_discount_rate annual-rate
-                  :earliest_discount_date earliest-date})
-          (at-state :discount_offered)
-          (set-fields values)))))
+                (where {:seller_id supplier-id
+                        :id invoice-id
+                        :annual_discount_rate annual-rate
+                        :earliest_discount_date earliest-date})
+                (has-state? :discount_offered :discount_accepted)
+                (set-fields (assoc values
+                              :discount_accepted (sqlfn :now))))))))
 
 (defn invoice-confirm-discount! [company-id invoice-id net-value gross-value]
   )
