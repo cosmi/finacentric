@@ -211,8 +211,22 @@ z dokładnością do 4 cyfr po przecinku"
                 (set-fields (assoc values
                               :discount_accepted (sqlfn :now))))))))
 
-(defn invoice-confirm-discount! [company-id invoice-id net-value gross-value]
-  )
+(defn invoice-confirm-discount! [company-id invoice-id date]
+  (throw-on-nil
+   (update db/invoices
+              (where {:buyer_id company-id
+                      :id invoice-id
+                      :discounted_payment_date date})
+              (has-state? :discount_accepted)
+              (set-fields {:discount_confirmed (sqlfn :now)}))))
+
+(defn invoice-cancel-confirm-discount! [company-id invoice-id]
+  (throw-on-nil
+   (update db/invoices
+              (where {:buyer_id company-id
+                      :id invoice-id})
+              (has-state? :discount_confirmed)
+              (set-fields {:discount_confirmed nil}))))
 
 (defn invoice-correction-done! [company-id invoice-id]
   )

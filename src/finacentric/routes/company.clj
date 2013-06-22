@@ -79,25 +79,25 @@
   ;; (option :email2 (vali/is-email? _) "Niepoprawny format adresu email")
   ;; (option :email2 (<= (count _) 50) "Email nie powinien mieć więcej niż 50 znaków")
   (optional
-    (rule :address_street (<= (count _) 80) "Ulica nie powinna mieć więcej niż 80 znaków")
-    (rule :address_street_no (<= (count _) 20) "Numer nie powinien mieć więcej niż 20 znaków")
-    (rule :nip (vali-util/is-nip? _) "Niepoprawny format NIP (proszę zapisać same cyfry, bez pauz)")
-    (rule :regon (vali-util/is-regon? _) "Niepoprawny format REGON")))
+   (rule :address_street (<= (count _) 80) "Ulica nie powinna mieć więcej niż 80 znaków")
+   (rule :address_street_no (<= (count _) 20) "Numer nie powinien mieć więcej niż 20 znaków")
+   (rule :nip (vali-util/is-nip? _) "Niepoprawny format NIP (proszę zapisać same cyfry, bez pauz)")
+   (rule :regon (vali-util/is-regon? _) "Niepoprawny format REGON")))
 
 
 
 
 (defn FORM-add-supplier [company-id]
   (FORM "/add-supplier"
-              #(layout (create-supplier-form %1 %2))
-              validate-create-supplier-form
-              #(let [id (db/create-supplier-for-company!
-                         company-id
-                         (dissoc % :email1 :email2)
-                         (->> [:email1 :email2]
-                              (map %)
-                              (remove nil?)))]
-                 (resp/redirect (str "supplier/" id)))))
+        #(layout (create-supplier-form %1 %2))
+        validate-create-supplier-form
+        #(let [id (db/create-supplier-for-company!
+                   company-id
+                   (dissoc % :email1 :email2)
+                   (->> [:email1 :email2]
+                        (map %)
+                        (remove nil?)))]
+           (resp/redirect (str "supplier/" id)))))
 
 
 (defvalidator validate-offer-discount-form
@@ -131,7 +131,7 @@
               company-id invoice-id
               (% :annual_discount_rate)
               (% :earliest_discount_date))
-           (resp/redirect "."))))
+             (resp/redirect "."))))
 
 (def SORT-COLUMNS {:name :companies.name
                    :number :number
@@ -148,9 +148,9 @@
       (dashboard company-id
                  (->>
                   (db/get-invoices-with-suppliers company-id
-                    (db/page-filter page-no page-size)
-                    (db/sorted-by sort-column sort-dir)
-                    invoices/not-rejected-filter)
+                                                  (db/page-filter page-no page-size)
+                                                  (db/sorted-by sort-column sort-dir)
+                                                  invoices/not-rejected-filter)
                   (map invoices/append-state))
                  sort-column
                  sort-dir))))
@@ -166,27 +166,39 @@
             (hello company-id sort dir)))
         (context "/invoice" []
           (id-context invoice-id
-            (GET "/" []
-              (invoice-details company-id invoice-id))
-            (GET "/file" []
-              (invoice-file company-id invoice-id))
-            (POST "/accept" []
-              (invoices/invoice-accept! company-id invoice-id))
-            (POST "/reject" []
-              (invoices/invoice-reject! company-id invoice-id))
-            (POST "/accept-cancel" []
-              (invoices/invoice-accept-cancel! company-id invoice-id))
-            (POST "/reject-cancel" []
-              (invoices/invoice-reject-cancel! company-id invoice-id))
-            (routes-when (invoices/check-invoice
-                          invoice-id
-                          (invoices/is-buyer? company-id)
-                          (invoices/has-state? :accepted :discount_offered))
-              (FORM-offer-discount company-id invoice-id))
+                      (routes-when (invoices/check-invoice
+                                    invoice-id
+                                    (invoices/is-buyer? company-id))
+                        (GET "/" []
+                          (invoice-details company-id invoice-id))
+                        (GET "/file" []
+                          (invoice-file company-id invoice-id))
+                        
+                        (routes-when (invoices/check-invoice invoice-id
+                                                             (invoices/has-state? :accepted))
+                          (POST "/accept" []
+                            (invoices/invoice-accept! company-id invoice-id))
+                          (POST "/reject" []
+                            (invoices/invoice-reject! company-id invoice-id)))
+                        (routes-when (invoices/check-invoice invoice-id
+                                                             (invoices/has-state? :accepted))
+                          (POST "/accept-cancel" []
+                            (invoices/invoice-accept-cancel! company-id invoice-id)))
+                        (routes-when (invoices/check-invoice invoice-id
+                                                             (invoices/has-state? :rejected))
+                          (POST "/reject-cancel" []
+                            (invoices/invoice-reject-cancel! company-id invoice-id)))
+                        (routes-when (invoices/check-invoice invoice-id
+                                                             (invoices/has-state? :accepted :discount_offered))
+                          (FORM-offer-discount company-id invoice-id))
+                        (routes-when (invoices/check-invoice invoice-id
+                                                             (invoices/has-state? :discount_accepted))
+                          (POST "/confirm-discount" [date]
+                            (let [date (parse-date date)]
+                              (invoices/invoice-confirm-discount! company-id invoice-id date))))
+                        (routes-when (invoices/check-invoice invoice-id
+                                                             (invoices/has-state? :discount_confirmed))
+                          (POST "/cancel-confirm-discount" []
+                            (invoices/invoice-cancel-confirm-discount! company-id invoice-id)))
 
-
-            ))))))
-
-
-            
-  
+                        )))))))

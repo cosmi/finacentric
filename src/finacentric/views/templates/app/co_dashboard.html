@@ -96,8 +96,17 @@ Is it me you're looking for?
           Zmień dyskont
         </a>
         {% case :discount_accepted %}
+        Żądana data płatności: {{i.discounted_payment_date}}
+        <a href="#" class="ajaxify" data-url="invoice/{{i.id}}/confirm-discount">
+          Potwierdź wypłatę (TODO)
+        </a>
         {% case :discount_confirmed %}
+        Zatwierdzona data płatności: {{i.discounted_payment_date}}
+        <a href="#" class="ajaxify" data-url="invoice/{{i.id}}/cancel-confirm-discount">
+          Anuluj potwierdzenie
+        </a>
         {% case :correction_done %}
+        Należy zapłacić zgodnie z korektą do dnia {{i.discounted_payment_date}}
         {% case :correction_received %}
         {% endswitch %}
       </td>
