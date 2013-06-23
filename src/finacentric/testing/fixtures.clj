@@ -167,6 +167,15 @@
                         )))))
 
 
+
+(defn accept-payment! [id date]
+  (form-post (url :company :invoice id :confirm-discount (str "?date=" date)) data)
+  )
+
+(defn correction-done! [id data]
+  (form-post (url :company :invoice id :correction) data)
+  )
+
 (defn init-db []
   (lobos.core/reset)
   (create-admin! "admin" "a1234")
@@ -244,6 +253,24 @@
                      :payment_date "2013-05-30"
                      :net_total 1500
                      :gross_total 1845}
+                     {:number "FV/5/3"
+                     :issue_date "2013-05-13"
+                     :sell_date "2013-05-13"
+                     :payment_date "2013-05-30"
+                     :net_total 1500
+                     :gross_total 1845}
+                      {:number "FV/5/4"
+                     :issue_date "2013-05-13"
+                     :sell_date "2013-05-13"
+                     :payment_date "2013-05-30"
+                     :net_total 1500
+                     :gross_total 1845}
+                      {:number "FV/5/5"
+                     :issue_date "2013-05-13"
+                     :sell_date "2013-05-13"
+                     :payment_date "2013-05-30"
+                     :net_total 1500
+                     :gross_total 1845}
                     ]]
         (create-simple-invoice! data))
 
@@ -257,6 +284,17 @@
       (offer-discount! 3 "2013-05-15" 11.5))
 
     (with-logged-user ["adam@druty.pl" "abcde"]
-      (accept-discount! 3 "2013-05-16")
+      (accept-discount! 3 "2013-05-16"))
+    
+    (with-logged-user ["a@dtel.pl" "abcde"]
+      (accept-payment! 3 "2013-05-16"))
+
+    
+    (with-logged-user ["adam@druty.pl" "abcde"]
+      (correction-done! 3 {:number "CV/5/5"
+                           :issue_date "2013-05-13"
+                           :payment_date "2013-05-30"
+                           :net_total 1500
+                           :gross_total 1845})
       )
     ))
