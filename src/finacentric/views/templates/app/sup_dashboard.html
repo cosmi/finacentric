@@ -90,6 +90,10 @@ Is it me you're looking for?
           Zmień ją
         </a>
         {% case :discount_confirmed %}
+        Kontrahent zatwierdził płatność, wystaw korektę:
+        <a href="invoice/{{i.id}}/correction">
+          Zmień ją
+        </a>
         {% case :correction_done %}
         {% case :correction_received %}
         {% endswitch %}

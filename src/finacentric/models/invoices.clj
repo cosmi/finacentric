@@ -228,8 +228,20 @@ z dokładnością do 4 cyfr po przecinku"
               (has-state? :discount_confirmed)
               (set-fields {:discount_confirmed nil}))))
 
-(defn invoice-correction-done! [company-id invoice-id]
-  )
+(defn create-or-edit-correction-with-discount! [invoice-id data]
+  (transaction
+   (or (update db/corrections
+               (where {:invoice_id invoice-id})
+               (set-fields data))
+       (let [invoice (db/get-invoice-unchecked invoice-id)]
+         (insert db/corrections
+                 (values (merge {:currency (invoice :invoice)}
+                                data)))
+         ))))
+
+(defn get-correction-with-discount [invoice-id]
+  (select db/corrections
+          (where {:invoice_id invoice-id})))
 
 
 

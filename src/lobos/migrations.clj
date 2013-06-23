@@ -84,8 +84,6 @@
               
               (decimal :discounted_net_total 15 2)
               (decimal :discounted_gross_total 15 2)
-
-              
               
               (timestamp :accepted)
               (timestamp :rejected)
@@ -96,7 +94,23 @@
 
               (varchar :file_id 32)
               
-              (varchar :correction_file_id 32)
+              ))
+
+      (create
+       (table :corrections
+              (integer :id :primary-key :auto-inc)
+              (integer :invoice-id [:refer :invoices :id] :unique)
+              (varchar :number 30)
+              
+              (date :issue_date)
+              (date :payment_date)
+ 
+              (decimal :net_total 15 2)
+              (decimal :gross_total 15 2)
+
+              (varchar :currency 8 (default "PLN"))
+              
+              (varchar :file_id 32)
               ))
 
       ;; (create 

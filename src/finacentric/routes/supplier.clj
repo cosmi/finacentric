@@ -117,47 +117,80 @@
 
 ;; Invoice Correction Form
 
-(defvalidator valid-correction-invoice
-  (date-field :payment_date "Błędny format daty")
-  (rule :net_total (<= (count _) 50) "Zbyt długi ciąg")
-  (rule :gross_total (<= (count _) 50) "Zbyt długi ciąg")
-  (decimal-field :net_total 2 "Błędny format danych"
-                 "Wartość nie powinna mieć więcej niż 2 miejsca po przecinku")
-  (decimal-field :gross_total 2 "Błędny format danych"
-                 "Wartość nie powinna mieć więcej niż 2 miejsca po przecinku")
+(defn valid-correction-invoice [invoice-id]
+  (let [invoice (db/get-invoice-unchecked invoice-id)]
+    (validator
+     (rule :number (<= 2 (count _) 40) "Numer powinien mieć 2 do 40 znaków")
+     (date-field :payment_date "Błędny format daty")
+     (date-field :issue_date "Błędny format daty")
+     (rule :net_total (<= (count _) 50) "Zbyt długi ciąg")
+     (rule :gross_total (<= (count _) 50) "Zbyt długi ciąg")
+     (decimal-field :net_total 2 "Błędny format danych"
+                    "Wartość nie powinna mieć więcej niż 2 miejsca po przecinku")
+     (decimal-field :gross_total 2 "Błędny format danych"
+                    "Wartość nie powinna mieć więcej niż 2 miejsca po przecinku")
 
-  (rule :gross_total (< (get-field :net_total) _) "Wartość brutto jest mniejsza niż netto")
-  (convert :invoice (if (vali/valid-file? _) _ nil))
-  (optional
-    (with-field :invoice
-      (rule (= "application/pdf" (:content-type _)) "Niepoprwany typ dokumentu")
-      (rule (<= (:size _) INVOICE-FILE-SIZE-LIMIT) "Plik z fakturą jest zbyt duży"))))
+     (rule :net_total (<= _ (invoice :discounted_net_total))
+           (str "Wartość netto nie może przekraczać "
+                (invoice :discounted_net_total)
+                " " (invoice :currency)))
+     (rule :gross_total (<= _ (invoice :discounted_gross_total))
+           (str "Wartość brutto nie może przekraczać "
+                (invoice :discounted_gross_total)
+                " " (invoice :currency)))                                                             
 
-(defn correction-invoice-form [input errors]
-  (form-wrapper
-   (with-input input
-     (with-errors errors
-       (text-input :number "Numer" 40 true)
-       (date-input :issue_date "Data wystawienia" 30 true)
-       (date-input :sell_date "Data sprzedaży" 10 true)
-       (date-input :payment_date "Termin płatności" 30 true)
-       (decimal-input :net_total "Wartość netto" 30)
-       (decimal-input :gross_total "Wartość brutto" 30)
-       (file-input :invoice "Korekta faktury (PDF)")))))
+     (rule :gross_total (< (get-field :net_total) _) "Wartość brutto jest mniejsza niż netto")
+     (convert :file (if (vali/valid-file? _) _ nil))
+     (optional
+      (with-field :file
+        (rule (= "application/pdf" (:content-type _)) "Niepoprwany typ dokumentu")
+        (rule (<= (:size _) INVOICE-FILE-SIZE-LIMIT) "Plik z korektą jest zbyt duży"))))))
 
-(defn- handle-correction-invoice-form [input supplier-id buyer-id]
+
+
+(defn correction-invoice-form [invoice-id input errors]
+  (let [invoice (db/get-invoice-unchecked invoice-id)
+        input (or input
+                  (invoices/get-correction-with-discount invoice-id)
+                  {:payment_date (invoice :discounted_payment_date)
+                   :net_total (invoice :discounted_net_total)
+                   :gross_total (invoice :discounted_gross_total)})]
+    (form-wrapper
+     (with-input input
+       (with-errors errors
+         (hiccup/html [:p "Wprowadzanie korekty do Faktury VAT nr: " (invoice :number)])
+         (text-input :number "Numer korekty" 40)
+         (date-input :issue_date "Data wystawienia" 30)
+         (date-input :payment_date "Termin płatności" 30)
+         (decimal-input :net_total "Wartość netto" 30)
+         (hiccup/html [:p "Maksymalnie " (invoice :discounted_net_total)])
+         (decimal-input :gross_total "Wartość brutto" 30)
+         (hiccup/html [:p "Maksymalnie " (invoice :discounted_gross_total)])
+         (file-input :file "Korekta faktury (PDF)"))))))
+
+
+(defn- handle-correction-invoice-form [input invoice-id]
   ;; file upload?
   ;; TODO na razie to ma w kontent skopiowany z tworzenia inwojsa
-  (let [upload (when (input :invoice)
+  (let [upload (when (input :file)
                  (try
-                   (files/store-file! (-> input :invoice :tempfile)
-                                      (-> input :invoice :content-type) {})
+                   (files/store-file! (-> input :file :tempfile)
+                                      (-> input :file :content-type) {})
                    (catch Exception e (.printStackTrace e) nil)))
-        input (dissoc (if upload (assoc input :file_id upload) input) :invoice)]
-    (and (input :invoice) (not upload)
-         (throw-validation-error :invoice "Błąd podczas zapisywania pliku"))
-    (db/simple-create-invoice input supplier-id buyer-id)))
+        input (-> input
+                  (dissoc :file)
+                  (cond-> upload (assoc :file_id upload)))]
+    (and (input :file) (not upload)
+         (throw-validation-error :file "Błąd podczas zapisywania pliku"))
+    (invoices/create-or-edit-correction-with-discount! invoice-id input)))
 
+
+(defn FORM-correction-invoice [invoice-id]
+  (FORM "/correction"
+        #(layout (correction-invoice-form
+                  invoice-id %1 %2))
+        (valid-correction-invoice invoice-id)
+        #(handle-correction-invoice-form % invoice-id)))
 
 
 ;;; REGISTER FROM REG-CODE
@@ -298,11 +331,6 @@
 
 
 
-(defn FORM-correction-invoice [supplier-id buyer-id]
-  (FORM "/correction"
-        #(layout (correction-invoice-form %1 %2))
-        valid-correction-invoice
-        #(handle-correction-invoice-form % supplier-id buyer-id)))
 
 (defn invoice-details [supplier-id buyer-id invoice-id]
   (when-let [invoice (db/get-invoice invoice-id supplier-id buyer-id)]
@@ -345,8 +373,8 @@
 
                   (routes-when (invoices/check-invoice
                                 invoice-id
-                                (invoices/has-state? :discount_confirmed :correction_done :correction_received))
-                    (FORM-correction-invoice supplier-id buyer-id))
+                                (invoices/has-state? :discount_confirmed :correction_done))
+                    (FORM-correction-invoice invoice-id))
 
                   (FORM-simple-invoice-edit invoice-id supplier-id)
                   (FORM-discount-accept invoice-id supplier-id)

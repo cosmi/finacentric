@@ -87,7 +87,8 @@
   ;;                       (assoc %1 %2 (to-sql-date d))
   ;;                       %1) v [:issue_date :sell_date :payment_date :discounted_payment_date])))
   )
-
+(defentity corrections
+  (belongs-to invoices {:fk :invoice_id}))
 ;; (defentity invoices-send
 ;;   (table :invoices :invoices-send))
 
