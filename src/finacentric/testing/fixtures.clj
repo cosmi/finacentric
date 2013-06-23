@@ -19,6 +19,7 @@
 
 (defn form-post
   [url args]
+  (println :FORM url)
   (let [result (http/get (str "http://localhost:3000" url)  { :cookies *cookies*})
         body (-> result :body (java.io.StringReader.) enlive/html-resource)]
     (assert (= (:status result) 200))
@@ -169,11 +170,10 @@
 
 
 (defn accept-payment! [id date]
-  (form-post (url :company :invoice id :confirm-discount (str "?date=" date)) data)
-  )
+  (action-post (str (url :company :invoice id :confirm-discount) "?date=" date) {}))
 
 (defn correction-done! [id data]
-  (form-post (url :company :invoice id :correction) data)
+  (form-post (url :supplier :invoice id :correction) data)
   )
 
 (defn init-db []

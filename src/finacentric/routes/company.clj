@@ -58,6 +58,7 @@
 
 ;; Forms & Stuff
 
+
 (defn create-supplier-form [input errors]
   (form-wrapper
    (with-input input
@@ -165,6 +166,10 @@
                 dir (or (get SORT-DIRS (keyword dir)) :ASC)]
             (hello company-id sort dir)))
         (context "/invoice" []
+          (do
+            (prn :request (request :uri))
+            (constantly nil)
+            )
           (id-context invoice-id
                       (routes-when (invoices/check-invoice
                                     invoice-id
@@ -194,6 +199,7 @@
                         (routes-when (invoices/check-invoice invoice-id
                                                              (invoices/has-state? :discount_accepted))
                           (POST "/confirm-discount" [date]
+                            (prn :DAte date)
                             (let [date (parse-date date)]
                               (invoices/invoice-confirm-discount! company-id invoice-id date))))
                         (routes-when (invoices/check-invoice invoice-id

@@ -182,7 +182,9 @@
                   (cond-> upload (assoc :file_id upload)))]
     (and (input :file) (not upload)
          (throw-validation-error :file "Błąd podczas zapisywania pliku"))
-    (invoices/create-or-edit-correction-with-discount! invoice-id input)))
+    (invoices/create-or-edit-correction-with-discount! invoice-id input)
+    (resp/redirect ".")
+    ))
 
 
 (defn FORM-correction-invoice [invoice-id]

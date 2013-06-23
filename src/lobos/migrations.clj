@@ -99,7 +99,7 @@
       (create
        (table :corrections
               (integer :id :primary-key :auto-inc)
-              (integer :invoice-id [:refer :invoices :id] :unique)
+              (integer :invoice_id [:refer :invoices :id] :unique)
               (varchar :number 30)
               
               (date :issue_date)
