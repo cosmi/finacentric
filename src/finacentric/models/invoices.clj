@@ -84,6 +84,7 @@
     (where (~'= :id ~invoice-id))
     ~@tests
     (aggregate (~'count :*) :cnt)
+    ;; prn-and-exec
     exec
     first :cnt
     (> 0)))

@@ -209,12 +209,12 @@
   (form-wrapper
    (with-input input
      (with-errors errors
-       (text-input :reg-code "Kod rejestracyjny *" 50)
-       (text-input :email "Adres email *" 50)
-       (pass-input* :password "Hasło *" 50)
-       (pass-input* :repeat-password "Powtórz hasło *" 50)
-       (text-input :first_name "Imię" 30)
-       (text-input :last_name "Nazwisko" 40)))))
+        (text-input :reg-code "Kod rejestracyjny *" 50)
+        (text-input :email "Adres email *" 50)
+        (pass-input* :password "Hasło *" 50)
+        (pass-input* :repeat-password "Powtórz hasło *" 50)
+        (text-input :first_name "Imię" 30)
+        (text-input :last_name "Nazwisko" 40)))))
 
 ;; Routes
 

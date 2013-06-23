@@ -148,6 +148,7 @@
   (down []
         (drop (table :users) :cascade)
         (drop (table :invoices) :cascade)
+        (drop (table :corrections) :cascade)
         (drop (table :invoice_lines) :cascade)
         (drop (table :companies) :cascade)
         (drop (table :company_datas) :cascade)
