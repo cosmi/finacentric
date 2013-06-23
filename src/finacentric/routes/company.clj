@@ -175,7 +175,7 @@
                           (invoice-file company-id invoice-id))
                         
                         (routes-when (invoices/check-invoice invoice-id
-                                                             (invoices/has-state? :accepted))
+                                                             (invoices/has-state? :accepted :input))
                           (POST "/accept" []
                             (invoices/invoice-accept! company-id invoice-id))
                           (POST "/reject" []
