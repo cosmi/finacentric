@@ -241,8 +241,10 @@ z dokładnością do 4 cyfr po przecinku"
          ))))
 
 (defn get-correction-with-discount [invoice-id]
-  (select db/corrections
-          (where {:invoice_id invoice-id})))
+  (-> (select db/corrections
+          (where {:invoice_id invoice-id})
+          (limit 1))
+      first))
 
 
 
