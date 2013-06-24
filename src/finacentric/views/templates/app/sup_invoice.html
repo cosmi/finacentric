@@ -171,5 +171,10 @@ Korekta wykonana? {{i.corrected}}
 <a href="/supplier/invoice/{{i.id}}/file">Plik</a>
 {% endif %}
 
-</div>
+{% if form %}
+<hr/>
+{{form}}
+{% endif %}
+
+
 {% endblock %}

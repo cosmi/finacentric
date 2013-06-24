@@ -29,6 +29,11 @@
   (layout/render
    "app/sup_base.html" {:content (apply str (flatten content))}))
 
+(defn invoice-layout [invoice-id form]
+  (layout/render
+   "app/sup_invoice.html" {:i (db/get-invoice-unchecked invoice-id) :form (apply str (flatten [form]))}))
+
+
 (defn prepare-invoices [from to page per-page]
   (db/get-invoices from to (db/page-filter page per-page)))
 
@@ -189,8 +194,8 @@
 
 (defn FORM-correction-invoice [invoice-id]
   (FORM "/correction"
-        #(layout (correction-invoice-form
-                  invoice-id %1 %2))
+        #(invoice-layout invoice-id (correction-invoice-form
+                                     invoice-id %1 %2))
         (valid-correction-invoice invoice-id)
         #(handle-correction-invoice-form % invoice-id)))
 
@@ -316,7 +321,7 @@
                           (db/get-invoice-unchecked invoice-id)
                           input
                           )]
-              (layout (discount-accept-form invoice-id input errors))))
+              (invoice-layout invoice-id (discount-accept-form invoice-id input errors))))
           valid-discount-accept-form
           #(try
              (invoices/invoice-accept-discount!

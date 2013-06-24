@@ -24,6 +24,11 @@
   (layout/render
    "app/co_base.html" {:content (apply str (flatten content))}))
 
+(defn invoice-layout [invoice-id form]
+  (layout/render
+   "app/co_invoice.html" {:i (db/get-invoice-unchecked invoice-id) :form (apply str (flatten [form]))}))
+
+
 (defn prepare-invoices [from to page per-page]
   (db/get-invoices from to (db/page-filter page per-page)))
 
@@ -125,7 +130,7 @@
           (let [input (if-not (nil? input)
                         input
                         (db/get-invoice-unchecked invoice-id))]
-            (layout (offer-discount-form input errors))))
+            (invoice-layout invoice-id (offer-discount-form input errors))))
         validate-offer-discount-form
         #(do (prn %)
              (invoices/invoice-offer-discount!
