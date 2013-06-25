@@ -1,6 +1,7 @@
 (ns finacentric.models.invoices
   (:require [finacentric.models.db :as db])
-  (:use [korma.core :as korma]
+  (:use [korma.sql.fns]
+        [korma.core :as korma]
         [korma.db :only (defdb transaction)])
   (:require [clj-time.core :as time]
             [clj-time.coerce :as coerce])
@@ -29,50 +30,56 @@
        (throw (Exception. "Nil returned"))
        ret#)))
 
-(def state-filters
+(def states
   '{:input {:accepted nil
-           :rejected nil}
-   :accepted {:accepted [not= nil]
-              :annual_discount_rate nil
-              :earliest_discount_date nil}
-   :rejected {:rejected [not= nil]}
-   :discount_offered {:annual_discount_rate [not= nil]
-                      :earliest_discount_date [not= nil]
-                      :discount_accepted nil}
-   :discount_accepted {:discount_accepted [not= nil]
-                       :discount_confirmed nil}
-   :discount_confirmed {:discount_confirmed [not= nil]
-                        :corrected nil}
-   :correction_done {:corrected [not= nil]
-                     :correction_received nil}
-   :correction_received {:correction_received [not= nil]}
-   })
+            :rejected nil}
+    :accepted {:accepted [not= nil]
+               :annual_discount_rate nil
+               :earliest_discount_date nil}
+    :rejected {:rejected [not= nil]}
+    :discount_offered {:annual_discount_rate [not= nil]
+                       :earliest_discount_date [not= nil]
+                       :discount_accepted nil}
+    :discount_accepted {:discount_accepted [not= nil]
+                        :discount_confirmed nil}
+    :discount_confirmed {:discount_confirmed [not= nil]
+                         :corrected nil}
+    :correction_done {:corrected [not= nil]
+                      :correction_received nil}
+    :correction_received {:correction_received [not= nil]}
+    })
 
-(def state-checkers
-  (into {}
-        (for [[state, values] state-filters]
-          [state
-           (apply every-pred
-                  (for [[k, v] values]
-                    (if (vector? v)
-                      (let [[f & args] v
-                            f (eval f)]
-                        #(apply f (get % k) args))
-                      #(= (get % k) v))))])))
 
-(defn get-state [invoice]
-  (->> state-checkers
-       (filter (fn [[s,f]] (f invoice)))
-       first
-       first))
+(defn- state-filters [state]
+  `{:state [pred-= ~(name state)]})
 
-(defn append-state [invoice]
-  (assoc invoice :state (get-state invoice)))
+;; (def state-checkers
+;;   (into {}
+;;         (for [[state, values] state-filters]
+;;           [state
+;;            (apply every-pred
+;;                   (for [[k, v] values]
+;;                     (if (vector? v)
+;;                       (let [[f & args] v
+;;                             f (eval f)]
+;;                         #(apply f (get % k) args))
+;;                       #(= (get % k) v))))])))
+
+;; (defn get-state [invoice]
+;;   (invoice :state))
+;; (->> state-checkers
+;;      (filter (fn [[s,f]] (f invoice)))
+;;      first
+;;      first))
+
+;; (defn append-state [invoice]
+;;   (assoc invoice :state (get-state invoice)))
 
 (defmacro at-state [query state]
-  `(where ~query (state-filters ~state)))
+  `(where ~query ~(state-filters state))
+  )
 (defmacro at-states [query state]
-  `(where ~query (state-filters ~state)))
+  `(where ~query ~(state-filters state)))
 
 (defn prn-and-exec [query]
   (println "QUERY:" (as-sql query))
@@ -98,64 +105,87 @@
 (defmacro has-state? [query & states]
   (assert (every? keyword states) "States cannot accept dynamic value")
   `(where ~query (~'or ~@(map state-filters states))))
-  
-  
-(defn invoice-input! [supplier-id buyer-id data]
-  (db/simple-create-invoice data supplier-id buyer-id))
+
+
+(defn invoice-input! [seller-id buyer-id data]
+  (transaction
+   (let [data-ids (group-by :id
+                            (select db/companies
+                                    (where (or (= :id seller-id) (= :id buyer-id)))
+                                    (fields [:id :data_id])))
+         data-ids #(-> data-ids (get %) (get :data_id))]
+
+     (-> (insert* db/invoices)
+         (values (merge data
+                        {:seller_id seller-id :buyer_id buyer-id
+                         :seller_data_id (data-ids seller-id)
+                         :buyer_data_id (data-ids buyer-id)
+                         :state "input"
+                         }))
+         exec
+         ))))
 
 
 (defn invoice-simple-edit! [supplier-id invoice-id data]
   (throw-on-nil
-    (update db/invoices
-      (where {:seller_id supplier-id
-              :id invoice-id})
-      (has-state? :input :rejected)
-      (set-fields (assoc data
-                    :rejected nil)))))
+   (update db/invoices
+           (where {:seller_id supplier-id
+                   :id invoice-id})
+           (has-state? :input :rejected)
+           (set-fields (assoc data
+                         :state "input"
+                         :rejected nil)))))
 
 (defn invoice-accept! [company-id invoice-id]
   (throw-on-nil
-    (update db/invoices
-      (where {:buyer_id company-id
-              :id invoice-id})
-      (at-state :input)
-      (set-fields {:accepted (sqlfn :now)}))))
+   (-> (update* db/invoices)
+       (where {:buyer_id company-id
+               :id invoice-id})
+       (at-state :input)
+       (set-fields {:accepted (sqlfn :now)
+                    :state "accepted"})
+       exec
+       )))
 
 
 (defn invoice-reject! [company-id invoice-id]
   (throw-on-nil
-    (update db/invoices
-      (where {:buyer_id company-id
-              :id invoice-id})
-      (at-state :input)
-      (set-fields {:rejected (sqlfn :now)}))))
+   (update db/invoices
+           (where {:buyer_id company-id
+                   :id invoice-id})
+           (at-state :input)
+           (set-fields {:rejected (sqlfn :now)
+                        :state "rejected"}))))
 
 (defn invoice-accept-cancel! [company-id invoice-id]
   (throw-on-nil
-    (update db/invoices
-      (where {:buyer_id company-id
-              :id invoice-id})
-      (at-state :accepted)
-      (set-fields {:accepted nil}))))
+   (update db/invoices
+           (where {:buyer_id company-id
+                   :id invoice-id})
+           (at-state :accepted)
+           (set-fields {:accepted nil
+                        :state "input" }))))
 
 (defn invoice-reject-cancel! [company-id invoice-id]
   (throw-on-nil
-    (update db/invoices
-      (where {:buyer_id company-id
-              :id invoice-id})
-      (at-state :rejected)
-      (set-fields {:rejected nil}))))
+   (update db/invoices
+           (where {:buyer_id company-id
+                   :id invoice-id})
+           (at-state :rejected)
+           (set-fields {:rejected nil
+                        :state "input" }))))
 
 (defn invoice-offer-discount! [company-id invoice-id annual-rate earliest-date]
   (throw-on-nil
-    (update db/invoices
-      (where {:buyer_id company-id
-              :id invoice-id})
-      (has-state? :accepted :discount_offered)
-      (set-fields {:annual_discount_rate annual-rate
-                   :earliest_discount_date earliest-date}
-                   
-                   ))))
+   (update db/invoices
+           (where {:buyer_id company-id
+                   :id invoice-id})
+           (has-state? :accepted :discount_offered)
+           (set-fields {:annual_discount_rate annual-rate
+                        :earliest_discount_date earliest-date
+                        :state "discount_offered"}
+
+                       ))))
 
 
 (defn calculate-discount-rate
@@ -170,9 +200,9 @@ z dokładnością do 4 cyfr po przecinku"
         _ (assert (-> first-date (.compareTo last-date) (<= 0)))
         days-diff (.getDays (org.joda.time.Days/daysBetween first-date last-date))
         date-diff (/ days-diff 365.)
-    ;; można nie zakładać, że rok ma 365 dni, ale wygląda na to, że
-    ;; na rynkach finansowych stosuje się takie uproszczenie przy krótszych niż rok
-    ;; okresach - a tu okres nie będzie dłuższy niż 92 dni
+        ;; można nie zakładać, że rok ma 365 dni, ale wygląda na to, że
+        ;; na rynkach finansowych stosuje się takie uproszczenie przy krótszych niż rok
+        ;; okresach - a tu okres nie będzie dłuższy niż 92 dni
         annual-rate (/ annual-percent-rate 100M)
         float-rate (- 1.0 (Math/pow (- 1 annual-rate) date-diff))]
     (-> float-rate (* 100.) bigdec (.setScale 4 java.math.BigDecimal/ROUND_HALF_UP))
@@ -185,8 +215,8 @@ z dokładnością do 4 cyfr po przecinku"
   (prn :NEW new-payment-date)
   (let [invoice (->
                  (select db/invoices
-                   (where {:id invoice-id})
-                   (has-state? :discount_offered :discount_accepted))
+                         (where {:id invoice-id})
+                         (has-state? :discount_offered :discount_accepted))
                  first)
         discount-rate (calculate-discount-rate
                        (invoice :annual_discount_rate)
@@ -200,34 +230,37 @@ z dokładnością do 4 cyfr po przecinku"
      :discounted_payment_date new-payment-date}))
 
 (defn invoice-accept-discount! [supplier-id invoice-id annual-rate new-payment-date earliest-date]
-    (throw-on-nil
-     (transaction
-      (let [values (get-discount-values invoice-id new-payment-date)]
-        (update db/invoices
-                (where {:seller_id supplier-id
-                        :id invoice-id
-                        :annual_discount_rate annual-rate
-                        :earliest_discount_date earliest-date})
-                (has-state? :discount_offered :discount_accepted)
-                (set-fields (assoc values
-                              :discount_accepted (sqlfn :now))))))))
+  (throw-on-nil
+   (transaction
+    (let [values (get-discount-values invoice-id new-payment-date)]
+      (update db/invoices
+              (where {:seller_id supplier-id
+                      :id invoice-id
+                      :annual_discount_rate annual-rate
+                      :earliest_discount_date earliest-date})
+              (has-state? :discount_offered :discount_accepted)
+              (set-fields (assoc values
+                            :discount_accepted (sqlfn :now)
+                            :state "discount_accepted")))))))
 
 (defn invoice-confirm-discount! [company-id invoice-id date]
   (throw-on-nil
    (update db/invoices
-              (where {:buyer_id company-id
-                      :id invoice-id
-                      :discounted_payment_date date})
-              (has-state? :discount_accepted)
-              (set-fields {:discount_confirmed (sqlfn :now)}))))
+           (where {:buyer_id company-id
+                   :id invoice-id
+                   :discounted_payment_date date})
+           (has-state? :discount_accepted)
+           (set-fields {:discount_confirmed (sqlfn :now)
+                        :state "discount_confirmed"}))))
 
 (defn invoice-cancel-confirm-discount! [company-id invoice-id]
   (throw-on-nil
    (update db/invoices
-              (where {:buyer_id company-id
-                      :id invoice-id})
-              (has-state? :discount_confirmed)
-              (set-fields {:discount_confirmed nil}))))
+           (where {:buyer_id company-id
+                   :id invoice-id})
+           (has-state? :discount_confirmed)
+           (set-fields {:discount_confirmed nil
+                        :state "discount_accepted"}))))
 
 (defn create-or-edit-correction-with-discount! [invoice-id data]
   (transaction
@@ -235,6 +268,8 @@ z dokładnością do 4 cyfr po przecinku"
                (where {:invoice_id invoice-id})
                (set-fields data))
        (let [invoice (db/get-invoice-unchecked invoice-id)]
+         (update db/invoices (where {:id invoice-id})
+                          (set-fields {:state "correction_done"}))
          (insert db/corrections
                  (values (merge {:currency (invoice :invoice)}
                                 data)))
@@ -242,8 +277,8 @@ z dokładnością do 4 cyfr po przecinku"
 
 (defn get-correction-with-discount [invoice-id]
   (-> (select db/corrections
-          (where {:invoice_id invoice-id})
-          (limit 1))
+              (where {:invoice_id invoice-id})
+              (limit 1))
       first))
 
 
@@ -258,7 +293,7 @@ z dokładnością do 4 cyfr po przecinku"
                (cond-> %
                        (subfields :max) (where {field [<= (subfields :max)]})
                        (subfields :min) (where {field [>= (subfields :min)]})))
-               query params)))
+            query params)))
 
 
 (defn get-invoices-for-company [company-id & filters]

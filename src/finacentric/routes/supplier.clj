@@ -42,12 +42,9 @@
   ;(binding [*context* (str "/supplier/" supplier-id "/" buyer-id)]
   (layout/render
    "app/sup_dashboard.html" {:invoices
-                             (->>
                               (db/get-invoices
                                supplier-id buyer-id
-                               (db/page-filter page per-page))
-                              (map invoices/append-state)
-                              )}))
+                               (db/page-filter page per-page))}))
 
 
 (defn invoice-view [invoice-id supplier-id buyer-id invoice]
@@ -105,7 +102,7 @@
         input (dissoc (if upload (assoc input :file_id upload) input) :invoice)]
     (and (input :invoice) (not upload)
          (throw-validation-error :invoice "Błąd podczas zapisywania pliku"))
-    (db/simple-create-invoice input supplier-id buyer-id)))
+    (invoices/invoice-input! supplier-id buyer-id input )))
 
 (defn- handle-simple-invoice-form-edit [input supplier-id invoice-id ]
   ;; file upload? TODO: wyciagnac upload do osobnego pliki (może nawet to zrobić jako walidator cośtam input).

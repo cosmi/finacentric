@@ -157,12 +157,10 @@
   (with-pagination page-no
     (with-page-size 30 page-size
       (dashboard company-id
-                 (->>
-                  (db/get-invoices-with-suppliers company-id
-                                                  (db/page-filter page-no page-size)
-                                                  (db/sorted-by sort-column sort-dir)
-                                                  invoices/not-rejected-filter)
-                  (map invoices/append-state))
+                 (db/get-invoices-with-suppliers company-id
+                                                 (db/page-filter page-no page-size)
+                                                 (db/sorted-by sort-column sort-dir)
+                                                 invoices/not-rejected-filter)
                  sort-column
                  sort-dir))))
 
@@ -183,7 +181,9 @@
                    (date-input :max "Maksymalna data wystawienia" 10))
        (in-context :payment_date
                    (date-input :min  "Minimalna data płatności" 10)
-                   (date-input :max  "Maksymalna data płatności" 10))))))
+                   (date-input :max  "Maksymalna data płatności" 10))
+       (in-context :state
+                   (text-input :equals "Status faktury" 40))))))
 
 (defvalidator filters-form-validator
   (optional
@@ -195,7 +195,12 @@
                        "Wartość nie powinna mieć więcej niż 2 miejsca po przecinku")))
      (doseq [field [:issue_date :payment_date]]
        (input-context field
-                      (date-field subfield "Błędny format daty"))))))
+                      (date-field subfield "Błędny format daty"))))
+   (input-context :state
+                  (rule :equals (< (count _) 41) "Za długie")
+                  (convert :equals (keyword _))
+                  (rule :equals (invoices/states _) "Nie ma takiego stanu"))
+   ))
   
 
 (defn display-invoices-list [company-id page-no page-size filter-params]
@@ -206,7 +211,6 @@
                     (invoices/gen-invoice-filter obj)
                     (db/page-filter page-no page-size)))
         form (filters-form filter-params (get-errors))]
-    (clojure.pprint/pprint obj)
     (layout/render
      "app/co_dashboard.html" {:invoices invoices
                               :filters form

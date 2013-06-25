@@ -66,6 +66,7 @@
               (date :sell_date)
               (date :payment_date)
               (varchar :payment_mode 30)
+              (varchar :state 30)
 
               (decimal :paid_already 15 2)
 

@@ -82,6 +82,7 @@
   (belongs-to seller_data {:fk :seller_data_id})
   (belongs-to buyer_data {:fk :buyer_data_id})
   (has-many invoice_lines)
+  (transform #(cond-> % (:state %) (assoc :state (-> % :state keyword))))
   ;; (prepare (fn [v]
   ;;            (reduce #(if-let [d (%1 %2)]
   ;;                       (assoc %1 %2 (to-sql-date d))
@@ -201,19 +202,6 @@
   (delete sellers (where {:buyer_id buyer-id :seller_id seller-id})))
 
 
-(defn simple-create-invoice [obj seller-id buyer-id]
-  (transaction
-    (let [data-ids (group-by :id
-                             (select companies
-                               (where (or (= :id seller-id) (= :id buyer-id)))
-                               (fields [:id :data_id])))
-          data-ids #(-> data-ids (get %) (get :data_id))]
-      
-      (insert invoices (values (merge obj
-                                      {:seller_id seller-id :buyer_id buyer-id
-                                           :seller_data_id (data-ids seller-id)
-                                           :buyer_data_id (data-ids buyer-id)
-                                           }))))))
 
 (defn simple-save-invoice [invoice-id data]
   (update invoices
