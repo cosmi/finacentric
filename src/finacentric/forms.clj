@@ -84,6 +84,7 @@
       ~@body)))
 
 (defmacro in-context [context & body]
-  `(binding [*context* (conj *context* ~context)]
-     ~@body))
+  `(binding [*context* (conj @#'*context* ~context)]
+     (list
+      ~@body)))
 

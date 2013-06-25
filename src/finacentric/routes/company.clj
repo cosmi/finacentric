@@ -34,7 +34,6 @@
 
 
 (defn dashboard [supplier-id invoices sort-column sort-dir]
-  (prn sort-column sort-dir)
   (layout/render
    "app/co_dashboard.html" {:invoices invoices
                             :s {:col (name sort-column)
@@ -44,6 +43,13 @@
   (hiccup/html [:form {:method "post"}
                 [:fieldset content]
                 [:button {:type "submit" :class "btn"} "OK"]]))
+
+(defn get-form-wrapper [content]
+  (hiccup/html [:form
+                [:fieldset content]
+                [:button {:type "submit" :class "btn"} "OK"]]))
+
+
 
 ;; Invoice Details
 
@@ -132,8 +138,7 @@
                         (db/get-invoice-unchecked invoice-id))]
             (invoice-layout invoice-id (offer-discount-form input errors))))
         validate-offer-discount-form
-        #(do (prn %)
-             (invoices/invoice-offer-discount!
+        #(do (invoices/invoice-offer-discount!
               company-id invoice-id
               (% :annual_discount_rate)
               (% :earliest_discount_date))
@@ -161,6 +166,56 @@
                  sort-column
                  sort-dir))))
 
+
+
+(defn filters-form [params errors]
+  (get-form-wrapper
+   (with-input params
+     (with-errors errors
+       (in-context :net_total
+                   (decimal-input :min "Minimalna wartość netto" 40)
+                   (decimal-input :max "Maksymalna wartość netto" 40))
+       (in-context :gross_total
+                   (decimal-input :min "Minimalna wartość brutto" 40)
+                   (decimal-input :max "Maksymalna wartość brutto" 40))
+       (in-context :issue_date
+                   (date-input :min "Minimalna data wystawienia" 10)
+                   (date-input :max "Maksymalna data wystawienia" 10))
+       (in-context :payment_date
+                   (date-input :min  "Minimalna data płatności" 10)
+                   (date-input :max  "Maksymalna data płatności" 10))))))
+
+(defvalidator filters-form-validator
+  (optional
+   (doseq [subfield [:min :max]]
+     (doseq [field [:net_total :gross_total]]
+       (input-context field
+                      (decimal-field
+                       subfield 2 "Błędny format danych"
+                       "Wartość nie powinna mieć więcej niż 2 miejsca po przecinku")))
+     (doseq [field [:issue_date :payment_date]]
+       (input-context field
+                      (date-field subfield "Błędny format daty"))))))
+  
+
+(defn display-invoices-list [company-id page-no page-size filter-params]
+  (let [obj (validates? filters-form-validator filter-params)
+        invoices (when obj
+                   (invoices/get-invoices-for-company
+                    company-id
+                    (invoices/gen-invoice-filter obj)
+                    (db/page-filter page-no page-size)))
+        form (filters-form filter-params (get-errors))]
+    (clojure.pprint/pprint obj)
+    (layout/render
+     "app/co_dashboard.html" {:invoices invoices
+                              :filters form
+                              ;; :s {:col (name sort-column)
+                              ;;     :dir (clojure.string/lower-case (name sort-dir))}
+                              }
+     )
+    ))
+
 (defroutes company-routes
   (context "/company" {:as request}
     (with-int-param [company-id (auth/get-current-users-company-id)]
@@ -170,11 +225,11 @@
           (let [sort (or (get SORT-COLUMNS (keyword sort)) :id)
                 dir (or (get SORT-DIRS (keyword dir)) :ASC)]
             (hello company-id sort dir)))
+        (GET "/list-invoices" {params :params}
+          (with-pagination page-no     
+            (with-page-size 30 page-size
+              (display-invoices-list company-id page-no page-size params))))
         (context "/invoice" []
-          (do
-            (prn :request (request :uri))
-            (constantly nil)
-            )
           (id-context invoice-id
                       (routes-when (invoices/check-invoice
                                     invoice-id
@@ -204,7 +259,6 @@
                         (routes-when (invoices/check-invoice invoice-id
                                                              (invoices/has-state? :discount_accepted))
                           (POST "/confirm-discount" [date]
-                            (prn :DAte date)
                             (let [date (parse-date date)]
                               (invoices/invoice-confirm-discount! company-id invoice-id date))))
                         (routes-when (invoices/check-invoice invoice-id

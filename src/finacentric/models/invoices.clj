@@ -74,9 +74,9 @@
 (defmacro at-states [query state]
   `(where ~query (state-filters ~state)))
 
-;; (defn prn-and-exec [query]
-;;   (println "QUERY:" (as-sql query))
-;;   (exec query))
+(defn prn-and-exec [query]
+  (println "QUERY:" (as-sql query))
+  (exec query))
 
 (defmacro check-invoice [invoice-id & tests]
   `(->
@@ -250,3 +250,25 @@ z dokładnością do 4 cyfr po przecinku"
 
 (def not-rejected-filter
   #(where % {:rejected nil}))
+
+
+(defn gen-invoice-filter [params]
+  (fn [query]
+    (reduce #(let [[field subfields] %2]
+               (cond-> %
+                       (subfields :max) (where {field [<= (subfields :max)]})
+                       (subfields :min) (where {field [>= (subfields :min)]})))
+               query params)))
+
+
+(defn get-invoices-for-company [company-id & filters]
+  (-> (reduce #(-> %1 %2)
+              (select* db/invoices)
+              filters)
+      (is-buyer? company-id)
+      (join :left
+            db/companies
+            (= :invoices.seller_id :companies.id)
+            )
+      (fields "invoices.*" :companies.name)
+      exec))

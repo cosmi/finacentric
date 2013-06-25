@@ -34,11 +34,18 @@
 
 
 (defn get-input-field [field]
-  (get @*input* field))
+  (-> @*input* (get-in *context*) (get field)))
 
 (defn has-error? [field]
+  (prn field :e *errors*)
   (-> *errors* deref (get-in *context*) (get field) not-empty))
 
+
+
+
+(defmacro input-context [context & body]
+  `(binding [*context* (conj @#'*context* ~context)]
+     ~@body))
 
 (defmacro rule [field test error-msg]
   `(let [field# ~field]
@@ -65,7 +72,9 @@
      `(let [field# ~field]
         (try
           (convert field# ~test)
-          (catch Exception e# (set-error! field# ~error-msg))))))
+          (catch Exception e#
+            (.printStackTrace e#)
+            (set-error! field# ~error-msg))))))
 
 
 
