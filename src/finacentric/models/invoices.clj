@@ -50,6 +50,20 @@
     })
 
 
+(def state-names
+  '{:input "Czeka na weryfikację"
+    :accepted "Zweryfikowana"
+    :rejected "Odrzucona"
+    :discount_offered ""
+    :discount_accepted {:discount_accepted [not= nil]
+                        :discount_confirmed nil}
+    :discount_confirmed {:discount_confirmed [not= nil]
+                         :corrected nil}
+    :correction_done {:corrected [not= nil]
+                      :correction_received nil}
+    :correction_received {:correction_received [not= nil]}
+    })
+
 (defn- state-filters [state]
   `{:state [pred-= ~(name state)]})
 

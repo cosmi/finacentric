@@ -59,6 +59,8 @@
       [:div.error error]
       ))))
 
+
+
 (defn pass-input*
   "Without input"
   [field label max-len]
@@ -69,6 +71,54 @@
     (when-let [error (get-error field)]
       [:div.error error]
       ))))
+
+
+(defn compare-vals [a b]
+  (or (and (nil? a) (nil? b))
+      (when (and a b)
+        (or (= a b)
+            (= (name a) (name b))))))
+(defn select-input
+  ([field label values disabled?]
+     (hiccup/html
+      (list
+       [:label label]
+       [:select (cond->
+                {:name (get-field-name field)}
+                disabled?
+                (assoc :disabled true))
+        (for [[k, lab] values]
+          [:option (cond-> {:value (name k)}
+                           (compare-vals k (get-value field))
+                           (assoc :selected true)) lab])]
+       (when-let [error (get-error field)]
+         [:div.error error]))))
+  ([field label values]
+     (select-input field label values false)))
+
+(defn radio-input
+  ([field label values disabled?]
+     (hiccup/html
+      (list
+       [:label label]
+       (for [[k, lab] values]
+         [:label
+          [:input (cond->
+                   {:type "radio"
+                    :name (get-field-name field)
+                    :value (name k)}
+                   disabled?
+                   (assoc :disabled true)
+                   (compare-vals k (get-value field))
+                   (assoc :checked true)
+                   )]
+          lab])
+       (when-let [error (get-error field)]
+         [:div.error error]))))
+  ([field label values]
+     (radio-input field label values false)))
+
+
 
 (def date-input text-input) ;TODO
 (def decimal-input text-input) ;TODO

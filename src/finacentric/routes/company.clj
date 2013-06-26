@@ -183,7 +183,9 @@
                    (date-input :min  "Minimalna data płatności" 10)
                    (date-input :max  "Maksymalna data płatności" 10))
        (in-context :state
-                   (text-input :equals "Status faktury" 40))))))
+                   (text-input :equals "Status faktury" 40))
+      
+       ))))
 
 (defvalidator filters-form-validator
   (optional
@@ -223,7 +225,7 @@
 (defroutes company-routes
   (context "/company" {:as request}
     (with-int-param [company-id (auth/get-current-users-company-id)]
-      (routes-when (auth/logged-to-company? company-id)
+      (routes-when (auth/logged-to-company? company-id)  
         (FORM-add-supplier company-id)
         (GET "/hello" [sort dir]
           (let [sort (or (get SORT-COLUMNS (keyword sort)) :id)
