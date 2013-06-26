@@ -1,0 +1,32 @@
+
+{% extends "app/sup_base.html" %}
+
+
+
+{% block content %}
+
+
+<h1>Co chcesz zrobić?</h1>
+
+<p><a href="add-invoice">Dodaj nową fakturę</a></p>
+<p><a href="get-paid">Przyspiesz płatność</a></p>
+
+{% if rejected %}
+<h1>Faktury odrzucone</h1>
+{% alias invoices rejected %}
+{% include "app/sup_invlist.html" %}
+{% endalias %}
+<a href="rejected">Zobacz wszystkie...</a>
+{% endif %}
+
+{% if corr-pending %}
+<h1>Faktury do korekty</h1>
+{% alias invoices corr-pending %}
+{% include "app/sup_invlist.html" %}
+{% endalias %}
+
+<a href="pending">Zobacz wszystkie...</a>
+{% endif %}
+
+
+{% endblock %}

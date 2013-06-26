@@ -1,34 +1,5 @@
 
-{% extends "app/sup_base.html" %}
-
-
-
-{% block content %}
-<div class="alert alert-info">
-<h4>Hello</h4>
-Is it me you're looking for?
- 
-</div>
-
-<a href="simple-invoice-form">Nowa faktura</a>
-
 <table class="table table-striped">
-  <!-- <colgroup> -->
-  <!--   <col span="1" style="width: 10px;"> -->
-  <!--   <col span="1" style="width: 10%;"> -->
-  <!--   <col span="1" > -->
-  <!--   <col span="1" style="width: 10%;">       -->
-  <!--   <col span="1" style="width: 10%;">       -->
-  <!--   <col span="1" style="width: 10%;"> -->
-  <!--   <col span="1" style="width: 10%;">       -->
-  <!--   <col span="1" style="width: 10%;">  -->
- 
-  <!--   <col span="1" style="width: 10%;">       -->
-  <!--   <col span="1" style="width: 10%;"> -->
-  <!--   <col span="1" style="width: 10%;"> -->
-  <!--   <col span="1" style="width: 10%;">        -->
-  <!--   <col span="1" style="width: 10%;">  -->
-  <!-- </colgroup> -->
   <thead>
     <tr>
       <th><input type="checkbox" name="selected-all"/></th>
@@ -91,7 +62,7 @@ Is it me you're looking for?
         </a>
         {% case :discount_confirmed %}
         Kontrahent zatwierdził płatność, wystaw korektę:
-        <a href="invoice/{{i.id}}/correction">
+        <a href="invoice/{{i.id}}/corrections">
           Zmień ją
         </a>
         {% case :correction_done %}
@@ -102,6 +73,3 @@ Is it me you're looking for?
 {% endfor %}
     
 </table>
-
-
-{% endblock %}

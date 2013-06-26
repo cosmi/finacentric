@@ -347,6 +347,22 @@
         (files/response file (str (invoice :number) ".pdf"))))))
 
 
+(defn start-page [supplier-id buyer-id]
+  (layout/render
+   "app/sup_start.html" {:rejected (->
+                                    (invoices/get-invoices-for-supplier
+                                     supplier-id
+                                     (db/page-filter 0 10)
+                                     #(invoices/has-state? % :rejected))
+                                    not-empty)
+                         :corr-pending (->
+                                        (invoices/get-invoices-for-supplier
+                                         supplier-id
+                                         (db/page-filter 0 10)
+                                         #(invoices/has-state? % :discount_confirmed))
+                                        not-empty)
+                         })
+  )
 
 
 
@@ -354,12 +370,15 @@
 (defroutes supplier-routes
   (context "/supplier" {:as request}
     (GET "/" []
-      (resp/redirect (str "/supplier/" (or (auth/get-current-users-company-id) 0)))) 
+      (resp/redirect "/supplier/start")) 
     (FORM-register-to-company)
     (with-int-param [supplier-id (auth/get-current-users-company-id)]
       (routes-when (auth/logged-to-company? supplier-id)
         (with-int-param [buyer-id (db/get-suppliers-first-buyer-id supplier-id)]
           (routes-when buyer-id
+            (GET "/start" []
+              (start-page supplier-id buyer-id))
+            
             (GET "/hello" []
               (with-pagination page-no
                 (with-page-size 30 page-size

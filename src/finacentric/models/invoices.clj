@@ -321,3 +321,13 @@ z dokładnością do 4 cyfr po przecinku"
             )
       (fields "invoices.*" :companies.name)
       exec))
+
+
+
+(defn get-invoices-for-supplier [supplier-id & filters]
+  (-> (reduce #(-> %1 %2)
+              (select* db/invoices)
+              filters)
+      exec))
+
+

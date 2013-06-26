@@ -1,8 +1,17 @@
 (ns finacentric.views.templates
   (:use [clabango.filters :only [context-lookup deftemplatefilter]]
         [clabango.parser :only [string->ast ast->groups]]
-        [clabango.tags]
+        [clabango.tags :exclusions [load-template]]
         [clojure.pprint]))
+
+
+(def template-path "finacentric/views/templates/")
+
+(defn fetch-template [template]
+  (-> 
+   (Thread/currentThread)
+   (.getContextClassLoader)
+   (.getResource (str template-path template))))
 
 (deftemplatetag "firstof" [[{args :args}] context]
   {:string (some identity (map #(context-lookup context %) args))
@@ -25,16 +34,31 @@
               (-> nodes first :args first keyword)
               (-> nodes first :args rest strip-quotes single-or-seq))})
 
+
+(deftemplatetag "alias" "endalias" [nodes context]
+  {:nodes (butlast (rest nodes))
+   :context (assoc context
+              (-> nodes first :args first keyword)
+              (-> nodes first :args second keyword context))})
+
 (defn extract-block [nodes name]
   (->> nodes
        (filter #(and (= (:type %) :block) (= (:name %) name)))
        first
        :nodes))
 
+
+(deftemplatetag "include" [nodes context]
+  (let [[node] nodes
+        [template] (:args node)
+        template (second (re-find #"\"(.*)\"" template))]
+    {:string (fetch-template template)
+     :context context}))
+
 (deftemplatetag "includeblock" [nodes context]
   (let [args (-> nodes first :args strip-quotes)
         [template block] args]
-    {:nodes (extract-block (-> template load-template string->ast (ast->groups context)) block)
+    {:nodes (extract-block (-> template fetch-template string->ast (ast->groups context)) block)
      :context context}))
 
 (deftemplatetag "debug" [nodes context]

@@ -6,10 +6,9 @@
             [finacentric.views.templates :as tags]
             [noir.session :as session]))
 
-(def template-path "finacentric/views/templates/")
 
 (defn render [template & [params]]
-  (parser/render-file (str template-path template)
+  (parser/render-file (str tags/template-path template)
                       (assoc (or params {})
                         :context (:context *request*)
                         :user-id (session/get :user-id))))
@@ -18,8 +17,7 @@
   (let [context (assoc (or params {})
                   :context (:context *request*)
                   :user-id (session/get :user-id))]
-    (-> (str template-path template)
-        cl-tags/load-template
+    (->  tags/fetch-template
         parser/string->ast
         (parser/ast->groups context)
         (tags/extract-block block)
