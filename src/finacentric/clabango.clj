@@ -219,13 +219,14 @@
 
 
 
-(defn str->emitter [s]
-  (let [inp (-> s split-str
+(defn str->emitter [s & [filename]]
+  (let [inp (->> s split-str
       ;; (splice-nodes #(if (= (-> % :type :text))
       ;;                  (map text-node (split-lines (% :text)))
       ;;                  [%]))
-                (->> (map mark-tagname))
-                enumerate-els)]
+                (map mark-tagname)
+                enumerate-els
+                (map #(assoc % :filename filename)))]
       (-> inp (compile-seq @*tags*)
           seq-emitter)))
 
@@ -352,15 +353,15 @@
   (let [[s fileref] (if (string? string-or-file)
                       [string-or-file "UNKNOWN"]
                       [(slurp string-or-file) string-or-file])]
-    s))
+    [s fileref]))
 
 (defn- load-renderer [template]
   (prn :loading template)
-  (let [emitter (->
-                 template
-                 fetch-template
-                 read-template
-                 str->emitter)]
+  (let [[s filename] (->
+                      template
+                      fetch-template
+                      read-template)
+        emitter  (str->emitter s filename)]
     (save-block! ::root emitter)))
 
 
