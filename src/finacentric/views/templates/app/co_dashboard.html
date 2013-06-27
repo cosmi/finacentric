@@ -30,9 +30,9 @@ Is it me you're looking for?
   <thead>
     <tr>
       <th><input type="checkbox" name="selected-all"/></th>
-      <th class="sorting {% ifequal s.col "companies.name" %}{{s.dir}}{% endifequal %}" 
+      <th class="sorting {% when s.col = "companies.name" then s.dir %}" 
           data-sorting="name">Kontrahent</th>
-      <th class="sorting {% ifequal s.col "number" %}{{s.dir}}{% endifequal %}" 
+      <th class="sorting {% when s.col = "number" then s.dir %}" 
           data-sorting="number">Numer</th>
       <th>Opis</th>
       <th class="sorting {% ifequal s.col "issue_date" %}{{s.dir}}{% endifequal %}" 

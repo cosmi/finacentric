@@ -4,14 +4,25 @@
             [clabango.tags :as cl-tags]
             [clabango.filters :as cl-filters]
             [finacentric.views.templates :as tags]
-            [noir.session :as session]))
+            [noir.session :as session]
+            [finacentric.clabango :as clabango]))
+
+
+(def template-path "finacentric/views/templates/")
 
 
 (defn render [template & [params]]
-  (parser/render-file (str tags/template-path template)
-                      (assoc (or params {})
-                        :context (:context *request*)
-                        :user-id (session/get :user-id))))
+  (clabango/with-template-root template-path
+    (let [renderer (clabango/get-renderer template)]
+      (renderer (assoc (or params {})
+                  :context (:context *request*)
+                  :user-id (session/get :user-id))))))
+
+;; (defn render [template & [params]]
+;;   (parser/render-file (str template-path template)
+;;                       (assoc (or params {})
+;;                         :context (:context *request*)
+;;                         :user-id (session/get :user-id))))
 
 (defn render-block [template block & [params]]
   (let [context (assoc (or params {})
