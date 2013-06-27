@@ -35,13 +35,13 @@ Is it me you're looking for?
       <th class="sorting {% when s.col = "number" then s.dir %}" 
           data-sorting="number">Numer</th>
       <th>Opis</th>
-      <th class="sorting {% ifequal s.col "issue_date" %}{{s.dir}}{% endifequal %}" 
+      <th class="sorting {% when s.col = "issue_date" then s.dir %}" 
           data-sorting="issue_date">Data wystawienia</th>
-      <th class="sorting {% ifequal s.col "payment_date" %}{{s.dir}}{% endifequal %}" 
+      <th class="sorting {% when s.col = "payment_date" then s.dir %}" 
           data-sorting="payment_date">Termin płatności</th>
-      <th class="sorting {% ifequal s.col "net_total" %}{{s.dir}}{% endifequal %}" 
+      <th class="sorting {% when s.col = "net_total" then s.dir %}" 
           data-sorting="net_total">Netto</th>
-      <th class="sorting {% ifequal s.col "gross_total" %}{{s.dir}}{% endifequal %}" 
+      <th class="sorting {% when s.col = "gross_total" then s.dir %}" 
           data-sorting="gross_total">Brutto</th>
       <th>Roczny dyskont</th>
       <th>Netto</th>
