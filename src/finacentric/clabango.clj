@@ -318,7 +318,6 @@
        )))
 
 (def-block-tag "switch" "endswitch" [switch-node inner end-node]
-  (prn  (take-nodes-until-tag inner "case"))
   (let [cases
         (loop [inner inner out {} vals [::else]]
           (let [[then case else] (take-nodes-until-tag inner "case")
@@ -356,7 +355,6 @@
     [s fileref]))
 
 (defn- load-renderer [template]
-  (prn :loading template)
   (let [[s filename] (->
                       template
                       fetch-template

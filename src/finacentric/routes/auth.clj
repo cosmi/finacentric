@@ -16,6 +16,9 @@
 (defn logged-in? []
   (session/get :user-id))
 
+(defn current-user-id []
+  (session/get :user-id))
+
 (defn logged-as-admin? []
   (db/is-admin? (session/get :user-id)))
 

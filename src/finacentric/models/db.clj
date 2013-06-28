@@ -76,6 +76,8 @@
 (defentity buyer_data
   (table :company_datas :buyer_data))
 
+(defentity invoice_events)
+
 (defentity invoices
   (belongs-to seller_company {:fk :seller_id})
   (belongs-to buyer_company {:fk :buyer_id})

@@ -4,7 +4,8 @@
         [korma.core :as korma]
         [korma.db :only (defdb transaction)])
   (:require [clj-time.core :as time]
-            [clj-time.coerce :as coerce])
+            [clj-time.coerce :as coerce]
+            [finacentric.routes.auth :as auth])
   (:import [org.joda.time Days LocalDate]))
 
 
@@ -29,6 +30,29 @@
      (if-not ret#
        (throw (Exception. "Nil returned"))
        ret#)))
+
+
+
+(defn- current-user-id []
+  (auth/current-user-id))
+
+(defn add-invoice-event! [invoice-id event]
+  (insert db/invoice_events
+          (values {:invoice_id invoice-id
+                   :user-id (current-user-id)
+                   :event event
+                   :ts (sqlfn :now)})))
+
+(defn add-invoice-message! [invoice-id msg]
+  (insert db/invoice_events
+          (values {:invoice_id invoice-id
+                   :user-id (current-user-id)
+                   :state "msg"
+                   :msg msg
+                   :ts (sqlfn :now)})))
+
+
+
 
 (def states
   '{:input {:accepted nil
@@ -123,83 +147,96 @@
 
 (defn invoice-input! [seller-id buyer-id data]
   (transaction
-   (let [data-ids (group-by :id
-                            (select db/companies
-                                    (where (or (= :id seller-id) (= :id buyer-id)))
-                                    (fields [:id :data_id])))
-         data-ids #(-> data-ids (get %) (get :data_id))]
+   (throw-on-nil
+    (let [data-ids (group-by :id
+                             (select db/companies
+                                     (where (or (= :id seller-id) (= :id buyer-id)))
+                                     (fields [:id :data_id])))
+          data-ids #(-> data-ids (get %) (get :data_id))]
 
-     (-> (insert* db/invoices)
-         (values (merge data
-                        {:seller_id seller-id :buyer_id buyer-id
-                         :seller_data_id (data-ids seller-id)
-                         :buyer_data_id (data-ids buyer-id)
-                         :state "input"
-                         }))
-         exec
-         ))))
+      (when-let [invoice (-> (insert* db/invoices)
+                             (values (merge data
+                                            {:seller_id seller-id :buyer_id buyer-id
+                                             :seller_data_id (data-ids seller-id)
+                                             :buyer_data_id (data-ids buyer-id)
+                                             :state "input"
+                                             }))
+                             exec
+                             )]
+        (add-invoice-event! (invoice :id) "input")
+        )))))
 
 
 (defn invoice-simple-edit! [supplier-id invoice-id data]
-  (throw-on-nil
-   (update db/invoices
-           (where {:seller_id supplier-id
-                   :id invoice-id})
-           (has-state? :input :rejected)
-           (set-fields (assoc data
-                         :state "input"
-                         :rejected nil)))))
+  (transaction
+   (throw-on-nil
+    (add-invoice-event! invoice-id "edit")
+    (update db/invoices
+            (where {:seller_id supplier-id
+                    :id invoice-id})
+            (has-state? :input :rejected)
+            (set-fields (assoc data
+                          :state "input"
+                          :rejected nil))))))
 
 (defn invoice-accept! [company-id invoice-id]
-  (throw-on-nil
-   (-> (update* db/invoices)
-       (where {:buyer_id company-id
-               :id invoice-id})
-       (at-state :input)
-       (set-fields {:accepted (sqlfn :now)
-                    :state "accepted"})
-       exec
-       )))
+  (transaction
+   (throw-on-nil
+    (add-invoice-event! invoice-id "accept")
+    (-> (update* db/invoices)
+        (where {:buyer_id company-id
+                :id invoice-id})
+        (at-state :input)
+        (set-fields {:accepted (sqlfn :now)
+                     :state "accepted"})
+        exec))))
 
 
 (defn invoice-reject! [company-id invoice-id]
-  (throw-on-nil
-   (update db/invoices
-           (where {:buyer_id company-id
-                   :id invoice-id})
-           (at-state :input)
-           (set-fields {:rejected (sqlfn :now)
-                        :state "rejected"}))))
+  (transaction
+   (throw-on-nil
+    (add-invoice-event! invoice-id "reject")
+    (update db/invoices
+            (where {:buyer_id company-id
+                    :id invoice-id})
+            (at-state :input)
+            (set-fields {:rejected (sqlfn :now)
+                         :state "rejected"})))))
 
 (defn invoice-accept-cancel! [company-id invoice-id]
-  (throw-on-nil
-   (update db/invoices
-           (where {:buyer_id company-id
-                   :id invoice-id})
-           (at-state :accepted)
-           (set-fields {:accepted nil
-                        :state "input" }))))
+  (transaction
+   (throw-on-nil
+    (add-invoice-event! invoice-id "accept-cancel")
+    (update db/invoices
+            (where {:buyer_id company-id
+                    :id invoice-id})
+            (at-state :accepted)
+            (set-fields {:accepted nil
+                         :state "input" })))))
 
 (defn invoice-reject-cancel! [company-id invoice-id]
-  (throw-on-nil
-   (update db/invoices
-           (where {:buyer_id company-id
-                   :id invoice-id})
-           (at-state :rejected)
-           (set-fields {:rejected nil
-                        :state "input" }))))
+  (transaction
+   (throw-on-nil
+    (add-invoice-event! invoice-id "reject-cancel")
+    (update db/invoices
+            (where {:buyer_id company-id
+                    :id invoice-id})
+            (at-state :rejected)
+            (set-fields {:rejected nil
+                         :state "input" })))))
 
 (defn invoice-offer-discount! [company-id invoice-id annual-rate earliest-date]
-  (throw-on-nil
-   (update db/invoices
-           (where {:buyer_id company-id
-                   :id invoice-id})
-           (has-state? :accepted :discount_offered)
-           (set-fields {:annual_discount_rate annual-rate
-                        :earliest_discount_date earliest-date
-                        :state "discount_offered"}
-
-                       ))))
+  (transaction
+   (throw-on-nil
+    (add-invoice-event! invoice-id "offer-discount")
+    (update db/invoices
+            (where {:buyer_id company-id
+                    :id invoice-id})
+            (has-state? :accepted :discount_offered)
+            (set-fields {:annual_discount_rate annual-rate
+                         :earliest_discount_date earliest-date
+                         :state "discount_offered"}
+                        )))))
 
 
 (defn calculate-discount-rate
@@ -244,46 +281,55 @@ z dokładnością do 4 cyfr po przecinku"
      :discounted_payment_date new-payment-date}))
 
 (defn invoice-accept-discount! [supplier-id invoice-id annual-rate new-payment-date earliest-date]
-  (throw-on-nil
    (transaction
-    (let [values (get-discount-values invoice-id new-payment-date)]
-      (update db/invoices
-              (where {:seller_id supplier-id
-                      :id invoice-id
-                      :annual_discount_rate annual-rate
-                      :earliest_discount_date earliest-date})
-              (has-state? :discount_offered :discount_accepted)
-              (set-fields (assoc values
-                            :discount_accepted (sqlfn :now)
-                            :state "discount_accepted")))))))
+    (throw-on-nil
+     (add-invoice-event! invoice-id "accept-discount")
+     (let [values (get-discount-values invoice-id new-payment-date)]
+       (update db/invoices
+               (where {:seller_id supplier-id
+                       :id invoice-id
+                       :annual_discount_rate annual-rate
+                       :earliest_discount_date earliest-date})
+               (has-state? :discount_offered :discount_accepted)
+               (set-fields (assoc values
+                             :discount_accepted (sqlfn :now)
+                             :state "discount_accepted")))))))
 
 (defn invoice-confirm-discount! [company-id invoice-id date]
-  (throw-on-nil
-   (update db/invoices
-           (where {:buyer_id company-id
-                   :id invoice-id
-                   :discounted_payment_date date})
-           (has-state? :discount_accepted)
-           (set-fields {:discount_confirmed (sqlfn :now)
-                        :state "discount_confirmed"}))))
+  (transaction
+   (throw-on-nil
+    (add-invoice-event! invoice-id "confirm-discount")
+    (update db/invoices
+            (where {:buyer_id company-id
+                    :id invoice-id
+                    :discounted_payment_date date})
+            (has-state? :discount_accepted)
+            (set-fields {:discount_confirmed (sqlfn :now)
+                         :state "discount_confirmed"})))))
 
 (defn invoice-cancel-confirm-discount! [company-id invoice-id]
-  (throw-on-nil
-   (update db/invoices
-           (where {:buyer_id company-id
-                   :id invoice-id})
-           (has-state? :discount_confirmed)
-           (set-fields {:discount_confirmed nil
-                        :state "discount_accepted"}))))
+  (transaction
+   (throw-on-nil
+    (add-invoice-event! invoice-id "cancel-confirm-discount")
+    (update db/invoices
+            (where {:buyer_id company-id
+                    :id invoice-id})
+            (has-state? :discount_confirmed)
+            (set-fields {:discount_confirmed nil
+                         :state "discount_accepted"})))))
 
 (defn create-or-edit-correction-with-discount! [invoice-id data]
   (transaction
-   (or (update db/corrections
+   (or (when
+           (update db/corrections
                (where {:invoice_id invoice-id})
                (set-fields data))
+         (add-invoice-event! invoice-id "edit-corr")
+         true)
        (let [invoice (db/get-invoice-unchecked invoice-id)]
          (update db/invoices (where {:id invoice-id})
-                          (set-fields {:state "correction_done"}))
+                 (set-fields {:state "correction_done"}))
+         (add-invoice-event! invoice-id "create-corr")
          (insert db/corrections
                  (values (merge {:currency (invoice :invoice)}
                                 data)))
@@ -329,5 +375,3 @@ z dokładnością do 4 cyfr po przecinku"
               (select* db/invoices)
               filters)
       exec))
-
-

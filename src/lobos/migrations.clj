@@ -102,17 +102,23 @@
               (integer :id :primary-key :auto-inc)
               (integer :invoice_id [:refer :invoices :id] :unique)
               (varchar :number 30)
-              
               (date :issue_date)
               (date :payment_date)
- 
               (decimal :net_total 15 2)
               (decimal :gross_total 15 2)
-
               (varchar :currency 8 (default "PLN"))
-              
               (varchar :file_id 32)
               ))
+
+      (create
+       (table :invoice_events
+              (integer :id :primary-key :auto-inc)
+              (integer :user_id [:refer :users :id])
+              (varchar :event 30)
+              (varchar :msg 300)
+              (timestamp :ts)
+              (integer :invoice_id [:refer :invoices :id] :unique)))
+              
 
       ;; (create 
       ;;  (table :tax_rates
@@ -151,6 +157,7 @@
         (drop (table :invoices) :cascade)
         (drop (table :corrections) :cascade)
         (drop (table :invoice_lines) :cascade)
+        (drop (table :invoice_events) :cascade)
         (drop (table :companies) :cascade)
         (drop (table :company_datas) :cascade)
         (drop (table :sellers_buyers) :cascade)))
