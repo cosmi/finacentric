@@ -3,6 +3,9 @@
    :exclude [alter drop bigint boolean char double float time])
   (:use (lobos [migration :only [defmigration]] core schema config)))
 
+(defmacro try-hard [& body]
+  `(do ~@(for [l body] `(try ~l (catch Exception e#))))
+  )
 (defmigration init-tables
   (up [] 
       (create
@@ -153,11 +156,12 @@
               (decimal :vat 5 2)
               (varchar :extra 500))))
   (down []
-        (drop (table :users) :cascade)
-        (drop (table :invoices) :cascade)
-        (drop (table :corrections) :cascade)
-        (drop (table :invoice_lines) :cascade)
-        (drop (table :invoice_events) :cascade)
-        (drop (table :companies) :cascade)
-        (drop (table :company_datas) :cascade)
-        (drop (table :sellers_buyers) :cascade)))
+        (try-hard
+         (drop (table :users) :cascade)
+         (drop (table :invoices) :cascade)
+         (drop (table :corrections) :cascade)
+         (drop (table :invoice_lines) :cascade)
+         ;; (drop (table :invoice_events) :cascade)
+         (drop (table :companies) :cascade)
+         (drop (table :company_datas) :cascade)
+         (drop (table :sellers_buyers) :cascade))))
