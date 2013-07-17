@@ -6,7 +6,9 @@
         finacentric.routes.admin
         [dieter.core :only [asset-pipeline]]
         [ring.middleware.file-info :only [wrap-file-info]]
-        compojure.core)
+        compojure.core
+        [causeway.properties :only [defprop]]
+        )
   (:require [noir.util.middleware :as middleware]
             [noir.session :as session]
             [compojure.route :as route]
@@ -16,6 +18,8 @@
             [com.postspectacular.rotor :as rotor]
             [org.httpkit.server :as http-kit]
             finacentric.validation))
+
+(defprop Dupa 7)
 
 (defroutes app-routes
   (route/resources "/")
