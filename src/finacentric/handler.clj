@@ -8,6 +8,7 @@
         [ring.middleware.file-info :only [wrap-file-info]]
         compojure.core
         [causeway.properties :only [defprop]]
+        [causeway.bootconfig :only [devmode? bootconfig]]
         )
   (:require [noir.util.middleware :as middleware]
             [noir.session :as session]
@@ -18,8 +19,6 @@
             [com.postspectacular.rotor :as rotor]
             [org.httpkit.server :as http-kit]
             finacentric.validation))
-
-(defprop Dupa 7)
 
 (defroutes app-routes
   (route/resources "/")
@@ -81,14 +80,8 @@
           (finacentric.validation/wrap-validation)
           (asset-pipeline config-options)
           asset-fixpath))
+
 (def war-handler app)
-
-(defn dev? [args] (some #{"-dev"} args))
-
-(defn port [args]
-  (if-let [port (first (remove #{"-dev"} args))]
-    (Integer/parseInt port)
-    3000))
 
 (defn -main [& args]
   (init)
@@ -96,5 +89,5 @@
    ;(if (dev? args)
      (reload/wrap-reload #(apply #'war-handler %&))
     ; war-handler)
-   {:port (port args)})
-  (timbre/info "server started on port" port))
+   {:port (bootconfig :server-port)})
+  (timbre/info "server started on port" (bootconfig :server-port)))

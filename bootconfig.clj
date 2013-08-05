@@ -1,1 +1,2 @@
-{:properties-db "finacentric"}
+{:properties-db "finacentric"
+ :server-port 3000}
