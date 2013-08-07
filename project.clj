@@ -6,14 +6,25 @@
   :dependencies [[org.clojure/clojure "1.5.1"]
                  [causeway "0.2.1"]
                  [ring "1.2.0"]
-                ; [ring-server "0.2.8"]
-                 [ring-http-basic-auth "0.0.2"]]
+                 [ring-http-basic-auth "0.0.2"]
+                 ;;lobos + extra deps
+                 [lobos "1.0.0-beta1"]
+                 [postgresql/postgresql "9.1-901.jdbc4"]
+                 ;;korma + extra deps
+                 [korma "0.3.0-RC5"]
+                 [org.clojure/java.jdbc "0.3.0-alpha4"]
+                 [log4j "1.2.15" :exclusions [javax.mail/mail
+                                              javax.jms/jms
+                                              com.sun.jdmk/jmxtools
+                                              com.sun.jmx/jmxri]]]
   :plugins [[lein-ring "0.8.6"]
             [lein-pprint "1.1.1"]]
   :ring  {:handler finacentric.handler/main-handler,
           :init finacentric.handler/init,
           :destroy finacentric.handler/destroy
           }
+
+  :main finacentric.devtools
 
   :profiles {
              :production {:jvm-opts ["-Dbootconfig=bootconfig/prod.clj"]

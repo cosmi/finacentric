@@ -9,7 +9,7 @@
         [causeway.assets]
         [causeway.assets.providers]
         [causeway.templates :only [set-default-url-templates-provider!]]
-        [finacentric.auth :only [is-logged-in?]]
+        [finacentric.ctrl.auth :only [is-logged-in?]]
         [finacentric.app :only [public-routes logged-routes]]
         [finacentric.admin :only [admin-routes]])
   (:require [compojure.handler :as handler]
@@ -56,11 +56,16 @@
 (def template-preview
   (preview/preview-templates-handler "templates"))
 
+
+(defn wrap-access-fn [handler test-fn]
+  ;; TODO: use one in causeway after deploying new version
+  #(if (test-fn) (handler %) (constantly nil)))
+
 (def main-handler
   (-> 
    (routes
      #'public-routes
-     (routes-when (is-logged-in?)
+     (wrap-access-fn #(is-logged-in?)
        #'logged-routes)
      #'admin-routes
      (routes-when (devmode?)
@@ -79,7 +84,8 @@
    (combine-providers
     (variant-provider "variants" "templates")
     (resource-provider "templates")))
-  (when devmode?
-    (require 'finacentric.devtools)))
+  ;; (when devmode?
+  ;;   (require 'finacentric.devtools))
+  )
 
 (defn destroy [])
