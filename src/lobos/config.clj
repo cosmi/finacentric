@@ -1,6 +1,6 @@
 (ns lobos.config
-  (:use lobos.connectivity))
+  (:use lobos.connectivity
+        causeway.bootconfig))
 
-(open-global {:subprotocol "postgresql"
-              :subname "//localhost/finacentric"})
+(open-global (bootconfig :db-spec))
 

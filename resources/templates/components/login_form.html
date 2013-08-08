@@ -3,10 +3,11 @@
 
 <form method="post"{% if target %} target="{{target}}"{% endif %}>
   <label> <p>Nazwa użytkownika lub email</p> 
-   <input name="login" value="{{data.login}}"/>
+   <input name="login" value="{{form.login}}"/>
   </label>
   <label> <p>Nazwa użytkownika lub email</p> 
    <input type= "password" name="password"/>
   </label>
   <input type="submit" value="Zaloguj się"/>
 </form>
+<p> <a href="{{links.register}}">Zarejestruj się</a></p>
