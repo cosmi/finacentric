@@ -13,7 +13,7 @@
               (integer :id :primary-key :auto-inc)
               (varchar :name 50)
               (varchar :domain 30 :unique)
-              (varchar :reg_token 50 :unique)
+              (varchar :regcode 50 :unique)
               ))
       
       (create

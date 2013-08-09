@@ -20,6 +20,6 @@
   )
 
 (defn register-company! [{regcode :regcode company-name :name}]
-  
-
-  )
+  (let [company (get-company-by-regcode regcode)]
+    
+    ))
