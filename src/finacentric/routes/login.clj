@@ -32,7 +32,17 @@
                   (do
                     (register-company! (get-current-user-id) data)
                     (response/redirect (get-default-url)))
-                  (render "register_company.html" {:error (get-errors) :form form}))))
+                  (render "register_company.html" {:error (get-errors) :form form})))
+  (GET "/register-buyer" []
+    (render "register_buyer.html" {}))
+  (POST "/register-buyer" {form :params}
+    (validate-let [data (validates? register-buyer-validator form)]
+                  (do
+                    (register-buyer! (get-current-user-id) data)
+                    (response/redirect (get-default-url)))
+                  (render "register_company.html" {:error (get-errors) :form form})))
+
+  )
 
 (defroutes login-routes
   (context "" []

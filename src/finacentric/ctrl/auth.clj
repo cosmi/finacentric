@@ -13,6 +13,7 @@
   (boolean (session/get :login-data)))
 
 (defn log-in! [user password]
+  (prn user password)
   (when-let [data (get-login-data user password)]
     (session/put! :login-data data)))
 
@@ -24,6 +25,7 @@
       (get :id)))
 
 (defn get-default-url []
+  (prn :>> (session/get :login-data))
   (if (is-logged-in?)
     (if (get-users-company-id (get-current-user-id))
       (link :dashboard)

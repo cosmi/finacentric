@@ -4,7 +4,10 @@
   {:login "/login"
    :logout "/logout"
    :dashboard "/dashboard"
-   :register-company "/register-company"})
+   :register "/register"
+   :reset-password "/forgot-password"
+   :register-company "/register-company"
+   :register-buyer "/register-buyer"})
 
 (defn get-links-table []
   links-table)

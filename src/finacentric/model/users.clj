@@ -7,12 +7,16 @@
 
 
 
-(defn get-login-data-by-email [email password])
+(defn get-login-data-by-email [email password]
+  (-> (select USERS (where {:email email})) first))
 
-(defn get-login-data-by-username [username password])
-
-(defn get-login-data [uname-or-email password]
-  (some #(% uname-or-email password) [get-login-data-by-username get-login-data-by-email]))
+(defn get-login-data [email password]
+  (when-let [user-data (get-login-data-by-email email)]
+    (when (crypt/compare password (user-data :pass))
+      (-> (select-keys user-data [:email :id])
+          (assoc :name (if (or (user-data :first_name) (user-data :last_name))
+                         (format "%s %s" (user-data :first_name) (user-data :last_name))
+                         (user-data :email)))))))
 
 (defn create-user! [user-data]
   (insert USERS (values user-data)))
