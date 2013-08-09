@@ -5,6 +5,7 @@
    :logout "/logout"
    :dashboard "/dashboard"
    :register "/register"
+   :landing-page "/"
    :reset-password "/forgot-password"
    :register-company "/register-company"
    :register-buyer "/register-buyer"})

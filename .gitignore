@@ -3,3 +3,4 @@
 .sass-cache
 /.lein-repl-history
 /bootconfig.clj
+\.#*

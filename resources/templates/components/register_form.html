@@ -1,6 +1,6 @@
 {% if error %}<p>Niepoprawne dane logowania</p>{% endif %}
 
-<form method="post"{% if target %} target="{{target}}"{% endif %}>
+<form autocomplete="off" method="post"{% if target %} action="{{target}}"{% endif %}>
   <label> <p>Adres email</p> 
    <input name="email" value="{{form.email}}"/>
   </label>

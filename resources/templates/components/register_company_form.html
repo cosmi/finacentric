@@ -1,4 +1,4 @@
-<form method="post" {% if target %}target="{{target}}"{% endif %}>
+<form autocomplete="off" method="post" {% if target %}action="{{target}}"{% endif %}>
   <label> Wpisz kod rejestracyjny otrzymany od kontrahenta
   <input name="regcode" value="{{form.regcode}}"/>
   {% if error.regcode %}<p>{{error.regcode}}</p>{% endif %}

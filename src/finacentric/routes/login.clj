@@ -49,4 +49,9 @@
     (routes-when (not (is-logged-in?))
       unlogged-routes)
     (routes-when (partially-registered?)
-      partially-reg-routes)))
+      partially-reg-routes)
+
+  (POST "/logout" []
+    (log-out!)
+    (response/redirect (get-default-url)))
+    ))

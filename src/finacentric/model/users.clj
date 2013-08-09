@@ -7,7 +7,7 @@
 
 
 
-(defn get-login-data-by-email [email password]
+(defn get-login-data-by-email [email]
   (-> (select USERS (where {:email email})) first))
 
 (defn get-login-data [email password]

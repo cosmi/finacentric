@@ -14,7 +14,9 @@
               (varchar :name 50)
               (varchar :domain 30 :unique)
               (varchar :regcode 50 :unique)
-              (boolean :is_buyer (default false) 
+              (boolean :is_buyer (default false))
+              (boolean :active (default false))
+              (boolean :confirmed (default false))
               ))
       
       (create
