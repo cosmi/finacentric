@@ -1,0 +1,7 @@
+<form method="post" {% if target %}target="{{target}}"{% endif %}>
+  <label> Wpisz pełną nazwę firmy
+  <input name="name" value="{{form.name}}"/>
+  {% if error.name %}<p>{{error.name}}</p>{% endif %}
+  </label>
+  <button type="submit">Zapisz</button>
+</form>
