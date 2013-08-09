@@ -1,0 +1,19 @@
+{% if error %}<p>Niepoprawne dane logowania</p>{% endif %}
+
+<form method="post"{% if target %} target="{{target}}"{% endif %}>
+  <label> <p>Adres email</p> 
+   <input name="email" value="{{form.email}}"/>
+  </label>
+  {% if error.email %}<p>{{error.email}}</p>{% endif %}
+
+  <label> <p>Hasło</p> 
+   <input type="password" name="password"/>
+  </label>
+  {% if error.password %}<p>{{error.password}}</p>{% endif %}
+  <label> <p>Powtórz hasło</p> 
+    <input type="password" name="repeat-password"/>
+  </label>
+  {% if error.repeat-password %}<p>{{error.repeat-password}}</p>{% endif %}
+
+  <input type="submit" value="Zaloguj się"/>
+</form>

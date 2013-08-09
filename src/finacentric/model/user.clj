@@ -2,7 +2,7 @@
   (:require [noir.util.crypt :as crypt]
             [noir.session :as session])
   (:use finacentric.schema
-        [korma.core :only [insert values update set-fields where]]
+        [korma.core :only [insert values update set-fields where select]]
         ))
 
 

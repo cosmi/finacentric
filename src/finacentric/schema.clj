@@ -1,12 +1,13 @@
 (ns finacentric.schema
   (:use korma.db
-        korma.core))
-  
-(defdb db (postgres {:db "mydb"
-                     :user "user"
-                     :password "dbpass"}))
+        korma.core
+        causeway.bootconfig))
+
+
+(defdb db (bootconfig :db-spec))
 
 
 
 
-(defentity USERS)
+(defentity USERS (table :users))
+(defentity COMPANIES (table :companies))

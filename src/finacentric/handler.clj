@@ -59,14 +59,15 @@
 
 (defn wrap-access-fn [handler test-fn]
   ;; TODO: use one in causeway after deploying new version
-  #(if (test-fn) (handler %) (constantly nil)))
+  (fn [req] (if (test-fn) (handler req) nil)))
 
 (def main-handler
   (-> 
    (routes
      #'public-routes
-     (wrap-access-fn #(is-logged-in?)
-       #'logged-routes)
+     (wrap-access-fn
+      #'logged-routes
+      #(is-logged-in?))
      #'admin-routes
      (routes-when (devmode?)
        (context "/template" []
