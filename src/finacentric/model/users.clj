@@ -37,3 +37,7 @@
               (fields :company_id))
       first
       :company_id))
+
+
+(defn set-users-company-id! [user-id company-id]
+  (update USERS (where {:id user-id}) (set-fields {:company_id company-id})))
