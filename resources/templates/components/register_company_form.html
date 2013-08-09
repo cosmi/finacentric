@@ -1,0 +1,11 @@
+<form method="post" {% if target %}target="{{target}}"{% endif %}>
+  <label> Wpisz kod rejestracyjny otrzymany od kontrahenta
+  <input name="regcode" value="{{form.regcode}}"/>
+  {% if error.regcode %}<p>{{error.regcode}}</p>{% endif %}
+  </label>
+  <label> Wpisz pełną nazwę firmy
+  <input name="name" value="{{form.name}}"/>
+  {% if error.name %}<p>{{error.name}}</p>{% endif %}
+  </label>
+  <button type="submit">Zapisz</button>
+</form>

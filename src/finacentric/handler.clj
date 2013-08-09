@@ -10,7 +10,7 @@
         [causeway.assets.providers]
         [causeway.templates :only [set-default-url-templates-provider!]]
         [finacentric.ctrl.auth :only [is-logged-in?]]
-        [finacentric.app :only [public-routes logged-routes]]
+        [finacentric.app :only [public-routes]]
         [finacentric.admin :only [admin-routes]])
   (:require [compojure.handler :as handler]
             [finacentric.localized]
@@ -65,9 +65,9 @@
   (-> 
    (routes
      #'public-routes
-     (wrap-access-fn
-      #'logged-routes
-      #(is-logged-in?))
+     ;; (wrap-access-fn
+     ;;  #'logged-routes
+     ;;  #(is-logged-in?))
      #'admin-routes
      (routes-when (devmode?)
        (context "/template" []

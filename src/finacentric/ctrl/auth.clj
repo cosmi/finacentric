@@ -3,7 +3,8 @@
         [causeway.bootconfig :only [devmode? bootconfig]]
         [causeway.validation]
         [causeway.l10n :only [loc]]
-        [finacentric.model.user])
+        [finacentric.model.users]
+        [finacentric.links])
   (:require [noir.session :as session]
             [noir.validation :as vali]))
 
@@ -18,10 +19,19 @@
 (defn log-out! []
   (session/remove! :login-data))
 
+(defn get-current-user-id []
+  (-> (session/get :login-data)
+      (get :id)))
+
 (defn get-default-url []
   (if (is-logged-in?)
-    "/home"
-    "/login"))
+    (if (get-users-company-id (get-current-user-id))
+      (link :dashboard)
+      (link :register-company))
+    (link :login)))
+
+(defn partially-registered? []
+  (and (is-logged-in?) (->  (get-current-user-id) get-users-company-id nil?)))
 
 
 (defvalidator password-validator
