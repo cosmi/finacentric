@@ -1,6 +1,6 @@
 <div class="login-box">
   <div class="left col-lg-4">
-    <header><img src="../img/logo-mini.png" /></header>
+    <header><img src="../img/logo.png" /></header>
     <section>
       <a href="{{links.register}}" class="wide-button">REGISTER</a>
       <a href="{{links.register}}" class="text-link strong">Don't have an account yet?</a>
@@ -11,6 +11,7 @@
   <div class="right col-lg-8">
     <header><h1>Sign in</h1></header>
     <section>
+      {% if error %}<div class="absolute alert alert-danger">Nieprawidłowe dane.</div>{% endif %}
       <form method="post"{% if target %} target="{{target}}"{% endif %}>
         <fieldset>
           <div class="form-group">
