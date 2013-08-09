@@ -1,0 +1,93 @@
+a:active,a:focus{
+	outline: none;
+}
+
+a:focus{
+	-moz-outline-style: none;
+}
+
+.nav-tabs .badge{
+	margin-left:5px;
+	padding-top: 4px;
+	padding-bottom: 4px;
+}
+
+.narrow-wrapper{
+		width:940px;
+		margin:auto;
+
+}
+
+.nav-tabs {
+border-bottom: none;
+
+}
+
+.tab-content{
+	padding:20px;
+	padding-top: 40px;
+	border:1px solid #DDDDDD;
+	
+	border-radius: 6px;
+	border-top-left-radius: 0px;
+}
+
+.tab-content .tab-content{
+	padding:0px;
+
+}
+
+.tab-pane footer.row{
+	margin-bottom: 20px;
+}
+
+
+.nav-tabs > li > a{
+	border:1px solid #CCC;
+	margin-right: 7px;
+	background:#EEEEEE;
+}
+
+.nav-tabs > li.active > a,.nav-tabs > li.active > a:hover,.nav-tabs > li.active > a:focus{
+	border:1px solid #CCC;
+	margin-right: 7px;
+	background:#DCDCDC;
+	border-bottom:none;
+	font-weight: bold;
+}
+.nav-tabs > li > a:hover{
+	border:1px solid #CCC;
+	background:#FCFCFC;
+
+}
+
+.paginator{
+	position:relative;
+}
+
+.paginator .pagination{
+	margin:0;
+	position: absolute;
+	right:20px;
+}
+
+.component{
+	margin-bottom: 20px;
+}
+
+table.table tr th, table.table tr td{
+	vertical-align: middle;
+
+}
+
+table.table .link{
+	font-weight: bold;
+}
+
+.lighter{
+	color:#999999;
+}
+
+.tab-pane table.table-striped .first-row td,.tab-pane table.table-striped .first-row th{
+	background: #DCDCDC;
+}
