@@ -4,3 +4,5 @@
  :admin-pass abc123
  :db-spec {:subprotocol "postgresql"
            :subname "//localhost/finacentric"}}
+
+           

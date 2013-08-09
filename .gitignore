@@ -2,3 +2,4 @@
 /pom.xml
 .sass-cache
 /.lein-repl-history
+/bootconfig.clj
