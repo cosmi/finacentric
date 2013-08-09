@@ -25,7 +25,7 @@
                            ["sample.css"]))
 (def sass-handler 
     (handlers/sass-handler "precompiled/css"
-                           ["sample1.css"]))
+                           ["zmiany.css"]))
 
 (def coffee-script-handler 
     (handlers/coffee-script-handler "precompiled/js"
