@@ -2,5 +2,10 @@
 
 {% block content %}
 Dashboard
+{% comment %} Przykładowo: {%endcomment%}
 
+{% load-block body %}
+{% include "components/ajax_table_loader.html" with target-url = links. %}
 {% endblock content %}
+
+
