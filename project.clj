@@ -30,7 +30,7 @@
              :production {:jvm-opts ["-Dbootconfig=bootconfig/prod.clj"]
                           :ring
                           {:open-browser? false, :stacktraces? false, :auto-reload? false}}
-             :dev {:jvm-opts ["-Dbootconfig=bootconfig/dev.clj"]
+             :dev {;:jvm-opts ["-Dbootconfig=bootconfig/dev.clj"]
                    :ring {:nrepl {:start? true :port 6060}
                           :open-browser? false}}
              })

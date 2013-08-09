@@ -1,9 +1,13 @@
 {% extends "layouts/logged_out.html" %}
 
 {% block body %}
+<div class="login-page-wrapper">
 <p> {{path}} </p>
 
 <p> {{parent}} </p>
 
+<div class="rounded shadow-box">
 {% include "components/login_form.html" %}
+</div>
+</div>
 {% endblock %}
