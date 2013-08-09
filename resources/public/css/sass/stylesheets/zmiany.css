@@ -1,0 +1,404 @@
+/* line 10, ../sass/zmiany.scss */
+body {
+  background: #eef2f5;
+}
+
+/* line 13, ../sass/zmiany.scss */
+a:active, a:focus {
+  outline: none;
+  -moz-outline-style: none;
+}
+
+/* line 18, ../sass/zmiany.scss */
+.narrow-wrapper {
+  width: 940px;
+  margin: auto;
+}
+/* line 22, ../sass/zmiany.scss */
+.narrow-wrapper .col-1, .narrow-wrapper .col-2, .narrow-wrapper .col-3, .narrow-wrapper .col-4, .narrow-wrapper .col-5, .narrow-wrapper .col-6, .narrow-wrapper .col-7, .narrow-wrapper .col-8, .narrow-wrapper .col-9, .narrow-wrapper .col-10, .narrow-wrapper .col-11, .narrow-wrapper .col-12, .narrow-wrapper .col-sm-1, .narrow-wrapper .col-sm-2, .narrow-wrapper .col-sm-3, .narrow-wrapper .col-sm-4, .narrow-wrapper .col-sm-5, .narrow-wrapper .col-sm-6, .narrow-wrapper .col-sm-7, .narrow-wrapper .col-sm-8, .narrow-wrapper .col-sm-9, .narrow-wrapper .col-sm-10, .narrow-wrapper .col-sm-11, .narrow-wrapper .col-sm-12, .narrow-wrapper .col-lg-1, .narrow-wrapper .col-lg-2, .narrow-wrapper .col-lg-3, .narrow-wrapper .col-lg-4, .narrow-wrapper .col-lg-5, .narrow-wrapper .col-lg-6, .narrow-wrapper .col-lg-7, .narrow-wrapper .col-lg-8, .narrow-wrapper .col-lg-9, .narrow-wrapper .col-lg-10, .narrow-wrapper .col-lg-11, .narrow-wrapper .col-lg-12 {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
+/* line 27, ../sass/zmiany.scss */
+.wide-wrapper {
+  width: 100%;
+  margin: auto;
+}
+
+/* line 31, ../sass/zmiany.scss */
+.modal-backdrop {
+  background-color: black;
+}
+
+/* line 35, ../sass/zmiany.scss */
+#contactModal .modal-body {
+  padding: 0px;
+}
+
+/* line 40, ../sass/zmiany.scss */
+.userbar {
+  text-align: right;
+}
+/* line 43, ../sass/zmiany.scss */
+.userbar a {
+  display: inline-block;
+}
+/* line 47, ../sass/zmiany.scss */
+.userbar .dropdown {
+  display: inline-block;
+}
+/* line 53, ../sass/zmiany.scss */
+.userbar .arrow-down {
+  float: right;
+  top: 5px;
+  margin-left: 8px;
+  position: relative;
+}
+
+/* line 61, ../sass/zmiany.scss */
+.main-header {
+  width: 100%;
+  height: 100px;
+  background: #1e2832;
+  position: relative;
+  border-bottom: 1px solid gainsboro;
+}
+/* line 68, ../sass/zmiany.scss */
+.main-header .top-nav {
+  position: absolute;
+  bottom: 0px;
+}
+/* line 72, ../sass/zmiany.scss */
+.main-header .top-nav .nav-tabs > li > a {
+  border-bottom: none;
+  border: 1px solid gainsboro;
+}
+/* line 77, ../sass/zmiany.scss */
+.main-header .top-nav .nav-tabs > li.active > a {
+  border-bottom: 1px solid white;
+  background: white;
+}
+
+/* line 86, ../sass/zmiany.scss */
+header.title {
+  height: 100px;
+  margin-bottom: 30px;
+}
+/* line 91, ../sass/zmiany.scss */
+header.title h1 {
+  margin-top: 30px;
+}
+/* line 95, ../sass/zmiany.scss */
+header.title .buttons {
+  padding-left: 40px;
+  position: relative;
+  top: 34px;
+  text-align: right;
+}
+/* line 101, ../sass/zmiany.scss */
+header.title .buttons .btn {
+  margin-left: 10px;
+}
+
+/* line 107, ../sass/zmiany.scss */
+.component {
+  margin-bottom: 20px;
+}
+
+/* line 111, ../sass/zmiany.scss */
+.nav-tabs {
+  border-bottom: none;
+}
+/* line 114, ../sass/zmiany.scss */
+.nav-tabs .badge {
+  margin-left: 5px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+/* line 121, ../sass/zmiany.scss */
+.tab-content {
+  border: none;
+  border-radius: 6px;
+  border-top-left-radius: 0px;
+  overflow: hidden;
+}
+/* line 129, ../sass/zmiany.scss */
+.tab-content .wide-wrapper {
+  background: white;
+}
+/* line 133, ../sass/zmiany.scss */
+.tab-content .tab-content {
+  padding: 0px;
+  border: 1px solid gainsboro;
+}
+/* line 138, ../sass/zmiany.scss */
+.tab-content .text {
+  float: left;
+}
+
+/* line 144, ../sass/zmiany.scss */
+.tab-pane footer.row {
+  margin-bottom: 20px;
+}
+/* line 147, ../sass/zmiany.scss */
+.tab-pane table.table-striped .first-row td, .tab-pane table.table-striped .first-row th {
+  background: gainsboro;
+}
+
+/* line 152, ../sass/zmiany.scss */
+.btn.disabled, .btn[disabled], fieldset[disabled] .btn {
+  opacity: 0.20;
+}
+
+/* line 158, ../sass/zmiany.scss */
+.nav-tabs > li > a {
+  border: 1px solid #cccccc;
+  margin-right: 7px;
+  background: #EEEEEE;
+}
+/* line 162, ../sass/zmiany.scss */
+.nav-tabs > li > a:hover {
+  border: 1px solid #cccccc;
+  background: #FCFCFC;
+}
+/* line 169, ../sass/zmiany.scss */
+.nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus {
+  border: 1px solid #cccccc;
+  margin-right: 7px;
+  background: gainsboro;
+  border-bottom: none;
+  font-weight: bold;
+}
+
+/* line 179, ../sass/zmiany.scss */
+.paginator {
+  position: relative;
+}
+/* line 182, ../sass/zmiany.scss */
+.paginator .pagination {
+  margin: 0;
+  position: absolute;
+  right: 40px;
+}
+
+/* line 190, ../sass/zmiany.scss */
+table.table tr th, table.table tr td {
+  vertical-align: middle;
+}
+/* line 194, ../sass/zmiany.scss */
+table.table .link {
+  font-weight: bold;
+}
+
+/* line 199, ../sass/zmiany.scss */
+.lighter {
+  color: #999999;
+}
+
+/* line 203, ../sass/zmiany.scss */
+.buttons {
+  padding-left: 40px;
+}
+
+/* line 207, ../sass/zmiany.scss */
+.arrows {
+  width: 15px;
+  height: 15px;
+  float: left;
+}
+
+/* line 213, ../sass/zmiany.scss */
+.arrow-down {
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 8px solid black;
+  margin-top: 3px;
+  display: block;
+}
+/* line 223, ../sass/zmiany.scss */
+.arrow-down.white {
+  border-top: 8px solid white;
+}
+
+/* line 229, ../sass/zmiany.scss */
+.arrow-up {
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-bottom: 7px solid black;
+  margin-bottom: 3px;
+  display: block;
+}
+
+/* line 240, ../sass/zmiany.scss */
+.main-footer {
+  background: #0E4482;
+  height: 200px;
+  width: 100%;
+}
+
+/* line 246, ../sass/zmiany.scss */
+.login-box {
+  background: red;
+  width: 600px;
+  height: 380px;
+  overflow: hidden;
+}
+/* line 256, ../sass/zmiany.scss */
+.login-box footer {
+  height: 60px;
+  background: black;
+  text-align: center;
+  padding-top: 19px;
+}
+/* line 262, ../sass/zmiany.scss */
+.login-box footer a:link, .login-box footer a:visited {
+  color: #666666;
+}
+/* line 266, ../sass/zmiany.scss */
+.login-box footer a:hover {
+  color: #727272;
+}
+/* line 270, ../sass/zmiany.scss */
+.login-box .wide-button {
+  display: block;
+  width: 100%;
+  height: 25px;
+}
+/* line 277, ../sass/zmiany.scss */
+.login-box .form-group label {
+  color: #666;
+  font-size: 0.9em;
+}
+/* line 282, ../sass/zmiany.scss */
+.login-box .left {
+  background: #363636;
+}
+/* line 284, ../sass/zmiany.scss */
+.login-box .left header img {
+  left: 22px;
+  position: absolute;
+  top: 21px;
+}
+/* line 290, ../sass/zmiany.scss */
+.login-box .left .wide-button {
+  background: #2C2C2C;
+  padding: 11px;
+  padding-left: 30px;
+  height: auto;
+}
+/* line 296, ../sass/zmiany.scss */
+.login-box .left .wide-button:link, .login-box .left .wide-button:visited {
+  font-weight: bold;
+  color: #666666;
+  text-decoration: none;
+}
+/* line 302, ../sass/zmiany.scss */
+.login-box .left .wide-button:hover {
+  background: #232323;
+  color: #727272;
+}
+/* line 308, ../sass/zmiany.scss */
+.login-box .left .text-link {
+  padding-top: 6px;
+  padding-left: 30px;
+  display: block;
+  font-weight: normal;
+  font-size: 0.9em;
+}
+/* line 315, ../sass/zmiany.scss */
+.login-box .left .text-link.strong {
+  font-weight: bold;
+  padding: 15px;
+  padding-left: 30px;
+  margin-bottom: 50px;
+}
+/* line 322, ../sass/zmiany.scss */
+.login-box .left .text-link:link, .login-box .left .text-link:visited {
+  color: #999999;
+  text-decoration: none;
+}
+/* line 327, ../sass/zmiany.scss */
+.login-box .left .text-link:hover {
+  color: #C9C9C9;
+}
+/* line 331, ../sass/zmiany.scss */
+.login-box .left .text-link:first {
+  margin-bottom: 40px;
+}
+/* line 338, ../sass/zmiany.scss */
+.login-box .right {
+  background: white;
+}
+/* line 340, ../sass/zmiany.scss */
+.login-box .right header h1 {
+  font-size: 2em;
+  position: absolute;
+  left: 30px;
+  top: 2px;
+}
+/* line 346, ../sass/zmiany.scss */
+.login-box .right section {
+  background: #F2F2F2;
+  border-top: 1px solid #E3E3E3;
+  padding: 30px;
+}
+/* line 351, ../sass/zmiany.scss */
+.login-box .right section .btn {
+  padding-left: 60px;
+  padding-right: 60px;
+  margin-right: 15px;
+}
+/* line 359, ../sass/zmiany.scss */
+.login-box header {
+  height: 80px;
+  position: relative;
+}
+/* line 364, ../sass/zmiany.scss */
+.login-box section {
+  height: 240px;
+  position: relative;
+}
+/* line 369, ../sass/zmiany.scss */
+.login-box .col-1, .login-box .col-2, .login-box .col-3, .login-box .col-4, .login-box .col-5, .login-box .col-6, .login-box .col-7, .login-box .col-8, .login-box .col-9, .login-box .col-10, .login-box .col-11, .login-box .col-12, .login-box .col-sm-1, .login-box .col-sm-2, .login-box .col-sm-3, .login-box .col-sm-4, .login-box .col-sm-5, .login-box .col-sm-6, .login-box .col-sm-7, .login-box .col-sm-8, .login-box .col-sm-9, .login-box .col-sm-10, .login-box .col-sm-11, .login-box .col-sm-12, .login-box .col-lg-1, .login-box .col-lg-2, .login-box .col-lg-3, .login-box .col-lg-4, .login-box .col-lg-5, .login-box .col-lg-6, .login-box .col-lg-7, .login-box .col-lg-8, .login-box .col-lg-9, .login-box .col-lg-10, .login-box .col-lg-11, .login-box .col-lg-12 {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
+/* line 375, ../sass/zmiany.scss */
+.search-component {
+  background: #E3E3E3;
+  border-radius: 8px;
+  border: 1px solid #cccccc;
+  padding: 20px;
+}
+/* line 381, ../sass/zmiany.scss */
+.search-component .search-item {
+  width: 30%;
+  height: 70px;
+  margin-right: 3%;
+  float: left;
+}
+/* line 388, ../sass/zmiany.scss */
+.search-component .search-item label {
+  color: #666666;
+}
+/* line 392, ../sass/zmiany.scss */
+.search-component .search-item .form-inline input {
+  width: 40%;
+}
+/* line 396, ../sass/zmiany.scss */
+.search-component .search-item .calendar {
+  background: url(../../../img/calendar-icon.png) white no-repeat right 4px center;
+  padding-left: 5px;
+}
+
+/* line 403, ../sass/zmiany.scss */
+.clearfix {
+  clear: both;
+}
