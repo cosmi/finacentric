@@ -5,9 +5,5 @@
           [finacentric.routes.login :only [login-routes]]))
 
 (defroutes public-routes
-  #'login-routes
-  (GET "/" []
-    (render "index.html" {:user (loc "John")})))
+  #'login-routes)
 
-(defroutes logged-routes
-  )

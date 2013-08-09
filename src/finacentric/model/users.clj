@@ -1,8 +1,8 @@
-(ns finacentric.model.user
+(ns finacentric.model.users
   (:require [noir.util.crypt :as crypt]
             [noir.session :as session])
   (:use finacentric.schema
-        [korma.core :only [insert values update set-fields where select]]
+        [korma.core]; :only [insert values update set-fields where select]]
         ))
 
 
@@ -29,3 +29,11 @@
 (defn create-user-with-pass! [user-data pass]
   (let [encrypted (encrypt-pass pass)]
     (insert USERS (values (assoc user-data :pass encrypted)))))
+
+
+(defn get-users-company-id [user-id]
+  (-> (select USERS
+              (where {:id user-id})
+              (fields :company_id))
+      first
+      :company_id))
