@@ -1,4 +1,4 @@
-(ns finacentric.model.users
+(ns finacentric.model.companies
   (:require [noir.util.crypt :as crypt]
             [noir.session :as session])
   (:use finacentric.schema
