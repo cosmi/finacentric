@@ -422,7 +422,7 @@ table.table {
 	width:100%;
 	height:100%;
 	margin:auto;
-	background:url(/img/glow.png) #1f2a34 no-repeat top center;
+	background: #1f2a34 no-repeat top center;
 }
 .rounded .login-box{
 	border-radius:8px;
@@ -432,5 +432,11 @@ table.table {
 
 .shadow-box .login-box{
 	box-shadow:0px 0px 30px 1px black;
+}
 
+.absolute{
+	position:absolute;
+	padding-top:3px;
+	padding-bottom:3px;
+	top:0px;
 }
