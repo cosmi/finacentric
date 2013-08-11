@@ -26,9 +26,10 @@
 
 (defn set-user-pass! [user-id pass]
   (let [encrypted (encrypt-pass pass)]
-    (update USERS
-      (where (= :id user-id))
-      (set-fields {:pass encrypted}))))
+    (or (update USERS
+                (where (= :id user-id))
+                (set-fields {:pass encrypted}))
+        (throw (ex-info "Could not change password" {:user-id user-id})))))
 
 (defn create-user-with-pass! [user-data pass]
   (let [encrypted (encrypt-pass pass)]
@@ -44,4 +45,6 @@
 
 
 (defn set-users-company-id! [user-id company-id]
-  (update USERS (where {:id user-id}) (set-fields {:company_id company-id})))
+  (or
+   (update USERS (where {:id user-id}) (set-fields {:company_id company-id}))
+   (throw (ex-info "No such user" {:user-id user-id}))))

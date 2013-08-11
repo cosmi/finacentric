@@ -1,8 +1,15 @@
-{% extends "components/logged_navbar.html" %}
+{% extends "components/navbar_logged.html" %}
 
 
 {% block navigation %}
+<ul>
+<li>
 <a href="{{links.dashboard}}" class="{% if path = links.dashboard %}active{% endif %}">Strona główna</a>
+<li>
 <a href="{{links.archive}}" class="{% if path = links.archive %}active{% endif %}">Archiwum faktur</a>
-i inne....
+<li>
+<a href="{{links.buyer.add-supplier}}" class="{% if path = links.buyer.add-supplier %}active{% endif %}">Dodaj dostawcę</a>
+</ul>
+
+
 {% endblock %}

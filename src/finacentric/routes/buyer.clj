@@ -1,4 +1,4 @@
-(ns finacentric.routes.supplier
+(ns finacentric.routes.buyer
   (:use [compojure.core]
         [causeway.utils]
         [finacentric.ctrl.auth]
@@ -8,11 +8,21 @@
   (:require [ring.util.response :as response]))
 
 
-(defroutes supplier-routes
-  (context "/supplier" []
+(defroutes buyer-routes
+  (context "/buyer" []
     (GET "/dashboard" []
-      (render "supplier_dashboard.html" {})
+      (render "buyer_dashboard.html" {})
       )
-    
+
+    (GET "/add-supplier" []
+      (render "buyer_add_supplier.html" {})
+      )
+
+    (POST "/add-supplier" {:keys [params]}
+      (render "buyer_add_supplier.html" {})
+      )
+
+
+
 
     ))

@@ -1,0 +1,22 @@
+{% ifempty regcodes %}
+<p> Brak kodów rejestracyjnych </p>
+{% else %}
+<table class="table">
+  <thead>
+    <tr>
+      <th>Nazwa</th>
+      <th>Kod</th>
+      <th>Akcje</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for s in suppliers %}
+    <tr>
+      <td>{{s.id}}</td>
+      <td>{{s.name}}</td>
+      <td>----</td>
+    </tr>
+    {% endfor suppliers %}
+  </tbody>
+</table>
+{% endifempty suppliers %}

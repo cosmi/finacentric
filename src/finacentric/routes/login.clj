@@ -25,33 +25,33 @@
                   (render "register.html" {:error (get-errors) :form form}))))
 
 (defroutes partially-reg-routes
-  (GET "/register-company" []
-    (render "register_company.html" {}))
-  (POST "/register-company" {form :params}
-    (validate-let [data (validates? register-company-validator form)]
+  (GET "/register-supplier" []
+    (render "supplier_register.html" {}))
+  (POST "/register-supplier" {form :params}
+    (validate-let [data (validates? register-supplier-validator form)]
                   (do
-                    (register-company! (get-current-user-id) data)
+                    (register-supplier! (get-current-user-id) data)
                     (response/redirect (get-default-url)))
-                  (render "register_company.html" {:error (get-errors) :form form})))
+                  (render "supplier_register.html" {:error (get-errors) :form form})))
   (GET "/register-buyer" []
-    (render "register_buyer.html" {}))
+    (render "buyer_register.html" {}))
   (POST "/register-buyer" {form :params}
     (validate-let [data (validates? register-buyer-validator form)]
                   (do
                     (register-buyer! (get-current-user-id) data)
                     (response/redirect (get-default-url)))
-                  (render "register_company.html" {:error (get-errors) :form form})))
+                  (render "buyer_register.html" {:error (get-errors) :form form})))
 
   )
 
 (defroutes login-routes
   (context "" []
-    (routes-when (not (is-logged-in?))
-      unlogged-routes)
+;    (routes-when (not (is-logged-in?))
+      unlogged-routes
     (routes-when (partially-registered?)
       partially-reg-routes)
 
-  (POST "/logout" []
-    (log-out!)
-    (response/redirect (get-default-url)))
+    (POST "/logout" []
+      (log-out!)
+      (response/redirect (get-default-url)))
     ))

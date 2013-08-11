@@ -1,0 +1,22 @@
+{% ifempty suppliers %}
+<p> Brak zarejestrowanych dostawców </p>
+{% else %}
+<table class="table">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Nazwa firmy</th>
+      <th>Akcje</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for s in suppliers %}
+    <tr>
+      <td>{{s.id}}</td>
+      <td>{{s.name}}</td>
+      <td>----</td>
+    </tr>
+    {% endfor suppliers %}
+  </tbody>
+</table>
+{% endifempty suppliers %}

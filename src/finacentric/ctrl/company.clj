@@ -13,20 +13,17 @@
 
 
 
-(defvalidator register-company-validator
-  (rule :regcode (get-company-with-regcode _) (loc "Niepoprawny klucz rejestracyjny"))
+(defvalidator register-supplier-validator
+  (rule :regcode (get-company-regcode _) (loc "Niepoprawny klucz rejestracyjny"))
   (rule :name (<= 5 (count _) 80) (loc "Nazwa musi mieć między 5 a 80 znaków.")))
 
-(defn register-company! [user-id {regcode :regcode company-name :name}]
-  (if-let [company (get-company-with-regcode regcode)]
-    (transaction
-     (when-not 
-         (and (set-users-company-id! user-id (company :id))
-              (finalize-company! (company :id) company-name))
-       (do (rollback)
-           (throw (Exception. "Cannot finalize company"))
-           ))
-    (throw (Exception. "No company with given regcode")))))
+(defn register-supplier! [user-id {regcode :regcode company-name :name}]
+  (transaction
+   (if-let [regcode (get-company-regcode regcode)]
+     (let [supplier (create-supplier! (regcode :owner_company_id) {:name company-name})]
+       (use-up-regcode! (regcode :id) (supplier :id))
+       (set-users-company-id! user-id (supplier :id)))
+     (throw (Exception. "Invalid regcode")))))
 
 
 
@@ -38,7 +35,11 @@
 
 (defn register-buyer! [user-id {company-name :name}]
   (transaction
-     (when-not 
-         (when-let [company (create-buyer-company! company-name)]
-           (set-users-company-id! user-id (company :id)))
-       (rollback))))
+   (let [company (create-buyer-company! company-name)]
+     (set-users-company-id! user-id (company :id)))))
+
+
+
+(defvalidator invite-supplier-validator
+  (rule :email (<= 5 (count _) 80) (loc "Nazwa musi mieć między 5 a 80 znaków."))
+  )

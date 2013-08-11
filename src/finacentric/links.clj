@@ -7,8 +7,22 @@
    :register "/register"
    :landing-page "/"
    :reset-password "/forgot-password"
-   :register-company "/register-company"
-   :register-buyer "/register-buyer"})
+   :register-supplier "/register-supplier"
+   :register-buyer "/register-buyer"
+   :buyer {:add-supplier "/buyer/add-supplier"
+           :dashboard "/buyer/dashboard"
+           :tables {
+                    :suppliers-list "/buyer/ajax/suppliers-list"
+                    :regcode-list "/buyer/ajax/regcode-list"
+                    
+                    }
+           }
+   :supplier {
+           :dashboard "/supplier/dashboard"
+           }
+
+   
+           })
 
 (defn get-links-table []
   links-table)

@@ -11,3 +11,5 @@
 
 (defentity USERS (table :users))
 (defentity COMPANIES (table :companies))
+(defentity COMPANY-REGCODES (table :company_regcodes))
+(defentity SELLERS-BUYERS (table :sellers_buyers))

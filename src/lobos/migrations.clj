@@ -13,11 +13,20 @@
               (integer :id :primary-key :auto-inc)
               (varchar :name 50)
               (varchar :domain 30 :unique)
-              (varchar :regcode 50 :unique)
-              (boolean :is_buyer (default false))
+              (boolean :is_buyer :not-null)
               (boolean :active (default false))
-              (boolean :confirmed (default false))
+              (timestamp :created_at (default (now)))
               ))
+
+      (create
+       (table :company_regcodes
+              (integer :id :primary-key :auto-inc)
+              (varchar :regcode 50 :unique)
+              (varchar :name 50)
+              (integer :owner_company_id [:refer :companies :id])
+              (integer :target_company_id [:refer :companies :id])
+              (boolean :used (default false))
+              (timestamp :created_at (default (now)))))
       
       (create
        (table :users
@@ -26,11 +35,11 @@
               (varchar :last_name 40)
               (varchar :email 50 :not-null :unique)
               (boolean :admin)
-              (time    :last_login)
               (boolean :is_active (default true))
               (varchar :pass 60)
               (integer :company_id [:refer :companies :id])
-              ))
+              (timestamp :last_login)
+              (timestamp :created_at (default (now)))))
       
       (create
        (table :sellers_buyers
@@ -167,6 +176,7 @@
          (drop (table :corrections) :cascade)
          ;; (drop (table :invoice_lines) :cascade)
          ;; (drop (table :invoice_events) :cascade)
+         (drop (table :company_regcodes) :cascade)
          (drop (table :companies) :cascade)
          (drop (table :company_datas) :cascade)
          (drop (table :sellers_buyers) :cascade))))
