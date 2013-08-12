@@ -2,14 +2,14 @@
 
 {% block body %}
 <div class="login-page-wrapper">
-<p> {{path}} </p>
+	<p> {{path}} </p>
 
-<p> {{parent}} </p>
+	<p> {{parent}} </p>
 
-<p> {{links.buyer.invoice-details(invoice=1)}} </p>
+	<p> {{links.buyer.invoice-details(invoice=1)}} </p>
 
-<div class="rounded shadow-box">
-{% include "components/form_login.html" %}
-</div>
+	<div class="rounded shadow-box">
+		{% include "components/form_login.html" %}
+	</div>
 </div>
 {% endblock %}

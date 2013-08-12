@@ -1,49 +1,30 @@
 {% extends "layouts/_wrapper.html" %}
 
-{% block body %}
+ 	{% block userbar %}
+  <div class="dropdown"> 
+    <div id="ProductList" class="dropdown-toggle btn btn-primary" data-toggle="dropdown" onclick="$('.dropdown-toggle').dropdown()"><div href="#" class="arrow-down white"></div> Jan Kowalski </div> 
+    <ul class="dropdown-menu">
+        <li> <a href="#">Zmień hasło</a> </li>
+        <li> <a href="#">Uzupełnij profil</a> </li>
+        <li> <a href="#">Wyloguj</a> </li>
+    </ul>
+  </div>
+  <a href="#" class="btn btn-primary">Pomoc</a>
+  <a data-toggle="modal" href="#contactModal" class="btn btn-primary">Wyloguj</a>
+{% endblock userbar %}
 
-	{% block header %}
-	<header class="main-header">
-      <div class="narrow-wrapper">
-        <a href="#" class="logo"></a>
-        <section class="userbar">
-       	{% block userbar %}
-          <div class="dropdown"> 
-            <div id="ProductList" class="dropdown-toggle btn btn-primary" data-toggle="dropdown" onclick="$('.dropdown-toggle').dropdown()"><div href="#" class="arrow-down white"></div> Jan Kowalski </div> 
-            <ul class="dropdown-menu">
-                <li> <a href="#">Zmień hasło</a> </li>
-                <li> <a href="#">Uzupełnij profil</a> </li>
-                <li> <a href="#">Wyloguj</a> </li>
-            </ul>
-          </div>
-          <a href="#" class="btn btn-primary">Pomoc</a>
-          <a data-toggle="modal" href="#contactModal" class="btn btn-primary">Wyloguj</a>
-        {% endblock userbar %}
-        </section>
-        <nav class="top-nav">
-        {% block navigation %}
-          <ul class="nav nav-tabs" id="mainMenuTabs">
-            <li class="active"><a href="#overview"  data-toggle="tab">Strona główna</a></li>
-            <li><a href="#profile" data-toggle="tab">Lista faktur</a></li>
-            <li><a href="#messages" data-toggle="tab">Korekty</a></li>
-            <li><a href="#settings" data-toggle="tab">Zaakceptowane</a></li>
-          </ul>
-        {% endblock navigation %}
-        </nav>
-      </div>
-    </header>
-	{% endblock header%}
+{% block navigation %}
+  <ul class="nav nav-tabs" id="mainMenuTabs">
+    <li class="active"><a href="#overview"  data-toggle="tab">Strona główna</a></li>
+    <li><a href="#profile" data-toggle="tab">Lista faktur</a></li>
+    <li><a href="#messages" data-toggle="tab">Korekty</a></li>
+    <li><a href="#settings" data-toggle="tab">Zaakceptowane</a></li>
+  </ul>
+{% endblock navigation %}
+        
 
-	{% block content %}
+{% block content %}
 	<section class="main-content">
 
 	</section>
-	{% endblock content %}
-
-	{% block footer %}
-	<footer class="main-footer">
-      <div class="wide-wrapper"></div>  
-    </footer>
-	{% endblock footer %}
-
-{% endblock body %}
+{% endblock content %}

@@ -261,6 +261,17 @@ table.table {
 	overflow:hidden;
 	margin:auto;
 
+	&.register{
+		background:#0F1418;
+		height: auto;
+		left{
+			height: auto;
+		}
+		section{
+			height: auto;
+		}
+
+	}
 	footer{
 		height: $footer-height;
 		background:$dark-general;

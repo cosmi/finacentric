@@ -1,8 +1,8 @@
-{% extends "components/navbar_logged.html" %}
-
-
-{% block navigation %}
-<a href="{{links.dashboard}}" class="{% if path = links.dashboard %}active{% endif %}">Strona główna</a>
-<a href="{{links.archive}}" class="{% if path = links.archive %}active{% endif %}">Archiwum faktur</a>
-i inne....
-{% endblock %}
+<ul>
+	<li>
+		<a href="{{links.dashboard}}" class="{% if path = links.dashboard %}active{% endif %}">Strona główna</a>
+	</li>
+	<li>
+		<a href="{{links.archive}}" class="{% if path = links.archive %}active{% endif %}">Archiwum faktur</a>
+	</li>
+</ul>

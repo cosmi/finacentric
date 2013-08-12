@@ -1,5 +1,15 @@
 {% extends "layouts/logged_out.html" %}
 
 {% block body %}
-{% include "components/form_register.html" %}
+<div class="login-page-wrapper">
+	<p> {{path}} </p>
+
+	<p> {{parent}} </p>
+
+	<p> {{links.buyer.invoice-details(invoice=1)}} </p>
+
+	<div class="rounded shadow-box">
+		{% include "components/form_register.html" %}
+	</div>
+</div>
 {% endblock %}

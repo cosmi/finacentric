@@ -1,15 +1,11 @@
-{% extends "components/navbar_logged.html" %}
-
-
-{% block navigation %}
 <ul>
-<li>
-<a href="{{links.dashboard}}" class="{% if path = links.dashboard %}active{% endif %}">Strona główna</a>
-<li>
-<a href="{{links.archive}}" class="{% if path = links.archive %}active{% endif %}">Archiwum faktur</a>
-<li>
-<a href="{{links.buyer.add-supplier}}" class="{% if path = links.buyer.add-supplier %}active{% endif %}">Dodaj dostawcę</a>
+	<li>
+		<a href="{{links.dashboard}}" class="{% if path = links.dashboard %}active{% endif %}">Strona główna</a>
+	</li>
+	<li>
+		<a href="{{links.archive}}" class="{% if path = links.archive %}active{% endif %}">Archiwum faktur</a>
+	</li>
+	<li>
+		<a href="{{links.buyer.add-supplier}}" class="{% if path = links.buyer.add-supplier %}active{% endif %}">Dodaj dostawcę</a>
+	</li>
 </ul>
-
-
-{% endblock %}
