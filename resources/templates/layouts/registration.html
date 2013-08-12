@@ -2,10 +2,13 @@
 
 {% block body %}
 
-{% include "components/navbar_logged.html" %}
+	{% block header %}
+	{% endblock %}
 
-{% block content %}
-dasdas
-{% endblock %}
+	{% block content %}
+	{% endblock %}
+
+	{% block footer %}
+	{% endblock %}
 
 {% endblock %}
