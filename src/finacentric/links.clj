@@ -11,6 +11,8 @@
    :register-buyer "/register-buyer"
    :buyer {:add-supplier "/buyer/add-supplier"
            :dashboard "/buyer/dashboard"
+           :invoice-details (fn [& {:keys [invoice]}]
+                              (format "/buyer/invoice/%d" invoice))
            :tables {
                     :suppliers-list "/buyer/ajax/suppliers-list"
                     :regcode-list "/buyer/ajax/regcode-list"
