@@ -10,10 +10,10 @@
 (defroutes public-routes
   (context "" []
     #'login-routes
-    (case (login-mode)
-      :supplier
+    ;; (case (login-mode)
+    ;;   :supplier
       #'supplier-routes
-      :buyer
+      ;; :buyer
       #'buyer-routes
-      (constantly nil))))
-
+      ;; (constantly nil))))
+))

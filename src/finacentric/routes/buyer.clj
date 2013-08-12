@@ -14,6 +14,10 @@
       (render "buyer_dashboard.html" {})
       )
 
+    (GET "/suppliers" []
+
+      )
+
     (GET "/add-supplier" []
       (render "buyer_add_supplier.html" {})
       )
