@@ -13,11 +13,14 @@
            :dashboard "/buyer/dashboard"
            :invoice-details (fn [& {:keys [invoice]}]
                               (format "/buyer/invoice/%d" invoice))
-           :tables {
-                    :suppliers-list "/buyer/ajax/suppliers-list"
-                    :regcode-list "/buyer/ajax/regcode-list"
+           :ajax {
+                    :suppliers "/buyer/ajax/suppliers"
+                    :invites "/buyer/ajax/regcodes"
                     
                     }
+           :suppliers {:list "/buyer/suppliers/list"
+                       :invites "/buyer/suppliers/invites"}
+           
            }
    :supplier {
            :dashboard "/supplier/dashboard"

@@ -1,6 +1,7 @@
 (ns finacentric.render
   (:require [causeway.templates :as templates]
             [finacentric.links :as links]
+            [finacentric.ctrl.auth :as auth]
             [noir.request :as request]))
 
 (def fn-base {:count count
@@ -19,6 +20,7 @@
 (defn enrich-data [data]
   (let [path (request/*request* :uri)]
     (merge {:links (links/get-links-table)
+            :user (auth/get-current-user-data)
             :parent (parse-dir path)
             :path path
             :fn fn-base}

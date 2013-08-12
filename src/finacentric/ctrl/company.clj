@@ -4,7 +4,7 @@
         [causeway.validation]
         [causeway.l10n :only [loc]]
         [finacentric.model companies users]
-        
+        [finacentric.ctrl auth]
         [finacentric.links]
         [korma.db :only [transaction rollback]])
   (:require [noir.session :as session]
@@ -43,3 +43,13 @@
 (defvalidator invite-supplier-validator
   (rule :email (<= 5 (count _) 80) (loc "Nazwa musi mieć między 5 a 80 znaków."))
   )
+
+
+
+
+
+(defn get-current-suppliers-list [page sort-order]
+  (get-suppliers  (get-current-company-id) page 30 sort-order))
+                                                                         
+(defn get-current-regcodes-list [page sort-order]
+  (get-regcodes  (get-current-company-id) page 30 sort-order))

@@ -36,6 +36,9 @@
   (-> get-current-company-id
       get-company-mode))
 
+(defn get-current-user-data []
+  (session/get :login-data))
+
 (defn login-mode []
   (if (not (is-logged-in?)) :not-logged-in
       (let [company-id (get-current-company-id)]

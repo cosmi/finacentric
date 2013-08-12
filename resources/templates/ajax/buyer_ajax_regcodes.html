@@ -1,0 +1,27 @@
+{% if empty regcodes %}
+<p> Brak aktywnych zaproszeń </p>
+{% else %}
+<table class="table table-striped">
+  <thead>
+    <tr class="first-row">
+      <th>#</th>
+      <th>Kod</th>
+      <th>Akcje</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for s in regcodes %}
+    <tr>
+      <td>{{s.id}}</td>
+      <td>{{s.regcode}}</td>
+      <td>----</td>
+    </tr>
+    {% endfor regcodes %}
+  </tbody>
+</table>
+<ul class="pagination">
+  <li><a href="#" class="async-link" data-url="{{path|safe}}?page={{page - 1}}&sorted={{sorted}}">&laquo;</a></li> 
+  <li><a href="#" class="async-link" data-url="{{path|safe}}?page={{page}}&sorted={{sorted}}">{{page}}</a></li>
+  <li><a href="#" class="async-link" data-url="{{path|safe}}?page={{page + 1}}&sorted={{sorted}}">&raquo;</a></li>
+</ul>
+{% endif empty regcodes %}

@@ -4,6 +4,7 @@
   (:use finacentric.schema
         [korma.core]; :only [insert values update set-fields where select]]
         [korma.db :only [transaction rollback]]
+        finacentric.model.utils
         ))
 
 (defn get-company-regcode [regcode]
@@ -35,3 +36,28 @@
       :supplier)))
 
 
+
+
+
+
+
+(defn get-suppliers [company-id page-no per-page sorted]
+(select SELLERS-BUYERS
+        (where {:buyer_id company-id})
+        (join :left
+              COMPANIES
+              (= :seller_id :companies.id))
+        (page page-no per-page)
+        )
+        
+  )
+
+
+
+
+
+(defn get-regcodes [company-id page-no per-page sorted]
+  (select COMPANY-REGCODES
+          (where {:owner_company_id company-id})
+          (page page-no per-page)
+          ))

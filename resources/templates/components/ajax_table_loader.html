@@ -1,3 +1,6 @@
-<div>
-  This is loader to url: {{target-url}}!{{path}}!
+<div class="async-block" data-url="{{target-url|safe}}">
+Trwa ładowanie ....
+<div class="on-error hide">
+  Nastąpił błąd. <a href="#" class="async-link" data-url="{{target-url|safe}}">Spróbuj ponownie</a>
+</div>
 </div>

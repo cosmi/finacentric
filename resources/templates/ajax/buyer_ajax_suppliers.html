@@ -1,0 +1,27 @@
+{% if empty suppliers %}
+<p> Brak zarejestrowanych dostawców </p>
+{% else %}
+<table class="table table-striped">
+  <thead>
+    <tr class="first-row">
+      <th>#</th>
+      <th>Nazwa firmy</th>
+      <th>Akcje</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for s in suppliers %}
+    <tr>
+      <td>{{s.id}}</td>
+      <td>{{s.name}}</td>
+      <td>----</td>
+    </tr>
+    {% endfor suppliers %}
+  </tbody>
+</table>
+<ul class="pagination">
+  <li><a href="#" class="async-link" data-url="{{path|safe}}?page={{page - 1}}&sorted={{sorted}}">&laquo;</a></li> 
+  <li><a href="#" class="async-link" data-url="{{path|safe}}?page={{page}}&sorted={{sorted}}">{{page}}</a></li>
+  <li><a href="#" class="async-link" data-url="{{path|safe}}?page={{page + 1}}&sorted={{sorted}}">&raquo;</a></li>
+</ul>
+{% endif empty suppliers %}

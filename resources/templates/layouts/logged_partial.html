@@ -2,7 +2,7 @@
 
   {% block userbar %}
   <div class="dropdown"> 
-    <div id="ProductList" class="dropdown-toggle btn btn-primary" data-toggle="dropdown" onclick="$('.dropdown-toggle').dropdown()"><div href="#" class="arrow-down white"></div> Jan Kowalski </div> 
+    <div id="ProductList" class="dropdown-toggle btn btn-primary" data-toggle="dropdown" onclick="$('.dropdown-toggle').dropdown()"><div href="#" class="arrow-down white"></div> {{user.name}} </div> 
     <ul class="dropdown-menu">
         <li> <a href="#">Zmień hasło</a> </li>
         <li> <a href="#">Uzupełnij profil</a> </li>
@@ -16,8 +16,8 @@
   {% block navigation %}
   {% endblock navigation %}
 
-	{% block content %}
-	<section class="main-content">
+  {% block content %}
+  <section class="main-content">
 
-	</section>
+  </section>
   {% endblock content %}
