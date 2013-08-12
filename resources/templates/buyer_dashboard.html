@@ -4,7 +4,7 @@
 Dashboard
 {% comment %} Przykładowo: {%endcomment%}
 
-{% include "components/ajax_table_loader.html" with target-url = links.buyer.active-table %}
+{% include "components/ajax_table_loader.html" only with target-url = "aaa" %}
 {% endblock content %}
 
 
