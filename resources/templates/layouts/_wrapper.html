@@ -15,6 +15,7 @@
 	    <script src="/js/bootstrap.min.js"></script>
 	    <script src="/js/bootstrap.js"></script>
 	    <script src="/js/bootstrap-datepicker.js"></script>
+	    <link href='http://fonts.googleapis.com/css?family=Lato:100,100italic,300,300italic,400italic,400,700,700italic,900,900italic' rel='stylesheet' type='text/css'>
 	    <script type='text/javascript'>
 	        $(window).load(function(){
 	          $('#searchInputSellTo').datepicker({
@@ -46,11 +47,12 @@
 	            <ul class="dropdown-menu">
 	                <li> <a href="#">Zmień hasło</a> </li>
 	                <li> <a href="#">Uzupełnij profil</a> </li>
-	                <li> <a href="#">Wyloguj</a> </li>
+	                
 	            </ul>
 	          </div>
 	          <a href="#" class="btn btn-primary">Pomoc</a>
-	          <a data-toggle="modal" href="#contactModal" class="btn btn-primary">Wyloguj</a>
+	          <form style="display:inline-block" action="{{links.logout}}" method="post"><input class="btn btn-primary" type="Submit" value="Wyloguj"/></form>
+
 	        {% endblock userbar %}
 	        </section>
 	        <nav class="top-nav">

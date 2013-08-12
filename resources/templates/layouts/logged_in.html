@@ -6,11 +6,10 @@
     <ul class="dropdown-menu">
         <li> <a href="#">Zmień hasło</a> </li>
         <li> <a href="#">Uzupełnij profil</a> </li>
-        <li> <a href="#">Wyloguj</a> </li>
     </ul>
   </div>
   <a href="#" class="btn btn-primary">Pomoc</a>
-  <a data-toggle="modal" href="#contactModal" class="btn btn-primary">Wyloguj</a>
+  <form style="display:inline-block" action="{{links.logout}}" method="post"><input class="btn btn-primary" type="Submit" value="Wyloguj"/></form>
 {% endblock userbar %}
 
 {% block navigation %}

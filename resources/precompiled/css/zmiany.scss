@@ -2,15 +2,20 @@ $page_standard_size:940px;
 
 $gray_color:#DCDCDC;
 $border-color:#CCC;
-$arrow-color:black;
+$arrow-color:white;
 $background-color:white;
 //$dark_general:#1e2832;
-$dark_general:#0f1418;
+$dark_general:#1e2832;
 //$gray_color:red;
 $general-bg-color:#eef2f5;
+$font-family:'Lato',Tahoma,Geneva,sans-serif;
+$tab-inactive:#34495e;
+$table-header-bg:#1e2730;
+$tab-active:#FFF;
 body{
 	background:$general-bg-color;
 	height:100%;
+	font-family:$font-family;
 }
 
 html{
@@ -45,6 +50,8 @@ a:active,a:focus{
 
 .userbar{
 	text-align:right;
+	position:relative;
+	top:23px;
 
 	a{
 		display: inline-block;
@@ -66,7 +73,7 @@ a:active,a:focus{
 }
 .main-header{
 	width:100%;
-	height:100px;
+	height:115px;
 	background:$dark_general;
 	position: relative;
 	border-bottom:1px solid $gray_color;
@@ -77,7 +84,7 @@ a:active,a:focus{
 
 		.nav-tabs > li > a{
 			border-bottom:none;
-			border:1px solid $gray_color;
+			//border:1px solid $gray_color;
 		}
 
 		.nav-tabs > li.active > a{
@@ -90,34 +97,68 @@ a:active,a:focus{
 }
 
 header.title{
-	height:100px;
+	height:73px;
 	
 	margin-bottom:30px;
 
 	h1{
-		margin-top: 30px;
+		margin-top: 17px;
+		font-size:0.9em;
+		font-family: $font-family;
+		color:#34495e;
+		font-size: 2.1em;
+		font-weight: 300;
+
+		.btn{
+			margin-right: 10px;
+		}
+		span {
+		  display: inline-block;
+		  position: relative;
+		  top: 3px;
+		}
+
 	}
 
 	.buttons{
 		padding-left:40px;
 		position: relative;
-		top:34px;
+		top:20px;
 		text-align:right;
 
 		.btn{
-			margin-left:10px;
+			margin-left:2px;
 		}
 	}
 }
 
 .component{
 	margin-bottom: 20px;
+
+	.nav-tabs > li{
+		margin-bottom: 0px;
+		&.active > a, &.active > a:hover, &.active > a:focus{
+		border:1px solid $table-header-bg;
+		color:white;
+		}
+	}
+
+	table {
+		border-bottom:1px solid #d4d9dd;
+		tr{
+			border-left:1px solid #d4d9dd;
+			border-right:1px solid #d4d9dd;
+		}
+	}
+	.table-striped > tbody > tr:nth-child(2n) > td, .table-striped > tbody > tr:nth-child(2n) > th{
+		background:#eef2f5;
+	}
 }
 
 .nav-tabs {
 	border-bottom: none;
 
-	.badge{
+	.badge, .label{
 		margin-left:5px;
 		padding-top: 4px;
 		padding-bottom: 4px;
@@ -138,7 +179,7 @@ header.title{
 
 	.tab-content{
 		padding:0px;
-		border:1px solid $gray_color;
+		//border:1px solid $gray_color;
 	}
 
 	.text{
@@ -151,7 +192,12 @@ header.title{
 		margin-bottom: 20px;
 	}
 	table.table-striped .first-row td, table.table-striped .first-row th{
-		background: $gray_color;
+		background: $table-header-bg;
+		color:white;
+		border-left:1px solid $table-header-bg;
+		border-right:1px solid $table-header-bg;
+		border-bottom:1px solid $table-header-bg;
+		border-top:1px solid $table-header-bg;
 	}
 }
 
@@ -162,12 +208,13 @@ header.title{
 
 .nav-tabs > li {
 	> a{
-		border:1px solid $border-color;
+		//border:1px solid $border-color;
 		margin-right: 7px;
-		background:#EEEEEE;
+		background:$tab-inactive;
+		color:$general-bg-color;
 		&:hover{
-			border:1px solid $border-color;
-			background:#FCFCFC;
+			border:1px solid #3d5d7d;
+			background:#3d5d7d;
 		}
 	}
 
@@ -175,7 +222,7 @@ header.title{
 		> a, > a:hover, > a:focus{
 			border:1px solid $border-color;
 			margin-right: 7px;
-			background:$gray_color;
+			background:$table-header-bg;
 			border-bottom:none;
 			font-weight: bold;	
 		}
@@ -188,7 +235,7 @@ header.title{
 	.pagination{
 		margin:0;
 		position: absolute;
-		right:40px;
+		right:15px;
 	}
 }
 
@@ -244,8 +291,8 @@ table.table {
 }
 
 .main-footer{
-	background:#0E4482;
-	height:200px;
+	background:$dark-general;
+	height:70px;
 	width:100%;
 }
 
@@ -255,12 +302,6 @@ table.table {
 	$footer-height:60px;
 	$left-padding:30px;
 	$login-box-width:600px;
-	
-	width:$login-box-width;
-	height:$section-height+$header-height+$footer-height;
-	overflow:hidden;
-	margin:auto;
-
 	&.register{
 		background:#0F1418;
 		height: auto;
@@ -272,6 +313,11 @@ table.table {
 		}
 
 	}
+	width:$login-box-width;
+	height:$section-height+$header-height+$footer-height;
+	overflow:hidden;
+	margin:auto;
+
 	footer{
 		height: $footer-height;
 		background:$dark-general;
@@ -450,4 +496,50 @@ table.table {
 	padding-top:3px;
 	padding-bottom:3px;
 	top:0px;
+}
+
+
+//logo 
+
+.logo{
+	width:187px;
+	height:49px;
+	background: url(../../../img/logo.png) no-repeat -16px 0px;
+	display:block;
+	float:left;
+	margin-top:13px;
+	position:absolute;
+	z-index:1000;
+}
+
+//nadpisanie kolorów przycisków i stworzenie nowych typów
+.btn-primary{
+	background:#24303d;
+	border:none;
+}
+
+.btn-export{
+	margin-left:15px;
+}
+
+.btn-standard{
+	background:$general-bg-color;
+	color:#7d8b98;
+	border-color:#e0e4e8;
+}
+
+.btn-general{
+	background:#34495e;
+	color:white;
+	border-color:$dark-general;
+	&:hover{
+		background:#27384a;
+		color:white;
+		border-color:$dark-general;
+	}
+}
+
+form .btn{
+	padding-top:8px;
+	padding-bottom:7px;
 }
