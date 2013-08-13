@@ -1,9 +1,9 @@
 {% extends "components/form_layout.html" %}
 
-{% block tytul %}
-{% endblock tytul}
+{% block form-header %}
+{% endblock form-header %}
 
-{% block formatka %}
+{% block form-content %}
 <form autocomplete="off"  method="post" {% if target %}action="{{target}}"{% endif %}>
   <label> Wpisz pełną nazwę firmy
   <input name="name" value="{{form.name}}"/>
@@ -11,8 +11,8 @@
   </label>
   <button type="submit">Zapisz</button>
 </form>
-{% endblock formatka %}
+{% endblock form-content %}
 
-{% block stopka %}
-{% endblock stopka}
+{% block form-footer %}
+{% endblock form-footer %}
 

@@ -1,8 +1,34 @@
-% block tytul %}
-{% endblock tytul}
-
-{% block formatka %}
-{% endblock formatka %}
-
-{% block stopka %}
-{% endblock stopka}
+<div class="form-component">
+	<div class="form-header">
+		{% block form-header %}
+		{% endblock form-header %}
+	</div>
+	<div class="form-content">
+		{% block form-content %}
+		<form class="form-horizontal">
+		<div class="form-group">
+		  <label for="inputEmail" class="col-lg-6 control-label">Nazwa firmy</label>
+		  <div class="col-lg-6">
+		    <input type="text" class="form-control" id="inputEmail" placeholder="">
+		  </div>
+		</div>
+		<div class="form-group">
+		  <label for="inputPassword" class="col-lg-6 control-label">Kod rejestracyjny</label>
+		  <div class="col-lg-6">
+		    <input type="password" class="form-control" id="inputPassword" placeholder="">
+		  </div>
+		</div>
+		<div class="form-group">
+		  <div class="col-lg-offset-6 col-lg-6">
+		    <button type="submit" class="btn btn-warning">ZAPISZ</button>
+		    <button type="button" class="btn btn-link">Anuluj</button>
+		  </div>
+		</div>
+		</form>
+		{% endblock form-content %}
+	</div>
+	<div class="form-footer">
+		{% block form-footer %}
+		{% endblock form-footer %}
+	</div>
+</div>
