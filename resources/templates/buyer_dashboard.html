@@ -1,10 +1,7 @@
 {% extends "layouts/logged_buyer.html" %}
 
-{% block content %}
-Dashboard
-{% comment %} Przykładowo: {%endcomment%}
-
-{% include "components/ajax_table_loader.html" only with target-url = "aaa" %}
-{% endblock content %}
-
+{% block tabs %}
+	{% include "components/tabs_buyer.html" %}
+	{% include "components/ajax_table_loader.html" only with target-url = "aaa" %}
+{% endblock tabs %}
 

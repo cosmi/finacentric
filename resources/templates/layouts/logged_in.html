@@ -1,7 +1,7 @@
 {% extends "layouts/_wrapper.html" %}
 
- 	{% block userbar %}
-  <div class="dropdown"> 
+{% block _userbar %}
+  <!-- <div class="dropdown"> 
     <div id="ProductList" class="dropdown-toggle btn btn-primary" data-toggle="dropdown" onclick="$('.dropdown-toggle').dropdown()"><div href="#" class="arrow-down white"></div> {{user.name}} </div> 
     <ul class="dropdown-menu">
         <li> <a href="#">Zmień hasło</a> </li>
@@ -9,21 +9,18 @@
     </ul>
   </div>
   <a href="#" class="btn btn-primary">Pomoc</a>
-  <form style="display:inline-block" action="{{links.logout}}" method="post"><input class="btn btn-primary" type="Submit" value="Wyloguj"/></form>
-{% endblock userbar %}
+  <form style="display:inline-block" action="{{links.logout}}" method="post"><input class="btn btn-primary" type="Submit" value="Wyloguj"/></form> -->
+{% endblock _userbar %}
 
-{% block navigation %}
-  <ul class="nav nav-tabs" id="mainMenuTabs">
+{% block _navigation %}
+  <!-- <ul class="nav nav-tabs" id="mainMenuTabs">
     <li class="active"><a href="#overview"  data-toggle="tab">Strona główna</a></li>
     <li><a href="#profile" data-toggle="tab">Lista faktur</a></li>
     <li><a href="#messages" data-toggle="tab">Korekty</a></li>
     <li><a href="#settings" data-toggle="tab">Zaakceptowane</a></li>
-  </ul>
-{% endblock navigation %}
+  </ul> -->
+{% endblock _navigation %}
         
+{% block _tabs %}
 
-{% block content %}
-	<section class="main-content">
-
-	</section>
-{% endblock content %}
+{% endblock _tabs %}

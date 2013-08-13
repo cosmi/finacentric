@@ -1,0 +1,13 @@
+{% block tab %}
+  <div class="tab-pane" id="{% block tab-id %}{% endblock tab-id %}">
+    <section class="wide-wrapper">
+            <header class="narrow-wrapper title">
+      {% block tab-title %}
+      {% endblock tab-title %}
+      </header>
+    </section>
+
+    {% block tab-main %}
+    {% endblock tab-main %}
+  </div>
+{% endblock tab %}

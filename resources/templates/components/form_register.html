@@ -15,17 +15,17 @@
           <div class="form-group">
             <label for="contactInputEmail">Adres email:</label>
             {% if error.email %}<p>{{error.email}}</p>{% endif %}
-            <input type="text" class="form-control" id="contactInputEmail" placeholder="Enter email" name="login" value="{{form.login}}">
+            <input type="text" class="form-control" id="contactInputEmail" placeholder="Podaj mail" name="login" value="{{form.login}}">
           </div>
           <div class="form-group">
             <label for="contactInputPassword">Hasło:</label>
             {% if error.password %}<p>{{error.password}}</p>{% endif %}
-            <input type="password" class="form-control" id="contactInputPassword" placeholder="Password" name="password">
+            <input type="password" class="form-control" id="contactInputPassword" placeholder="Hasło" name="password">
           </div>
           <div class="form-group">
             <label for="contactInputRepeatPassword">Powtórz hasło:</label>
             {% if error.repeat-password %}<p>{{error.repeat-password}}</p>{% endif %}
-            <input type="password" class="form-control" id="contactInputRepeatPassword" placeholder="Password" name="repeat-password">
+            <input type="password" class="form-control" id="contactInputRepeatPassword" placeholder="Hasło" name="repeat-password">
           </div>
           <div class="form-inline">
             <div class="checkbox">
