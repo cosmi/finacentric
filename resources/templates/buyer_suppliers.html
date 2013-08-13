@@ -1,17 +1,33 @@
 {% extends "layouts/logged_buyer.html" %}
 
-{% block content %}
-<ul class="nav nav-tabs">
-  <li {%if path == links.buyer.suppliers.list %}class="active"{%endif%}>
-    <a href="{{ links.buyer.suppliers.list }}">Dostawcy</a>
-  <li {%if path == links.buyer.suppliers.invites %}class="active"{%endif%}>
-    <a href="{{ links.buyer.suppliers.invites }}">Zaproszenia</a></li>
+{% block _tabs %}
+	<ul class="nav nav-tabs">
+	  <li {% if path == links.buyer.suppliers.list %}class="active"{% endif %}>
+	    <a href="{{ links.buyer.suppliers.list }}">Dostawcy</a>
+	  <li {% if path == links.buyer.suppliers.invites %}class="active"{% endif %}>
+	    <a href="{{ links.buyer.suppliers.invites }}">Zaproszenia</a></li>
+	</ul>
+
+	{% block subcontent %}
+	{% comment %}To nie jest w sumie widok {% endcomment %}
+	{% endblock subcontent %}
+
+{% endblock _tabs %}
+
+{% block tabs %}
+<ul class="narrow-wrapper nav nav-tabs" id="SuppliersTabs">
+  <li class="active"><a href="#SuppliersList"  data-toggle="tab"><span class="text">Lista</span> <span class="label label-default">42</span></a></li>
+  <li><a href="#SuppliersInvites" data-toggle="tab"><span class="text">Zaproszenia</span> <span class="label label-danger">25</span></a></li>
 </ul>
-{% block subcontent %}
 
-{% comment %}To nie jest w sumie widok {% endcomment %}
-
-{% endblock subcontent %}
-{% endblock content %}
-
-
+<div class="narrow-wrapper tab-content">
+  <div class="tab-pane active" id="SuppliersList">
+  	coś 1
+  	{% include "components/ajax_table_loader.html" with target-url = links.buyer.ajax.suppliers %}
+  </div>
+  <div class="tab-pane" id="SuppliersInvites">
+  	coś 2 
+  	{% include "components/ajax_table_loader.html" with target-url = links.buyer.ajax.invites %}
+  </div>
+</div>
+{% endblock tabs %}
