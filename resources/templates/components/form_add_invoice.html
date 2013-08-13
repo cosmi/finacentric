@@ -1,0 +1,67 @@
+{% extends "components/form_layout.html" %}
+
+{% block form-header %}
+Dodawanie nowej faktury
+{% endblock form-header %}
+
+{% block form-content %}
+<form class="form-horizontal" autocomplete="off"  method="post" {% if target %}action="{{target}}"{% endif %}>
+	
+	<div class="form-group">
+	  <label for="numerFaktury" class="col-lg-6 control-label">Numer faktury</label>
+	  <div class="col-lg-6">
+	    <input class="form-control" id="numerFaktury" name="numerFaktury" placeholder="Podaj numer">
+	  </div>
+	</div>
+
+	<div class="form-group">
+      <label class="col-lg-6 control-label" for="seriaNumeracji">Seria numeracji</label>
+        <div class="col-lg-6">
+          	<select class="form-control" id="seriaNumeracji" name="seriaNumeracji">
+            	<option value="1">Domyślna roczna</option>
+            	<option value="2">Inna</option>
+        	</select>
+      	</div>
+    </div>
+
+    <div class="form-group">
+      <label class="col-lg-6 control-label" for="metodaPlatnosci">Metoda płatności</label>
+        <div class="col-lg-6">
+          	<select class="form-control" id="metodaPlatnosci" name="metodaPlatnosci" >
+            	<option value="gotowka">Płatność gotówką</option>
+            	<option value="przelew">Płatność przelewem</option>
+        	</select>
+      	</div>
+    </div>
+
+	<div class="form-group">
+	  <label for="dataWystawienia" class="col-lg-6 control-label">Data wystawienia</label>
+	  <div class="col-lg-6">
+	    <input type="text" class="form-control calendar" value="02/02/2013" data-date-format="dd/mm/yyyy" id="dataWystawienia" name="dataWystawienia">
+	  </div>
+	</div>
+
+	<div class="form-group">
+      <label class="col-lg-6 control-label" for="dostawca">Dostawca</label>
+        <div class="col-lg-6">
+         	<select class="form-control" id="dostawca" name="dostawca">
+	            <option value="1">1 Dostawca</option>
+	            <option value="2">2 Dostawca</option>
+	            <option value="3">3 Dostawca</option>
+	            <option value="4">4 Dostawca</option>
+	            <option value="5">5 Dostawca</option>
+        	</select>
+      	</div>
+    </div>
+
+	<div class="form-group">
+	  <div class="col-lg-offset-6 col-lg-6">
+	    <button type="submit" class="btn btn-warning">ZAPISZ</button>
+	    <button type="button" class="btn btn-link">Anuluj</button>
+	  </div>
+	</div>
+</form>
+{% endblock form-content %}
+
+{% block form-footer %}
+{% endblock form-footer %}
