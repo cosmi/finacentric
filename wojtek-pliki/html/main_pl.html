@@ -54,22 +54,23 @@
         <a href="#" class="logo"></a>
         <section class="userbar">
           <div class="dropdown"> 
-            <div id="ProductList" class="dropdown-toggle btn btn-primary" data-toggle="dropdown" onclick="$('.dropdown-toggle').dropdown()"><div href="#" class="arrow-down white"></div> John Doe </div> 
+            <div id="ProductList" class="dropdown-toggle btn btn-primary" data-toggle="dropdown" onclick="$('.dropdown-toggle').dropdown()"><div href="#" class="arrow-down white"></div> Jan Kowalski </div> 
             <ul class="dropdown-menu">
-                <li> <a href="#">Change password</a> </li>
-                <li> <a href="#">Fill profile</a> </li>
-                <li> <a href="#">Logout</a> </li>
+                <li> <a href="#">Zmień hasło</a> </li>
+                <li> <a href="#">Uzupełnij profil</a> </li>
+                <li> <a href="#">Wyloguj</a> </li>
             </ul>
           </div>
-          <a href="#" class="btn btn-primary">Help</a>
-          <a data-toggle="modal" href="#contactModal" class="btn btn-primary">Login</a>
+          <a href="#" class="btn btn-primary">Pomoc</a>
+          <!-- <a data-toggle="modal" href="#contactModal" class="btn btn-primary">Wyloguj</a> -->
+          <form style="display:inline-block" action="{{links.logout}}" method="post"><input class="btn btn-primary" type="Submit" value="Wyloguj"/></form>
         </section>
         <nav class="top-nav">
           <ul class="nav nav-tabs" id="mainMenuTabs">
-            <li class="active"><a href="#overview"  data-toggle="tab">Invoices</a></li>
-            <li><a href="#profile" data-toggle="tab">Profile</a></li>
-            <li><a href="#messages" data-toggle="tab">Messages</a></li>
-            <li><a href="#settings" data-toggle="tab">Settings</a></li>
+            <li class="active"><a href="#overview"  data-toggle="tab">Strona główna</a></li>
+            <li><a href="#profile" data-toggle="tab">Lista faktur</a></li>
+            <li><a href="#messages" data-toggle="tab">Korekty</a></li>
+            <li><a href="#settings" data-toggle="tab">Zaakceptowane</a></li>
           </ul>
         </nav>
       </div>
@@ -80,11 +81,11 @@
             <div class="tab-pane active" id="overview">
               <section class="wide-wrapper">
               <header class="narrow-wrapper title">
-                <h1 class="col-lg-6"><button type="button" class="btn btn-warning">+ New invoice</button> <span>Invoices</span></h1>
+                <h1 class="col-lg-6"><button type="button" class="btn btn-default btn-standard">&lsaquo; Powrót</button> <span>Bieżące faktury</span></h1>
                 <section class="buttons col-lg-6">
-                  <button type="button" class="btn btn-warning">+ New invoice</button>
-                  <button type="button" class="btn btn-info">Eksportuj</button>
-                  <button type="button" class="btn btn-info">Szukaj</button>
+                  <button type="button" class="btn btn-warning">Dodaj fakturę</button>
+                  <button type="button" class="btn btn-default btn-general">Eksportuj</button>
+                  
                 </section>
               </header>
             </section>
@@ -189,7 +190,7 @@
                     </table>
                     <footer class="row">
                       <div class="buttons col-lg-6">
-                        <button type="button" class="btn btn-default btn-export">Eksportuj</button>
+                        <button type="button" class="btn btn-default btn-export btn-general">Eksportuj</button>
                       </div>
                       <div class="paginator col-lg-6">
                         <ul class="pagination">
