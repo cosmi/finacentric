@@ -1,6 +1,10 @@
 {% extends "layouts/logged_partial.html" %}
 
-{% block body %}
-{% include "components/form_supplier_register.html" %}
-<a href="{{links.register-buyer}}">Chcę zostać odbiorcą faktur na Finacentric</a>
-{% endblock %}
+{% block content %}
+	<section class="main-content">
+		<section class="narrow-wrapper component">
+			<a href="{{links.register-buyer}}">Chcę zostać odbiorcą faktur na Finacentric</a>
+			{% include "components/form_supplier_register.html" %}
+		</section>
+	</section>
+{% endblock content %}
