@@ -1,8 +1,7 @@
-<ul>
-	<li>
-		<a href="{{links.dashboard}}" class="{% if path = links.dashboard %}active{% endif %}">Strona główna</a>
-	</li>
-	<li>
-		<a href="{{links.archive}}" class="{% if path = links.archive %}active{% endif %}">Archiwum faktur</a>
-	</li>
-</ul>
+<li class="{% if path = links.dashboard %}active{% endif %}">
+	<a href="{{links.dashboard}}"  data-toggle="tab">Strona główna</a>
+</li>
+<li class="{% if path = links.archive %}active{% endif %}">
+	<a href="{{links.archive}}" data-toggle="tab">Archiwum faktur</a>
+</li>
+
