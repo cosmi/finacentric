@@ -15,22 +15,27 @@
     <script src="../js/bootstrap.min.js"></script>
     <script src="../js/bootstrap.js"></script>
     <script type='text/javascript' src="../js/bootstrap-datepicker.js"></script>
+    <script type='text/javascript' src="../js/locales/bootstrap-datepicker.pl.js"></script>
     <link href='http://fonts.googleapis.com/css?family=Lato:100,100italic,300,300italic,400italic,400,700,700italic,900,900italic' rel='stylesheet' type='text/css'>
+    
     <script type='text/javascript'>
         $(window).load(function(){
           $('#searchInputSellTo').datepicker({
+            language: 'pl',
             weekStart:1
-            
           });
           $('#searchInputSellFrom').datepicker({
+            language: 'pl',
             weekStart:1
             
           });
           $('#searchInputPayTo').datepicker({
+            language: 'pl',
             weekStart:1
             
           });
           $('#searchInputPayFrom').datepicker({
+            language: 'pl',
             weekStart:1
             
           });
@@ -136,6 +141,14 @@
             </section>
 
             <section class="narrow-wrapper component">
+              <object data="sample.pdf" type="application/pdf" width="100%" height="1150px">
+               
+                <p>Twoja przeglądarka nie posiada obsługi plików PDF. <a href="sample.pdf">Pobierz plik stąd.</a></p>
+                
+              </object>
+            </section>
+
+            <section class="narrow-wrapper component">
               <div class="form-component">
                 <div class="form-header">Dodawanie faktury</div>
                 <div class="form-content">
@@ -178,9 +191,9 @@
                       <div class="form-inline">
                         <label for="searchInputSellFrom">od</label>
                         
-                        <input type="text" class="form-control calendar" value="02/02/2013" data-date-format="dd/mm/yyyy" id="searchInputSellFrom">
+                        <input type="text" class="form-control calendar" value="2013/02/02" data-date-format="yyyy/mm/dd" id="searchInputSellFrom">
                         <label for="searchInputSellTo">do</label>
-                        <input type="text" class="form-control calendar" value="02/02/2013" data-date-format="dd/mm/yyyy" id="searchInputSellTo">
+                        <input type="text" class="form-control calendar" value="2013/02/02" data-date-format="yyyy/mm/dd" id="searchInputSellTo">
                       </div>
                     </div>
                     <div class="search-item form-group">
@@ -207,9 +220,9 @@
                       <label for="searchInputPay">Data sprzedaży</label>
                       <div class="form-inline">
                         <label for="searchInputPayFrom">od</label>
-                        <input type="text" class="form-control calendar"  value="02/02/2013" data-date-format="dd/mm/yyyy" id="searchInputPayFrom" placeholder="">
+                        <input type="text" class="form-control calendar"  value="2013/02/02" data-date-format="yyyy/mm/dd" id="searchInputPayFrom" placeholder="">
                         <label for="searchInputPayTo">do</label>
-                      <input type="text" class="form-control calendar"  value="02/02/2013" data-date-format="dd/mm/yyyy" id="searchInputPayTo" placeholder="">
+                      <input type="text" class="form-control calendar"  value="2013/02/02" data-date-format="yyyy/mm/dd" id="searchInputPayTo" placeholder="">
                       </div>
                     </div>
                     <div class="clearfix"></div>

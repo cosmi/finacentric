@@ -470,6 +470,23 @@ table.table {
 
 }
 
+.datepicker{
+	//musi być important, żeby nie trzeba było edytować plików datepickera, które nie współpracują z najnowszą wersją bootstrapa
+	th.prev{
+		background:url(../../../img/left-arrow.png) no-repeat center center !important;
+		
+		&:hover{
+			background-color:#eee !important;
+		}
+	}
+	th.next{
+		background:url(../../../img/right-arrow.png)  no-repeat center center !important;
+		&:hover{
+			background-color:#eee !important;
+		}
+	}
+}
+
 //login page
 
 .login-page{
@@ -575,3 +592,4 @@ form .btn{
 		}
 	}
 }
+
