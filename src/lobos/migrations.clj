@@ -11,19 +11,21 @@
       (create
        (table :companies
               (integer :id :primary-key :auto-inc)
-              (varchar :name 50)
+              (varchar :name 50 :not-null)
               (varchar :domain 30 :unique)
               (boolean :is_buyer :not-null)
-              (boolean :active (default false))
+              ;(boolean :active (default false))
               (timestamp :created_at (default (now)))
               ))
 
       (create
        (table :company_regcodes
               (integer :id :primary-key :auto-inc)
-              (varchar :regcode 50 :unique)
-              (varchar :name 50)
-              (integer :owner_company_id [:refer :companies :id])
+              (varchar :regcode 50 :unique :not-null)
+              (varchar :name 80)
+              (varchar :email 50)
+              
+              (integer :owner_company_id [:refer :companies :id] :not-null)
               (integer :target_company_id [:refer :companies :id])
               (boolean :used (default false))
               (timestamp :created_at (default (now)))))
@@ -43,8 +45,8 @@
       
       (create
        (table :sellers_buyers
-              (integer :seller_id [:refer :companies :id])
-              (integer :buyer_id [:refer :companies :id])
+              (integer :seller_id [:refer :companies :id] :not-null)
+              (integer :buyer_id [:refer :companies :id] :not-null)
               (check "not_same" (!= :seller_id  :buyer_id))
               (primary-key [:seller_id :buyer_id])))
       
@@ -69,44 +71,44 @@
       (create
        (table :invoices
               (integer :id :primary-key :auto-inc)
-              (integer :seller_id [:refer :companies :id])
-              (integer :buyer_id [:refer :companies :id])
+              (integer :seller_id [:refer :companies :id] :not-null)
+              (integer :buyer_id [:refer :companies :id] :not-null)
               (foreign-key [:buyer_id :seller_id] :sellers_buyers)
-              (integer :seller_data_id [:refer :company_datas :id])
-              (integer :buyer_data_id [:refer :company_datas :id])
-              (varchar :number 30)
-              (varchar :description 30)
-              (unique [:number :buyer_id])
-              (date :issue_date)
-              (date :sell_date)
-              (date :payment_date)
-              (varchar :payment_mode 30)
-              (varchar :state 30)
+              ;; (integer :seller_data_id [:refer :company_datas :id])
+              ;; (integer :buyer_data_id [:refer :company_datas :id])
+              (varchar :number 30 :not-null)
+              ;; (varchar :description 30)
+              (unique [:number :seller_id])
+              (date :issue_date :not-null)
+              ;; (date :sell_date)
+              (date :payment_date :not-null)
+              ;; (varchar :payment_mode 30)
+              (varchar :state 30 (default "unverified"))
 
-              (decimal :paid_already 15 2)
+              ;; (decimal :paid_already 15 2)
 
               
-              (decimal :net_total 15 2)
-              (decimal :gross_total 15 2)
+              (decimal :net_total 15 2 :not-null)
+              (decimal :gross_total 15 2 :not-null)
 
               (varchar :currency 8 (default "PLN"))
-              (varchar :extra 500)
+              ;; (varchar :extra 500)
 
-              (decimal :annual_discount_rate 7 4) ; wymagana zniżka za przyspieszenie
-              (date :earliest_discount_date) ; najwcześniejsza możliwa opcja zniżki
+              ;; (decimal :annual_discount_rate 7 4) ; wymagana zniżka za przyspieszenie
+              ;; (date :earliest_discount_date) ; najwcześniejsza możliwa opcja zniżki
               
-              (date :discounted_payment_date)
-              (decimal :discount_rate 7 4)
+              ;; (date :discounted_payment_date)
+              ;; (decimal :discount_rate 7 4)
               
-              (decimal :discounted_net_total 15 2)
-              (decimal :discounted_gross_total 15 2)
+              ;; (decimal :discounted_net_total 15 2)
+              ;; (decimal :discounted_gross_total 15 2)
               
-              (timestamp :accepted)
-              (timestamp :rejected)
-              (timestamp :discount_accepted)
-              (timestamp :discount_confirmed)
-              (timestamp :corrected)
-              (timestamp :correction_received)
+              ;; (timestamp :accepted)
+              ;; (timestamp :rejected)
+              ;; (timestamp :discount_accepted)
+              ;; (timestamp :discount_confirmed)
+              ;; (timestamp :corrected)
+              ;; (timestamp :correction_received)
 
               (varchar :file_id 32)
               

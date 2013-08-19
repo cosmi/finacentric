@@ -1,0 +1,25 @@
+<section class="wide-wrapper">
+  <header class="narrow-wrapper title">
+    <h1 class="col-lg-6">{#<button type="button" class="btn btn-default btn-standard">‹ Powrót</button>#} <span>Dostawcy</span></h1>
+    <section class="buttons col-lg-6">
+      <button type="button" class="btn btn-warning">Zaproś do systemu</button>
+      
+    </section>
+  </header>
+</section>
+
+
+
+<ul class="narrow-wrapper nav nav-tabs">
+  <li class="active clearfix"><a href="#suppliers-list" data-toggle="tab"><span class=" ">Lista dostawców</span></a></li>
+  <li><a href="#invites-list" data-toggle="tab"><span class="">Zaproszenia</span></a></li>
+</ul>
+
+<div class="narrow-wrapper tab-content">
+  <div class="tab-pane active" id="suppliers-list">
+    {% include "/components/async.html" with target = links.buyer.ajax.suppliers.list %}
+  </div>
+  <div class="tab-pane" id="invites-list">
+    {% include "/components/async.html" with target = links.buyer.ajax.suppliers.invites %}
+  </div>
+</div>

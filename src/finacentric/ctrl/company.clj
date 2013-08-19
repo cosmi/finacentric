@@ -3,12 +3,13 @@
         [causeway.bootconfig :only [devmode? bootconfig]]
         [causeway.validation]
         [causeway.l10n :only [loc]]
-        [finacentric.model companies users]
+        [finacentric.model companies users regcodes]
         [finacentric.ctrl auth]
         [finacentric.links]
         [korma.db :only [transaction rollback]])
   (:require [noir.session :as session]
-            [noir.validation :as vali]))
+            [noir.validation :as vali]
+            [causeway.status :as status]))
 
 
 
@@ -41,15 +42,31 @@
 
 
 (defvalidator invite-supplier-validator
-  (rule :email (<= 5 (count _) 80) (loc "Nazwa musi mieć między 5 a 80 znaków."))
+  (optional
+   (rule :name (<= 5 (count _) 80) (loc "Nazwa powinna mieć między 1 a 80 znaków.")))
+  (rule :email (vali/is-email? _) (loc "Niepoprawny format adresu email"))
+  (rule :email (<= (count _) 50) (loc "Adres email nie powinien mieć więcej niż 50 znaków"))
   )
 
+(defn create-invite! [{:keys [name email]}]
+  (create-regcode! (get-current-company-id) name email))
 
 
 
 
-(defn get-current-suppliers-list [page sort-order]
-  (get-suppliers  (get-current-company-id) page 30 sort-order))
+(defn get-current-suppliers-list [page order dir]
+  (get-suppliers  (get-current-company-id) page 30 order dir))
                                                                          
-(defn get-current-regcodes-list [page sort-order]
-  (get-regcodes  (get-current-company-id) page 30 sort-order))
+(defn get-current-regcodes-list [page sort-order dir]
+  (get-regcodes  (get-current-company-id) page 30 sort-order dir))
+
+
+
+(defn delete-invite! [regcode-id]
+  (transaction
+   (if (check-regcode-auth regcode-id (get-current-company-id) :delete)
+     (delete-regcode! regcode-id)
+     (throw status/forbidden))))
+
+
+

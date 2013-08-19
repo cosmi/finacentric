@@ -1,0 +1,476 @@
+/* line 15, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+body {
+  background: #eef2f5;
+  height: 100%;
+  font-family: "Lato", Tahoma, Geneva, sans-serif; }
+
+/* line 21, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+html {
+  height: 100%; }
+
+/* line 24, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+a:active, a:focus {
+  outline: none;
+  -moz-outline-style: none; }
+
+/* line 29, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+.narrow-wrapper {
+  width: 940px;
+  margin: auto; }
+  /* line 33, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+  .narrow-wrapper .col-1, .narrow-wrapper .col-2, .narrow-wrapper .col-3, .narrow-wrapper .col-4, .narrow-wrapper .col-5, .narrow-wrapper .col-6, .narrow-wrapper .col-7, .narrow-wrapper .col-8, .narrow-wrapper .col-9, .narrow-wrapper .col-10, .narrow-wrapper .col-11, .narrow-wrapper .col-12, .narrow-wrapper .col-sm-1, .narrow-wrapper .col-sm-2, .narrow-wrapper .col-sm-3, .narrow-wrapper .col-sm-4, .narrow-wrapper .col-sm-5, .narrow-wrapper .col-sm-6, .narrow-wrapper .col-sm-7, .narrow-wrapper .col-sm-8, .narrow-wrapper .col-sm-9, .narrow-wrapper .col-sm-10, .narrow-wrapper .col-sm-11, .narrow-wrapper .col-sm-12, .narrow-wrapper .col-lg-1, .narrow-wrapper .col-lg-2, .narrow-wrapper .col-lg-3, .narrow-wrapper .col-lg-4, .narrow-wrapper .col-lg-5, .narrow-wrapper .col-lg-6, .narrow-wrapper .col-lg-7, .narrow-wrapper .col-lg-8, .narrow-wrapper .col-lg-9, .narrow-wrapper .col-lg-10, .narrow-wrapper .col-lg-11, .narrow-wrapper .col-lg-12 {
+    padding-left: 0px;
+    padding-right: 0px; }
+
+/* line 38, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+.wide-wrapper {
+  width: 100%;
+  margin: auto; }
+
+/* line 42, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+.modal-backdrop {
+  background-color: black; }
+
+/* line 46, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+#contactModal .modal-body {
+  padding: 0px; }
+
+/* line 51, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+.userbar {
+  text-align: right;
+  position: relative;
+  top: 23px; }
+  /* line 56, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+  .userbar a {
+    display: inline-block; }
+  /* line 60, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+  .userbar .dropdown {
+    display: inline-block; }
+  /* line 66, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+  .userbar .arrow-down {
+    float: right;
+    top: 5px;
+    margin-left: 8px;
+    position: relative; }
+
+/* line 74, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+.main-header {
+  width: 100%;
+  height: 115px;
+  background: #1e2832;
+  position: relative;
+  border-bottom: 1px solid gainsboro; }
+  /* line 81, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+  .main-header .top-nav {
+    position: absolute;
+    bottom: 0px; }
+    /* line 85, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+    .main-header .top-nav .nav-tabs > li > a {
+      border-bottom: none; }
+    /* line 90, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+    .main-header .top-nav .nav-tabs > li.active > a {
+      border-bottom: 1px solid white;
+      background: white; }
+
+/* line 99, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+header.title {
+  height: 73px;
+  margin-bottom: 30px; }
+  /* line 104, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+  header.title h1 {
+    margin-top: 17px;
+    font-size: 0.9em;
+    font-family: "Lato", Tahoma, Geneva, sans-serif;
+    color: #34495e;
+    font-size: 2.1em;
+    font-weight: 300; }
+    /* line 112, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+    header.title h1 .btn {
+      margin-right: 10px; }
+    /* line 115, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+    header.title h1 span {
+      display: inline-block;
+      position: relative;
+      top: 3px; }
+  /* line 123, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+  header.title .buttons {
+    padding-left: 40px;
+    position: relative;
+    top: 20px;
+    text-align: right; }
+    /* line 129, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+    header.title .buttons .btn {
+      margin-left: 2px; }
+
+/* line 135, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+.component {
+  margin-bottom: 20px; }
+  /* line 138, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+  .component .nav-tabs > li {
+    margin-bottom: 0px; }
+    /* line 140, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+    .component .nav-tabs > li.active > a, .component .nav-tabs > li.active > a:hover, .component .nav-tabs > li.active > a:focus {
+      border: 1px solid #1e2730;
+      color: white; }
+  /* line 146, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+  .component table {
+    border-bottom: 1px solid #d4d9dd; }
+    /* line 148, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+    .component table tr {
+      border-left: 1px solid #d4d9dd;
+      border-right: 1px solid #d4d9dd; }
+  /* line 153, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+  .component .table-striped > tbody > tr:nth-child(2n) > td, .component .table-striped > tbody > tr:nth-child(2n) > th {
+    background: #eef2f5; }
+
+/* line 158, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+.nav-tabs {
+  border-bottom: none; }
+  /* line 161, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+  .nav-tabs .badge, .nav-tabs .label {
+    margin-left: 5px;
+    padding-top: 4px;
+    padding-bottom: 4px; }
+
+/* line 168, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+.tab-content {
+  border: none;
+  border-radius: 6px;
+  border-top-left-radius: 0px;
+  overflow: hidden; }
+  /* line 176, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+  .tab-content .wide-wrapper {
+    background: white; }
+  /* line 180, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+  .tab-content .tab-content {
+    padding: 0px; }
+  /* line 185, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+  .tab-content .text {
+    float: left; }
+
+/* line 191, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+.tab-pane footer.row {
+  margin-bottom: 20px; }
+/* line 194, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+.tab-pane table.table-striped .first-row td, .tab-pane table.table-striped .first-row th {
+  background: #1e2730;
+  color: white;
+  border-left: 1px solid #1e2730;
+  border-right: 1px solid #1e2730;
+  border-bottom: 1px solid #1e2730;
+  border-top: 1px solid #1e2730; }
+
+/* line 204, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+.btn.disabled, .btn[disabled], fieldset[disabled] .btn {
+  opacity: 0.20; }
+
+/* line 210, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+.nav-tabs > li > a {
+  margin-right: 7px;
+  background: #34495e;
+  color: #eef2f5; }
+  /* line 215, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+  .nav-tabs > li > a:hover {
+    border: 1px solid #3d5d7d;
+    background: #3d5d7d; }
+/* line 222, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+.nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus {
+  border: 1px solid #cccccc;
+  margin-right: 7px;
+  background: #1e2730;
+  border-bottom: none;
+  font-weight: bold; }
+
+/* line 232, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+.paginator {
+  position: relative; }
+  /* line 235, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+  .paginator .pagination {
+    margin: 0;
+    position: absolute;
+    right: 15px; }
+
+/* line 243, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+table.table tr th, table.table tr td {
+  vertical-align: middle; }
+/* line 247, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+table.table .link {
+  font-weight: bold; }
+
+/* line 252, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+.lighter {
+  color: #999999; }
+
+/* line 256, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+.buttons {
+  padding-left: 40px; }
+
+/* line 260, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+.arrows {
+  width: 15px;
+  height: 15px;
+  float: left; }
+
+/* line 266, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+.arrow-down {
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 8px solid white;
+  margin-top: 3px;
+  display: block; }
+  /* line 276, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+  .arrow-down.white {
+    border-top: 8px solid white; }
+
+/* line 282, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+.arrow-up {
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-bottom: 7px solid white;
+  margin-bottom: 3px;
+  display: block; }
+
+/* line 293, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+.main-footer {
+  background: #1e2832;
+  height: 70px;
+  width: 100%; }
+
+/* line 299, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+.login-box {
+  width: 600px;
+  height: 380px;
+  overflow: hidden;
+  margin: auto; }
+  /* line 305, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+  .login-box.register {
+    background: #0F1418;
+    height: auto; }
+    /* line 308, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+    .login-box.register left {
+      height: auto; }
+    /* line 311, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+    .login-box.register section {
+      height: auto; }
+  /* line 321, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+  .login-box footer {
+    height: 60px;
+    background: #1e2832;
+    text-align: center;
+    padding-top: 19px; }
+    /* line 327, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+    .login-box footer a:link, .login-box footer a:visited {
+      color: #666666; }
+    /* line 331, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+    .login-box footer a:hover {
+      color: #727272; }
+  /* line 335, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+  .login-box .wide-button {
+    display: block;
+    width: 100%;
+    height: 25px; }
+  /* line 342, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+  .login-box .form-group label {
+    color: #666;
+    font-size: 0.9em; }
+  /* line 347, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+  .login-box .left {
+    background: #1e2832; }
+    /* line 349, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+    .login-box .left header img {
+      left: 7px;
+      position: absolute;
+      top: 21px; }
+    /* line 355, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+    .login-box .left .wide-button {
+      background: #2C2C2C;
+      padding: 11px;
+      padding-left: 30px;
+      height: auto; }
+      /* line 361, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+      .login-box .left .wide-button:link, .login-box .left .wide-button:visited {
+        font-weight: bold;
+        color: #666666;
+        text-decoration: none; }
+      /* line 367, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+      .login-box .left .wide-button:hover {
+        background: #232323;
+        color: #727272; }
+    /* line 373, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+    .login-box .left .text-link {
+      padding-top: 6px;
+      padding-left: 30px;
+      display: block;
+      font-weight: normal;
+      font-size: 0.9em; }
+      /* line 380, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+      .login-box .left .text-link.strong {
+        font-weight: bold;
+        padding: 15px;
+        padding-left: 30px;
+        margin-bottom: 50px; }
+      /* line 387, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+      .login-box .left .text-link:link, .login-box .left .text-link:visited {
+        color: #999999;
+        text-decoration: none; }
+      /* line 392, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+      .login-box .left .text-link:hover {
+        color: #C9C9C9; }
+      /* line 396, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+      .login-box .left .text-link:first {
+        margin-bottom: 40px; }
+  /* line 403, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+  .login-box .right {
+    background: #eef2f5; }
+    /* line 405, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+    .login-box .right header h1 {
+      font-size: 2em;
+      position: absolute;
+      left: 30px;
+      top: 2px; }
+    /* line 411, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+    .login-box .right section {
+      background: #eef2f5;
+      border-top: 1px solid #e3e3e3;
+      padding: 30px; }
+      /* line 416, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+      .login-box .right section .btn {
+        padding-left: 60px;
+        padding-right: 60px;
+        margin-right: 15px; }
+  /* line 424, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+  .login-box header {
+    height: 80px;
+    position: relative; }
+  /* line 429, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+  .login-box section {
+    height: 240px;
+    position: relative; }
+  /* line 434, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+  .login-box .col-1, .login-box .col-2, .login-box .col-3, .login-box .col-4, .login-box .col-5, .login-box .col-6, .login-box .col-7, .login-box .col-8, .login-box .col-9, .login-box .col-10, .login-box .col-11, .login-box .col-12, .login-box .col-sm-1, .login-box .col-sm-2, .login-box .col-sm-3, .login-box .col-sm-4, .login-box .col-sm-5, .login-box .col-sm-6, .login-box .col-sm-7, .login-box .col-sm-8, .login-box .col-sm-9, .login-box .col-sm-10, .login-box .col-sm-11, .login-box .col-sm-12, .login-box .col-lg-1, .login-box .col-lg-2, .login-box .col-lg-3, .login-box .col-lg-4, .login-box .col-lg-5, .login-box .col-lg-6, .login-box .col-lg-7, .login-box .col-lg-8, .login-box .col-lg-9, .login-box .col-lg-10, .login-box .col-lg-11, .login-box .col-lg-12 {
+    padding-left: 0px;
+    padding-right: 0px; }
+
+/* line 440, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+.search-component {
+  background: #E3E3E3;
+  border-radius: 8px;
+  border: 1px solid #cccccc;
+  padding: 20px; }
+  /* line 446, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+  .search-component .search-item {
+    width: 30%;
+    height: 70px;
+    margin-right: 3%;
+    float: left; }
+    /* line 453, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+    .search-component .search-item label {
+      color: #666666; }
+    /* line 457, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+    .search-component .search-item .form-inline input {
+      width: 40%; }
+    /* line 461, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+    .search-component .search-item .calendar {
+      background: url(../../../img/calendar-icon.png) white no-repeat right 4px center;
+      padding-left: 5px; }
+
+/* line 468, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+.clearfix {
+  clear: both; }
+
+/* line 478, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+.login-page-wrapper {
+  width: 100%;
+  height: 100%;
+  margin: auto;
+  background: #1f2a34 no-repeat top center;
+  padding-top: 100px; }
+
+/* line 485, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+.rounded .login-box {
+  border-radius: 8px;
+  overflow: hidden; }
+
+/* line 491, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+.shadow-box .login-box {
+  box-shadow: 0px 0px 30px 1px black; }
+
+/* line 495, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+.absolute {
+  position: absolute;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  top: 0px; }
+
+/* line 505, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+.logo {
+  width: 187px;
+  height: 49px;
+  background: url(../../../img/logo.png) no-repeat -16px 0px;
+  display: block;
+  float: left;
+  margin-top: 13px;
+  position: absolute;
+  z-index: 1000; }
+
+/* line 517, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+.btn-primary {
+  background: #24303d;
+  border: none; }
+
+/* line 522, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+.btn-export {
+  margin-left: 15px; }
+
+/* line 526, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+.btn-standard {
+  background: #eef2f5;
+  color: #7d8b98;
+  border-color: #e0e4e8; }
+
+/* line 532, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+.btn-general {
+  background: #34495e;
+  color: white;
+  border-color: #1e2832; }
+  /* line 536, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+  .btn-general:hover {
+    background: #27384a;
+    color: white;
+    border-color: #1e2832; }
+
+/* line 543, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+form .btn {
+  padding-top: 8px;
+  padding-bottom: 7px; }
+
+/* line 548, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+.form-component {
+  width: 600px;
+  padding: 20px;
+  margin: auto;
+  background: white;
+  border-radius: 5px; }
+  /* line 555, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+  .form-component .form-header {
+    border-bottom: 1px solid #eeeeee;
+    font-size: 2.1em;
+    font-weight: 300;
+    padding-bottom: 10px;
+    margin-left: 20px;
+    margin-right: 20px; }
+  /* line 564, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+  .form-component .form-content {
+    padding-left: 55px;
+    padding-right: 130px;
+    padding-top: 30px; }
+    /* line 569, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+    .form-component .form-content label {
+      padding-right: 20px; }
+    /* line 573, /var/folders/8w/_sg3b8jd3hndfjcvrlhhr9900000gn/T/causeway-sass882196696770417399/zmiany.scss */
+    .form-component .form-content .form-group {
+      padding-bottom: 10px; }

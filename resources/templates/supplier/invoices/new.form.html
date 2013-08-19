@@ -1,0 +1,42 @@
+
+{% extends "_layout.html" %}
+
+{% mixin "/mixins/form_layout.html" %}
+
+{% def return-to = links.supplier.invoices.default %}
+{%block section-actions%}{%endblock%}
+
+
+{% block content-section %}
+{% callblock form-layout %}
+{% endblock %}
+
+
+{% block form-header %}
+Dodaj fakturę
+{% endblock form-header %}
+
+{% block form-content %}
+<form class="form-horizontal {%if ajax%}async-form{%endif%}" enctype="multipart/form-data"
+      method="post" 
+      {% if target %}action="{{target}}"{% endif %}
+      {% if ajax and not target %}action="{{path}}"{%endif%}>
+	  {%callblock text-input with field="number", label="Numer faktury", placeholder="np. FV05/03/13"%}
+	  {%callblock date-input with field="issue_date", label="Data wystawienia"%}
+	  {%callblock date-input with field="payment_date", label="Data płatności"%}
+	  {%callblock currency-input with field="net_total", label="Suma netto (PLN)"%}
+	  {%callblock currency-input with field="gross_total", label="Suma brutto (PLN)"%}
+{%callblock file-input with field="invoice", label="Plik (.pdf)"%}
+
+	<div class="form-group">
+	  <div class="col-lg-offset-6 col-lg-6">
+	    <button type="submit" class="btn btn-warning">ZAPISZ</button>
+	  </div>
+	</div>
+</form>
+{% endblock form-content %}
+
+{% block form-footer %}
+{% endblock form-footer %}
+
+

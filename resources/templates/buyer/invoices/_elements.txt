@@ -1,0 +1,20 @@
+{% block invoice-actions %}
+
+	{% let id = invoice.id %}
+		{% switch invoice.state case "unverified" %}
+		<td>
+			<a href="{{links.api.invoice.verify(id)}}" class="btn btn-success ajaxify" >Zatwierdź</a>
+			<a href="{{links.api.invoice.unverify(id)}}" class="btn btn-warning ajaxify-delete">Odrzuć</a>
+		</td>
+		<td>	
+			{% if not empty invoice.file_id %}
+			<a href="{{links.api.invoice.file.get(id)}}" class="btn btn-default">Pobierz</a>
+			{% else %}
+			<button disabled class="btn btn-default">BRAK</a>
+			
+			{% endif%}
+		</td>
+		{% endswitch %}
+	{%endlet%}
+
+{% endblock %}

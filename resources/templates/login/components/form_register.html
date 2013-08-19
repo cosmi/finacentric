@@ -1,0 +1,43 @@
+{# używane przez login/register.html #}
+
+<div class="login-box register">
+  <div class="left col-lg-4">
+    <header><img src="../img/logo.png" /></header>
+    <section>
+      <a href="{{links.login}}" class="wide-button">LOGOWANIE</a>
+      <a href="{{links.login}}" class="text-link strong">Powrót do logowania</a>
+    </section>
+  </div>
+  <div class="right col-lg-8">
+    <header><h1>Rejestracja</h1></header>
+    <section>
+      {% if error %}<div class="absolute alert alert-danger">Niepoprawne dane.</div>{% endif %}
+      <form autocomplete="off" method="post"{% if target %} action="{{target}}"{% endif %}>
+        <fieldset>
+          <div class="form-group">
+            <label for="contactInputEmail">Adres email:</label>
+            {% if error.email %}<p>{{error.email}}</p>{% endif %}
+            <input type="text" class="form-control" id="contactInputEmail" placeholder="Podaj mail" name="email" value="{{form.email}}">
+          </div>
+          <div class="form-group">
+            <label for="contactInputPassword">Hasło:</label>
+            {% if error.password %}<p>{{error.password}}</p>{% endif %}
+            <input type="password" class="form-control" id="contactInputPassword" placeholder="Hasło" name="password">
+          </div>
+          <div class="form-group">
+            <label for="contactInputRepeatPassword">Powtórz hasło:</label>
+            {% if error.repeat-password %}<p>{{error.repeat-password}}</p>{% endif %}
+            <input type="password" class="form-control" id="contactInputRepeatPassword" placeholder="Hasło" name="repeat-password">
+          </div>
+          <div class="form-inline">
+            <div class="checkbox">
+              <button type="submit" class="btn btn-success">ZAREJESTRUJ</button>
+              <!-- <label><input type="checkbox"> Keep me signed in </label>-->
+            </div>
+          </div>
+        </fieldset>
+      </form>
+    </section>
+  </div>
+  
+</div>

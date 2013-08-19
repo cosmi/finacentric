@@ -1,0 +1,85 @@
+{% block form-layout %}
+
+<div class="form-component">
+	<div class="form-header">
+		{% block form-header %}
+		{% endblock form-header %}
+	</div>
+	<div class="form-content">
+		{% block form-content %}
+		{% endblock form-content %}
+	</div>
+	<div class="form-footer">
+		{% block form-footer %}
+		{% endblock form-footer %}
+	</div>
+</div>
+
+{% endblock %}
+
+
+
+{% defblock text-input %}
+{# params: field (string), label (String) [, placeholder (String)]#}
+{% let error = error and error(clojure.core/keyword(field)),
+	value = form and form(clojure.core/keyword(field)) %}
+<div class="form-group{{error?" has-error":""}}">
+  <label for="number" class="col-lg-6 control-label">{{label}}</label>
+  <div class="col-lg-6">
+	  		<input class="form-control" id="{{field|safe}}" name="{{field|safe}}" {% if placeholder %}placeholder="{{placeholder}}"{% endif %} value="{{value}}">
+  	{% if not empty error %}<span class="help-block">{{error}}</span>{% endif %}
+  </div>
+</div>
+
+{% endlet %}
+{% enddefblock %}
+
+
+{% defblock date-input %}
+{# params: field (string), label (String) [, placeholder (String)]#}
+{% let error = error and error(clojure.core/keyword(field)),
+	value = form and form(clojure.core/keyword(field)) %}
+<div class="form-group{{error?" has-error":""}}">
+  <label for="number" class="col-lg-6 control-label">{{label}}</label>
+  <div class="col-lg-6">
+	  		<input class="form-control calendar" id="{{field|safe}}" name="{{field|safe}}" {% if placeholder %}placeholder="{{placeholder}}"{% endif %} value="{{value}}" data-date-format="yyyy-mm-dd" >
+  	{% if not empty error %}<span class="help-block">{{error}}</span>{% endif %}
+  </div>
+</div>
+{% endlet %}
+
+{% enddefblock %}
+
+
+
+
+{% defblock currency-input %}
+{# params: field (string), label (String) [, placeholder (String)]#}
+{% let error = error and error(clojure.core/keyword(field)),
+	value = form and form(clojure.core/keyword(field)) %}
+<div class="form-group{{error?" has-error":""}}">
+  <label for="number" class="col-lg-6 control-label">{{label}}</label>
+  <div class="col-lg-6">
+	  		<input class="form-control" id="{{field|safe}}" name="{{field|safe}}" {% if placeholder %}placeholder="{{placeholder}}"{% endif %} value="{{value}}">
+  	{% if not empty error %}<span class="help-block">{{error}}</span>{% endif %}
+  </div>
+</div>
+
+{% endlet %}
+{% enddefblock %}
+
+
+
+
+{% defblock file-input %}
+{# params: field (string), label (String) [, placeholder (String)]#}
+{% let error = error and error(clojure.core/keyword(field))%}
+<div class="form-group{{error?" has-error":""}}">
+  <label for="number" class="col-lg-6 control-label">{{label}}</label>
+  <div class="col-lg-6">
+	  		<input class="form-control" id="{{field|safe}}" name="{{field|safe}}" type="file">
+  	{% if not empty error %}<span class="help-block">{{error}}</span>{% endif %}
+  </div>
+</div>
+{% endlet %}
+{% enddefblock %}

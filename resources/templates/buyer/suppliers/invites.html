@@ -1,0 +1,29 @@
+{% extends "_layout.html" %}
+
+{% block internal-content %}
+<table class="table table-striped">
+  <tbody><tr class="first-row">
+      <th>{#<div class="arrows"><a href="#" class="arrow-up"></a><a href="#" class="arrow-down"></a></div>#}
+		  Firma</th>
+      <th>{#<div class="arrows"><a href="#" class="arrow-up"></a><a href="#" class="arrow-down"></a></div>#}Email</th>
+      <th>{#<div class="arrows"><a href="#" class="arrow-up"></a><a href="#" class="arrow-down"></a></div>#}Kod rejestracyjny</th>
+	  <th>Akcje</th>
+    </tr>
+    {% for s in invites %}
+    <tr>
+      <td>{{s.name}}</td>
+      <td>{{s.email}}</td>
+      <td>{{s.regcode}}</td>
+      <td><button class="btn btn-danger ajaxify-delete " data-url="{{links.api.invite.delete(s.id)}}"
+		  data-confirm="Czy na pewno anulować zaproszenie?">Usuń</button></td>
+    </tr>
+    {% empty %}
+    <tr>
+      <td colspan='4'>Brak kodów rejestracyjnych</td>
+    </tr>
+    {% endfor invites %}
+  </tbody>
+</table>
+
+{% endblock %}
+

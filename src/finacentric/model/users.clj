@@ -46,5 +46,6 @@
 
 (defn set-users-company-id! [user-id company-id]
   (or
-   (update USERS (where {:id user-id}) (set-fields {:company_id company-id}))
-   (throw (ex-info "No such user" {:user-id user-id}))))
+   (update USERS (where {:id user-id :company_id nil}) (set-fields {:company_id company-id}))
+   (throw (ex-info "Cannot update user" {:user-id user-id}))))
+

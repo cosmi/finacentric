@@ -29,6 +29,15 @@
   (->  (get-current-user-id) get-users-company-id)
   )
 
+
+(defn get-current-company-data []
+  (->  (get-current-company-id) get-company-data)
+  )
+
+
+(defn get-current-buyer-id []
+  (-> (get-current-company-id) get-buyers-for-company first))
+
 (defn partially-registered? []
   (and (is-logged-in?) (->  (get-current-user-id) get-users-company-id nil?)))
 
@@ -48,9 +57,9 @@
 
 (defn get-default-url []
   (case (login-mode)
-    :buyer (link :buyer :dashboard)
-    :supplier (link :supplier :dashboard)
-    :partial-registration (link :register-supplier)
+    :buyer (link :buyer :default)
+    :supplier (link :supplier :default)
+    :partial-registration (link :partial :default)
     :not-logged-in (link :login)))
 
 (defvalidator password-validator

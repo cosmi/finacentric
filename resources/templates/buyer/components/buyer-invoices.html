@@ -1,0 +1,37 @@
+<section class="wide-wrapper">
+  <header class="narrow-wrapper title">
+    <h1 class="col-lg-6">{#<button type="button" class="btn btn-default btn-standard">‹ Powrót</button>#} <span>Faktury</span></h1>
+    <section class="buttons col-lg-6">
+      <button type="button" class="btn btn-warning">Zaproś do systemu</button>
+      
+    </section>
+  </header>
+</section>
+
+
+
+<ul class="narrow-wrapper nav nav-tabs">
+  <li class="active clearfix"><a href="#invoices-to-verify" data-toggle="tab"><span class="">Do weryfikacji</span></a></li>
+  <li><a href="#invoices-to-discount" data-toggle="tab"><span class="">Do przeceny</span></a></li>
+  <li><a href="#invoices-to-accept" data-toggle="tab"><span class="">Do zatwierdzenia</span></a></li>
+  <li><a href="#invoices-to-pay" data-toggle="tab"><span class="">Do zapłaty</span></a></li>
+  <li><a href="#all-invoices" data-toggle="tab"><span class="">Wszystkie</span></a></li>
+</ul>
+
+<div class="narrow-wrapper tab-content">
+  <div class="tab-pane active" id="invoices-to-verify">
+    {% include "/components/async.html" with target = links.buyer.ajax.invoices.verify %}
+  </div>
+  <div class="tab-pane" id="invoices-to-discount">
+    {% include "/components/async.html" with target = links.buyer.ajax.invoices.discount %}
+  </div>
+  <div class="tab-pane" id="invoices-to-accept">
+    {% include "/components/async.html" with target = links.buyer.ajax.invoices.accept %}
+  </div>
+  <div class="tab-pane" id="invoices-to-pay">
+    {% include "/components/async.html" with target = links.buyer.ajax.invoices.pay %}
+  </div>
+  <div class="tab-pane" id="all-invoices">
+    {% include "/components/async.html" with target = links.buyer.ajax.invoices.all %}
+  </div>
+</div>

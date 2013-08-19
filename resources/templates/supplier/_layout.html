@@ -1,0 +1,35 @@
+{% extends "/layouts/_wrapper.html" %}
+
+{% block navigation %}
+<ul class="nav nav-tabs" id="mainMenuTabs">
+	{% for el in [["Faktury", links.supplier.invoices]] %}
+	<li {%if fn.startsWith(path, el[1](:root))%}class="active"{%endif%}>
+		<a href="{{el[1](:default)}}">{{el[0]}}</a>
+	</li>
+	{% endfor %}
+</ul>
+{% endblock navigation %}
+
+{% block tabs %}
+<div class="tab-pane active" >
+	{% block title-section %}
+	<section class="wide-wrapper">
+		<header class="narrow-wrapper title">
+			<h1 class="col-lg-6">
+				{%if return-to%}
+				<a href="{{return-to}}" class="btn btn-default btn-standard">‹ Powrót</a>
+				{%endif%}
+					 <span>{% callblock section-title %}</span></h1>
+			<section class="buttons col-lg-6">
+				{%block section-actions%}
+				{%endblock %}
+    
+			</section>
+		</header>
+	</section>
+	{% endblock %}
+  	{% callblock content-section%}
+	
+</div>
+
+  {% endblock tabs %}

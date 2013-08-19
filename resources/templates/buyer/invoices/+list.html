@@ -1,0 +1,38 @@
+{% extends "_layout.html" %}
+{% mixin "_elements.txt" %}
+
+{% block internal-content %}
+<table class="table table-striped">
+	<tbody><tr class="first-row">
+		<th><input type="checkbox"></th>
+		<th><div class="arrows"><a href="#" class="arrow-up"></a><a href="#" class="arrow-down"></a></div>Firma</th>
+		<th><div class="arrows"><a href="#" class="arrow-up"></a><a href="#" class="arrow-down"></a></div>Towar/Usługa</th>
+		<th><div class="arrows"><a href="#" class="arrow-up"></a><a href="#" class="arrow-down"></a></div>Data sp.</th>
+		<th><div class="arrows"><a href="#" class="arrow-up"></a><a href="#" class="arrow-down"></a></div>Data płat.</th>
+		<th><div class="arrows"><a href="#" class="arrow-up"></a><a href="#" class="arrow-down"></a></div>Netto</th>
+		<th><div class="arrows"><a href="#" class="arrow-up"></a><a href="#" class="arrow-down"></a></div>Brutto</th>
+		<th>Akcje</th><th>Załącznik</th>
+	</tr>
+	{% for i in invoices %}
+	<tr>
+		<td><input type="checkbox"></td>
+		<td><a class="link" href="#">{{i.company_name}}</a></td>
+		<td>{{i.number}}</td>
+		<td><span class="lighter">{{i.issue_date}}</span></td>
+		<td><span class="lighter">{{i.payment_date}}</span></td>
+		<td>{{i.net_total}}</td>
+		<td><strong>{{i.gross_total}}</strong></td>
+
+		{% callblock invoice-actions with invoice = i %}
+		
+	</tr>
+	{% empty %}
+    <tr>
+      <td colspan='8'>Brak faktur</td>
+    </tr>
+    {% endfor invoices %}
+  </tbody>
+</table>
+
+{% endblock %}
+

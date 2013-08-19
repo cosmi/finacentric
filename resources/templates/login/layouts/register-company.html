@@ -1,0 +1,31 @@
+{# używane przez: login/register-supplier.html i login/register-buyer.html #}
+{% extends "/layouts/logged_partial.html" %}
+
+
+  {% block navigation %}
+  <ul class="nav nav-tabs" id="mainMenuTabs">
+    	{% for el in [["Rejestracja jako dostawca", links.register-supplier],["Rejestracja jako odbiorca", links.register-buyer]] %}
+    	<li {%if fn.startsWith(path, el[1])%}class="active"{%endif%}>
+    		<a href="{{el[1]}}"><span>{{el[0]}}</span></a>
+    	</li>
+    	{% endfor %}
+   
+  </ul>
+  {% endblock navigation %}
+
+
+  {% block section-title %} Dane firmy {% endblock %}
+  {%block section-actions%}
+  {%endblock %}
+
+  {% block content-section %}
+  <ul class="narrow-wrapper nav nav-tabs">
+  	
+  </ul>
+  <div class="narrow-wrapper tab-content">
+    <div class="tab-pane active" >
+  {% block internal-content %}	  	{% endblock %}
+    </div>
+  </div>
+
+  {% endblock %}

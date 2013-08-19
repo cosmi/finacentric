@@ -1,0 +1,22 @@
+{% extends "../_layout.html" %}
+
+{% block section-title %} Dostawcy {% endblock %}
+{%block section-actions%}
+<a href="{{links.buyer.suppliers.invite}}" class="btn btn-warning">Zaproś do systemu</a>
+{%endblock %}
+
+{% block content-section %}
+<ul class="narrow-wrapper nav nav-tabs">
+	{% for el in [["Lista dostawców", links.buyer.suppliers.list],["Zaproszenia", links.buyer.suppliers.invites]] %}
+	<li {%if fn.startsWith(path, el[1])%}class="active"{%endif%}>
+		<a href="{{el[1]}}"><span>{{el[0]}}</span></a>
+	</li>
+	{% endfor %}
+</ul>
+<div class="narrow-wrapper tab-content">
+  <div class="tab-pane active" >
+{% block internal-content %}	  	{% endblock %}
+  </div>
+</div>
+
+{% endblock %}

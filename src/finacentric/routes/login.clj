@@ -9,38 +9,38 @@
 
 (defroutes unlogged-routes
   (GET "/login" []
-    (render "login.html" {}))
+    (render "login/login.html" {}))
   (POST "/login" [login password]
     (if-not (log-in! login password)
-      (render "login.html" {:error :wrong-pass})
+      (render "login/login.html" {:error :wrong-pass})
       (response/redirect (get-default-url))))
 
   (GET "/register" []
-    (render "register.html" {}))
+    (render "login/register.html" {}))
   (POST "/register" {form :params}
     (validate-let [data (validates? register-form-validator form)]
                   (do
                     (register-user! data)
                     (response/redirect (get-default-url)))
-                  (render "register.html" {:error (get-errors) :form form}))))
+                  (render "login/register.html" {:error (get-errors) :form form}))))
 
 (defroutes partially-reg-routes
   (GET "/register-supplier" []
-    (render "supplier_register.html" {}))
+    (render "login/register-supplier.html" {}))
   (POST "/register-supplier" {form :params}
     (validate-let [data (validates? register-supplier-validator form)]
                   (do
                     (register-supplier! (get-current-user-id) data)
                     (response/redirect (get-default-url)))
-                  (render "supplier_register.html" {:error (get-errors) :form form})))
+                  (render "login/register-supplier.html" {:error (get-errors) :form form})))
   (GET "/register-buyer" []
-    (render "buyer_register.html" {}))
+    (render "login/register-buyer.html" {}))
   (POST "/register-buyer" {form :params}
     (validate-let [data (validates? register-buyer-validator form)]
                   (do
                     (register-buyer! (get-current-user-id) data)
                     (response/redirect (get-default-url)))
-                  (render "buyer_register.html" {:error (get-errors) :form form})))
+                  (render "login/register-buyer.html" {:error (get-errors) :form form})))
 
   )
 

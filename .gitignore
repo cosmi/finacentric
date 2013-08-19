@@ -4,3 +4,4 @@
 /.lein-repl-history
 /bootconfig.clj
 \.#*
+\.DS_store

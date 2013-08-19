@@ -1,4 +1,10 @@
-{% extends "layouts/_wrapper.html" %}
+{%comment%}
+Używane przez widoki:
+login/register-buyer.html
+login/register-supplier.html
+{%endcomment%}
+
+{% extends "_wrapper.html" %}
 
   {% block userbar %}
   <div class="dropdown"> 
@@ -16,8 +22,26 @@
   {% block navigation %}
   {% endblock navigation %}
 
-  {% block content %}
-  <section class="main-content">
+  {% block tabs %}
+  <div class="tab-pane active" >
+  	{% block title-section %}
+  	<section class="wide-wrapper">
+  		<header class="narrow-wrapper title">
+  			<h1 class="col-lg-6">
+  				{%if return-to%}
+  				<a href="{{return-to}}" class="btn btn-default btn-standard">‹ Powrót</a>
+  				{%endif%}
+  					 <span>{% callblock section-title %}</span></h1>
+  			<section class="buttons col-lg-6">
+  				{%block section-actions%}
+  				{%endblock %}
+    
+  			</section>
+  		</header>
+  	</section>
+  	{% endblock %}
+    	{% callblock content-section%}
+	
+  </div>
 
-  </section>
-  {% endblock content %}
+    {% endblock tabs %}

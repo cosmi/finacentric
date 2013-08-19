@@ -1,0 +1,16 @@
+{% block invoice-actions %}
+
+	{% let id = invoice.id %}
+		{% switch invoice.state case "unverified" %}
+		<td>
+			<a href="{{links.api.invoice.delete(id)}}" class="btn btn-danger ajaxify-delete" data-confirm="Czy na pewno usunąć fakturę? Akcji nie można cofnąć.">Usuń</a>
+		</td>
+		<td>	
+			{% if not empty invoice.file_id %}
+			<a href="{{links.api.invoice.file.delete(id)}}" class="btn btn-danger ajaxify-delete" data-confirm="Czy na pewno usunąć załącznik? Akcji nie można cofnąć.">Usuń</a>
+			{% endif%}
+		</td>
+		{% endswitch %}
+	{%endlet%}
+
+{% endblock %}

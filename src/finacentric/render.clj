@@ -5,7 +5,7 @@
             [noir.request :as request]))
 
 (def fn-base {:count count
-              :beginsWith #(.beginsWith %1 %2)
+              :startsWith #(.startsWith %1 %2)
               :endsWith #(.endsWith %1 %2)
               :str str
               :clj #(-> % symbol find-var deref)})
@@ -21,6 +21,7 @@
   (let [path (request/*request* :uri)]
     (merge {:links (links/get-links-table)
             :user (auth/get-current-user-data)
+            :company (auth/get-current-company-data)
             :parent (parse-dir path)
             :path path
             :fn fn-base}

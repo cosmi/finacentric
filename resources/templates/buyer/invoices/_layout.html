@@ -1,0 +1,25 @@
+{% extends "../_layout.html" %}
+
+{% block section-title %} Faktury {% endblock %}
+
+
+{% block content-section %}
+<ul class="narrow-wrapper nav nav-tabs">
+	{% for el in [["Wszystkie", links.buyer.invoices.all],
+				  ["Do weryfikacji", links.buyer.invoices.verify],
+				  ["Do obniżki", links.buyer.invoices.discount],
+				  ["Do akceptacj", links.buyer.invoices.accept],
+				  ["Do zapłaty", links.buyer.invoices.pay]
+				  ] %}
+	<li {%if fn.startsWith(path, el[1])%}class="active"{%endif%}>
+		<a href="{{el[1]}}"><span>{{el[0]}}</span></a>
+	</li>
+	{% endfor %}
+</ul>
+<div class="narrow-wrapper tab-content">
+  <div class="tab-pane active" >
+{% block internal-content %}	  	{% endblock %}
+  </div>
+</div>
+
+{% endblock %}
